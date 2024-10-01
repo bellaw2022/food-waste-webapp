@@ -1,5 +1,4 @@
 
-Copy code
 # Fridgify Web Application
 
 ## Overview
