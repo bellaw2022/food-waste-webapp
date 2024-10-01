@@ -15,7 +15,6 @@ Fridgify is a web application that helps users manage grocery inventory, track f
 - Python 3.x
 - Node.js (v14 or higher)
 - npm (v6 or higher)
-- Git
 
 ## Instructions for Setting Up the Project
 
