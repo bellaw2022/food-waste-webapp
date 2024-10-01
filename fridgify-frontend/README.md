@@ -1,70 +1,79 @@
-# Getting Started with Create React App
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Copy code
+# Fridgify Web Application
 
-## Available Scripts
+## Overview
+Fridgify is a web application that helps users manage grocery inventory, track food waste, and reduce environmental impact. This app includes a React frontend and Flask backend. The backend is hosted on Heroku, and the database is pre-configured using PostgreSQL.
 
-In the project directory, you can run:
+### Technologies Used:
+- Flask (Backend)
+- PostgreSQL (Database)
+- React (Frontend)
+- Heroku (Backend Hosting)
+  
+## Prerequisites
+- Python 3.x
+- Node.js (v14 or higher)
+- npm (v6 or higher)
+- Git
 
-### `npm start`
+## Instructions for Setting Up the Project
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+### 1.Clone the Repository
+To get started, clone the repository to your local machine:
+```bash
+git clone https://github.com/bellaw2022/food-waste-webapp.git
+```
+```bash
+cd food-waste-webapp
+```
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+### 2. Backend Setup (Flask)
 
-### `npm test`
+### Step 1: Create a Virtual Environment
+In the `flask-backend` directory, set up a virtual environment:
+```bash
+cd flask-backend
+python3 -m venv venv
+```
+```bash
+source venv/bin/activate  # For Linux/macOS
+```
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
 
-### `npm run build`
+```bash
+use `venv\Scripts\activate` # For Windows
+```
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+### Step 2: Install Dependencies
+Install the backend dependencies using the requirements.txt file:
+```bash
+pip install -r requirements.txt
+```
+### Step 3: Running the Backend Server
+Once the environment is ready, you can run the Flask server:
+```bash
+flask run
+```
+The backend will run on http://127.0.0.1:5000/.
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+### 3. Frontend Setup (React)
+### Step 1: Navigate to the Frontend Directory
+```bash
+cd ../fridgify-frontend
+```
+### Step 2: Install Dependencies
+Install the necessary React dependencies:
+```bash
+npm install
+```
+### Step 3: Running the Frontend
+Start the React development server:
+```bash
+npm start
+```
+The frontend will run on http://localhost:3000.
 
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+### Step 4: Checking the Statistics Page
+To confirm that the frontend is correctly connected to the backend, navigate to the Statistics page by clicking on the link from the homepage. This page will fetch user waste data from the backend and display it.
