@@ -26,6 +26,9 @@ git clone https://github.com/bellaw2022/food-waste-webapp.git
 ```bash
 cd food-waste-webapp
 ```
+### 1.2 Environment Variables
+You will need to create a `.env` file in the backend directory of the project, plz reach out to get the file. 
+
 
 ### 2. Backend Setup (Flask)
 
