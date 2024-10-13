@@ -2,19 +2,69 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { CheckIcon } from "lucide-react";
-import Webcam from "react-webcam";
-import { useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import useWindowDimensions from "@/hooks/useWindowDimensions";
 import { Alert } from "@/components/ui/alert";
 
+import * as tf from "@tensorflow/tfjs";
+import "@tensorflow/tfjs-backend-webgl"; // set backend to webgl
+import { detectVideo } from "./utils/detect";
+import Webcam from "react-webcam";
+// import { Webcam } from "./utils/webcam";
+
 export default function ScanningPage() {
+    // const webcamRef = new Webcam();
     const webcamRef = useRef<Webcam>(null);
+    // const cameraRef = useRef(null);
+    const canvasRef = useRef<HTMLCanvasElement>(null);
 
     const { width, height } = useWindowDimensions();
     const videoConstraints = useMemo(() => ({
         width, height,
         facingMode: "environment",
     }), [width, height]);
+
+    // const [loading, setLoading] = useState({ loading: true, progress: 0 }); // loading state
+    const [model, setModel] = useState({
+        net: null,
+        inputShape: [1, 0, 0, 3],
+    }); // init model & input shape
+
+    // references
+
+    // model configs
+    const modelName = "yolov8n";
+
+    // useEffect(() => {
+    //     webcam.open(cameraRef.current); // open webcam
+    //     // cameraRef.current.style.display = "block"; // show camera
+    // }, []);
+
+    useEffect(() => {
+        tf.ready().then(async () => {
+        const yolov8 = await tf.loadGraphModel(
+            `/${modelName}_web_model/model.json`,
+            {
+            onProgress: (fractions) => {
+                // setLoading({ loading: true, progress: fractions }); // set loading fractions
+                console.log(fractions);
+            },
+            }
+        ); // load model
+
+            // warming up model
+            const dummyInput = tf.ones(yolov8.inputs[0].shape);
+            const warmupResults = yolov8.execute(dummyInput);
+
+            // setLoading({ loading: false, progress: 1 });
+            setModel({
+                net: yolov8,
+                inputShape: yolov8.inputs[0].shape,
+            }); // set model & input shape
+
+            tf.dispose([warmupResults, dummyInput]); // cleanup memory
+        });
+    }, []);
 
     return (
         <div className="relative w-full h-full">
@@ -24,8 +74,20 @@ export default function ScanningPage() {
                     audio={false}
                     screenshotFormat="image/jpeg"
                     videoConstraints={videoConstraints}
-                    onUserMedia={() => {}}
+                    onPlay={() => detectVideo(webcamRef.current?.video, model, canvasRef.current)}
                 />
+                {/* <video
+                    autoPlay
+                    muted
+                    ref={cameraRef}
+                    width={width}
+                    height={height}
+                    onPlay={() => detectVideo(cameraRef.current, model, canvasRef.current)}
+                /> */}
+                 {/* <canvas width={model.inputShape[1]} height={model.inputShape[2]} ref={canvasRef} /> */}
+            </div>
+            <div className="absolute top-0 left-0">
+                <canvas width={model.inputShape[1]} height={model.inputShape[2]} ref={canvasRef} />
             </div>
             <div className="w-full h-full absolute top-0 left-0 z-10">
                 <Overlay />                
