@@ -3,7 +3,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { CheckIcon } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
-import useWindowDimensions from "@/hooks/useWindowDimensions";
+import { useWindowDimensions } from "@/hooks";
 import { Alert } from "@/components/ui/alert";
 
 import * as tf from "@tensorflow/tfjs";
@@ -12,7 +12,7 @@ import { detectVideo } from "./utils/detect";
 import Webcam from "react-webcam";
 // import { Webcam } from "./utils/webcam";
 
-export default function ScanningPage() {
+export const ScanningPage = () => {
     // const webcamRef = new Webcam();
     const webcamRef = useRef<Webcam>(null);
     // const cameraRef = useRef(null);

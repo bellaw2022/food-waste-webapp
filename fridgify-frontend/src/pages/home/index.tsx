@@ -1,4 +1,4 @@
-export default function Home({ profile, login, logOut }) {
+export const HomePage = ({ profile, login, logOut }) => {
     return (
         <div>
             <h2>Welcome to Fridgify!</h2>
