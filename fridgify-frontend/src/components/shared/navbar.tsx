@@ -23,7 +23,9 @@ export const Navbar = () => {
             <div className="flex flex-row items-center justify-center gap-1">
                 {buttonRoutes.map((route) => (
                     <Link to={route.path}>
-                        <Button variant="outline">
+                        <Button variant="outline"
+                            className={route.path === location.pathname ? "border-black" : ""}
+                        >
                             {route.name}
                         </Button>
                     </Link>
