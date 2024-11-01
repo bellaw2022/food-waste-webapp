@@ -1,7 +1,7 @@
 export const HomePage = ({ profile, login, logOut }) => {
     return (
-        <div>
-            <h2>Welcome to Fridgify!</h2>
+        <div className="mx-4">
+            <h1 className="text-3xl font-bold">Home</h1>
             <br />
             {profile ? (
                 <div>

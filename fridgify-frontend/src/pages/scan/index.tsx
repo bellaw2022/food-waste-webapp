@@ -10,6 +10,7 @@ import * as tf from "@tensorflow/tfjs";
 import "@tensorflow/tfjs-backend-webgl"; // set backend to webgl
 import { detectVideo } from "./utils/detect";
 import Webcam from "react-webcam";
+import { Link } from "react-router-dom";
 // import { Webcam } from "./utils/webcam";
 
 export const ScanningPage = () => {
@@ -111,10 +112,11 @@ const Overlay = () => {
     return (
         <div className="p-4 h-full flex flex-col items-center h-screen overflow-hidden">
             <div className="flex flex-row items-center justify-between w-full">
-                <Button variant="outline">Back</Button>
+                <Link to="/inventory">
+                    <Button variant="outline">Back</Button>
+                </Link>
                 <Button>Finish</Button>
             </div>
-
             <Alert className="mt-[380px] flex flex-col items-center gap-2 bg-white/50">
                 <Input type="text" className="bg-white"></Input>
                 <div className="flex flex-row gap-4">
