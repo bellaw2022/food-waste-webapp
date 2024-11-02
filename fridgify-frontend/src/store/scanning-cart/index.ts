@@ -4,7 +4,7 @@ import type {} from '@redux-devtools/extension'; // required for devtools typing
 
 export enum UnitTypes {
     COUNT = "count",
-    GRAMS = "g",
+    GRAMS = "grams",
 }
 
 export interface CartItem {
