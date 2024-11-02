@@ -1,8 +1,8 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { HomePage, ScanningPage, InventoryPage, RecipePage, ProfilePage} from '@/pages';
 import { useOAuth } from "@/hooks";
-import { Navbar } from './components/shared';
-import { Toaster } from 'sonner';
+import { Navbar } from '@/components/shared';
+import { Toaster } from '@/components/ui/sonner';
 
 function App() {
     const { profile, login, logOut } = useOAuth();
