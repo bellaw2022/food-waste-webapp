@@ -1,5 +1,3 @@
-import * as React from "react"
-
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -11,18 +9,90 @@ import {
 } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
 import { useScanningCart } from "@/store/scanning-cart"
 import { XIcon } from "lucide-react"
+import { useState } from "react"
+
+import {
+    Table,
+    TableBody,
+    TableCaption,
+    TableCell,
+    TableFooter,
+    TableHead,
+    TableHeader,
+    TableRow,
+  } from "@/components/ui/table"
+  
+  const invoices = [
+    {
+      invoice: "INV001",
+      paymentStatus: "Paid",
+      totalAmount: "$250.00",
+      paymentMethod: "Credit Card",
+    },
+    {
+      invoice: "INV002",
+      paymentStatus: "Pending",
+      totalAmount: "$150.00",
+      paymentMethod: "PayPal",
+    },
+    {
+      invoice: "INV003",
+      paymentStatus: "Unpaid",
+      totalAmount: "$350.00",
+      paymentMethod: "Bank Transfer",
+    },
+    {
+      invoice: "INV004",
+      paymentStatus: "Paid",
+      totalAmount: "$450.00",
+      paymentMethod: "Credit Card",
+    },
+    {
+      invoice: "INV005",
+      paymentStatus: "Paid",
+      totalAmount: "$550.00",
+      paymentMethod: "PayPal",
+    },
+    {
+      invoice: "INV006",
+      paymentStatus: "Pending",
+      totalAmount: "$200.00",
+      paymentMethod: "Bank Transfer",
+    },
+    {
+      invoice: "INV007",
+      paymentStatus: "Unpaid",
+      totalAmount: "$300.00",
+      paymentMethod: "Credit Card",
+    },
+  ]
+  
+const ItemsTable = () => {
+    return (
+        <Table>
+            {/* <TableHeader>
+                <TableRow>
+                    <TableHead className="w-[100px]">Invoice</TableHead>
+                    <TableHead className="text-right">Amount</TableHead>
+                </TableRow>
+            </TableHeader> */}
+            <TableBody>
+                {invoices.map((invoice) => (
+                    <TableRow key={invoice.invoice}>
+                        <TableCell className="font-medium">{invoice.invoice}</TableCell>
+                        <TableCell className="text-right">{invoice.totalAmount}</TableCell>
+                    </TableRow>
+                ))}
+            </TableBody>
+        </Table>
+    )
+};  
 
 export const ManualInputModal = () => {
     const { isModalOpen, closeModal } = useScanningCart();
+    const [searchQuery, setSearchQuery] = useState("");
 
     if (!isModalOpen) return null;
 
@@ -41,35 +111,19 @@ export const ManualInputModal = () => {
                             <XIcon />
                         </Button>
                     </CardTitle>
-                    <CardDescription>Deploy your new project in one-click.</CardDescription>
+                    <CardDescription>Enter your item(s) below.</CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <form>
-                    <div className="grid w-full items-center gap-4">
-                        <div className="flex flex-col space-y-1.5">
-                        <Label htmlFor="name">Name</Label>
-                        <Input id="name" placeholder="Name of your project" />
-                        </div>
-                        <div className="flex flex-col space-y-1.5">
-                        <Label htmlFor="framework">Framework</Label>
-                        <Select>
-                            <SelectTrigger id="framework">
-                            <SelectValue placeholder="Select" />
-                            </SelectTrigger>
-                            <SelectContent position="popper">
-                            <SelectItem value="next">Next.js</SelectItem>
-                            <SelectItem value="sveltekit">SvelteKit</SelectItem>
-                            <SelectItem value="astro">Astro</SelectItem>
-                            <SelectItem value="nuxt">Nuxt.js</SelectItem>
-                            </SelectContent>
-                        </Select>
-                        </div>
+                    <Input placeholder="Search by Item Name" type="search"
+                        value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}
+                    />
+                    <div className="mt-5 h-[280px] border-[1px] border-black/10 rounded-md shadow-sm overflow-y-scroll">
+                        <ItemsTable />
                     </div>
-                    </form>
                 </CardContent>
                 <CardFooter className="flex justify-between">
                     <Button variant="outline">Cancel</Button>
-                    <Button>Deploy</Button>
+                    <Button>Update</Button>
                 </CardFooter>
             </Card>
         </div>
