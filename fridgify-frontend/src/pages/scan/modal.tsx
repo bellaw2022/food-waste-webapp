@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useScanningCart } from "@/store/scanning-cart"
 import { XIcon } from "lucide-react"
-import { useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 
 import {
     Table,
@@ -23,76 +23,138 @@ import {
     TableHeader,
     TableRow,
   } from "@/components/ui/table"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Checkbox } from "@/components/ui/checkbox"
+import { toast } from "sonner"
   
-  const invoices = [
+const catalog = [
     {
-      invoice: "INV001",
-      paymentStatus: "Paid",
-      totalAmount: "$250.00",
-      paymentMethod: "Credit Card",
+        name: "Whole Milk",
+        category: "Eggs & Dairy",
     },
     {
-      invoice: "INV002",
-      paymentStatus: "Pending",
-      totalAmount: "$150.00",
-      paymentMethod: "PayPal",
+        name: "2% Milk",
+        category: "Eggs & Dairy",
     },
     {
-      invoice: "INV003",
-      paymentStatus: "Unpaid",
-      totalAmount: "$350.00",
-      paymentMethod: "Bank Transfer",
+        name: "Almond Milk",
+        category: "Eggs & Dairy",
     },
     {
-      invoice: "INV004",
-      paymentStatus: "Paid",
-      totalAmount: "$450.00",
-      paymentMethod: "Credit Card",
+        name: "Eggs",
+        category: "Eggs & Dairy",
     },
     {
-      invoice: "INV005",
-      paymentStatus: "Paid",
-      totalAmount: "$550.00",
-      paymentMethod: "PayPal",
+        name: "Chicken Breasts",
+        category: "Meat",
     },
     {
-      invoice: "INV006",
-      paymentStatus: "Pending",
-      totalAmount: "$200.00",
-      paymentMethod: "Bank Transfer",
+        name: "Chicken Thighs",
+        category: "Meat",
     },
     {
-      invoice: "INV007",
-      paymentStatus: "Unpaid",
-      totalAmount: "$300.00",
-      paymentMethod: "Credit Card",
+        name: "Chicken Wings",
+        category: "Meat",
     },
-  ]
-  
-const ItemsTable = () => {
-    return (
-        <Table>
-            {/* <TableHeader>
-                <TableRow>
-                    <TableHead className="w-[100px]">Invoice</TableHead>
-                    <TableHead className="text-right">Amount</TableHead>
-                </TableRow>
-            </TableHeader> */}
-            <TableBody>
-                {invoices.map((invoice) => (
-                    <TableRow key={invoice.invoice}>
-                        <TableCell className="font-medium">{invoice.invoice}</TableCell>
-                        <TableCell className="text-right">{invoice.totalAmount}</TableCell>
-                    </TableRow>
-                ))}
-            </TableBody>
-        </Table>
-    )
-};  
+    {
+        name: "Ground Beef",
+        category: "Meat",
+    },
+    {
+        name: "Ground Turkey",
+        category: "Meat",
+    },
+    {
+        name: "Pork Ribs",
+        category: "Meat",
+    },
+    {
+        name: "Ham",
+        category: "Meat",
+    },
+    {
+        name: "Apple",
+        category: "Fruit",
+    },
+    {
+        name: "Banana",
+        category: "Fruit",
+    },
+    {
+        name: "Orange",
+        category: "Fruit",
+    },
+    {
+        name: "Grapefruit",
+        category: "Fruit",
+    },
+    {
+        name: "Grape",
+        category: "Fruit",
+    },
+    {
+        name: "Mango",
+        category: "Fruit",
+    },
+    {
+        name: "Papaya",
+        category: "Fruit",
+    },
+    {
+        name: "Canteloupe",
+        category: "Fruit",
+    },
+    {
+        name: "Watermelon",
+        category: "Fruit",
+    },
+    {
+        name: "Antelope",
+        category: "Fruit",
+    },
+    {
+        name: "Lettuce",
+        category: "Vegetables",
+    },
+    {
+        name: "Cabbage",
+        category: "Vegetables",
+    },
+    {
+        name: "Broccoli",
+        category: "Vegetables",
+    },
+    {
+        name: "Carrots",
+        category: "Vegetables",
+    },
+    {
+        name: "Spinach",
+        category: "Vegetables",
+    },
+    {
+        name: "Celery",
+        category: "Vegetables",
+    },
+]
 
 export const ManualInputModal = () => {
-    const { isModalOpen, closeModal } = useScanningCart();
+    const { isModalOpen, closeModal, cartItems, setItems } = useScanningCart();
     const [searchQuery, setSearchQuery] = useState("");
+    const [categoryQuery, setCategoryQuery] = useState("All");
+    const [updatedItems, setUpdatedItems] = useState(cartItems);
+
+    useEffect(() => {
+        setUpdatedItems(cartItems); // Reset to cartItems every time modal is opened/closed
+    }, [isModalOpen, cartItems]);
+
+    const onSubmit = useCallback(() => {
+        setItems(updatedItems);
+        toast("Scanning cart updated!", {
+            description: "You can click Finish to set quantities.",
+        });
+        closeModal();
+    }, [setItems, updatedItems, closeModal]);
 
     if (!isModalOpen) return null;
 
@@ -111,19 +173,66 @@ export const ManualInputModal = () => {
                             <XIcon />
                         </Button>
                     </CardTitle>
-                    <CardDescription>Enter your item(s) below.</CardDescription>
                 </CardHeader>
                 <CardContent>
                     <Input placeholder="Search by Item Name" type="search"
                         value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}
                     />
+                    <div className="mt-2 flex items-center gap-4">
+                        <Label htmlFor="framework">Category:</Label>
+                        <Select value={categoryQuery} onValueChange={setCategoryQuery}>
+                            <SelectTrigger id="framework">
+                                <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent position="popper">
+                                <SelectItem value="All">All Foods</SelectItem>
+                                <SelectItem value="Fruit">Fruit</SelectItem>
+                                <SelectItem value="Eggs & Dairy">Eggs & Dairy</SelectItem>
+                                <SelectItem value="Meat">Meat</SelectItem>
+                                <SelectItem value="Vegetables">Vegetables</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
                     <div className="mt-5 h-[280px] border-[1px] border-black/10 rounded-md shadow-sm overflow-y-scroll">
-                        <ItemsTable />
+                        <Table>
+                            <TableBody>
+                                {catalog.map((catalogItem) => {
+                                    if ((catalogItem.category === categoryQuery || categoryQuery=== "All") &&
+                                        (searchQuery === "" || catalogItem.name.toUpperCase().includes(searchQuery.toUpperCase()))
+                                    ) {
+                                        return (
+                                            <TableRow key={catalogItem.name} className="h-10">
+                                                <TableCell className="font-medium">
+                                                    <div className="ml-2">{catalogItem.name}</div>
+                                                </TableCell>
+                                                <TableCell className="text-right">
+                                                    <Checkbox 
+                                                        className="mr-5" 
+                                                        defaultChecked={catalogItem.name in updatedItems}
+                                                        onCheckedChange={(e) => {
+                                                            if (e) {
+                                                                setUpdatedItems({ ...updatedItems, [catalogItem.name]: 1 })
+                                                            } else {
+                                                                setUpdatedItems((items) => {
+                                                                    if (catalogItem.name in items) delete items[catalogItem.name];
+                                                                    return items;
+                                                                })
+                                                            }
+                                                        }} 
+                                                    />
+                                                </TableCell>
+                                            </TableRow>
+                                        )
+                                    }
+                                    return null;
+                                })}
+                            </TableBody>
+                        </Table>
                     </div>
                 </CardContent>
                 <CardFooter className="flex justify-between">
-                    <Button variant="outline">Cancel</Button>
-                    <Button>Update</Button>
+                    <Button variant="outline" onClick={closeModal}>Cancel</Button>
+                    <Button onClick={onSubmit}>Update</Button>
                 </CardFooter>
             </Card>
         </div>
