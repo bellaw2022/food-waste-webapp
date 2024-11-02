@@ -24,10 +24,12 @@
     "clsx": "^2.1.1",
     "jsqr": "^1.4.0",
     "lucide-react": "^0.447.0",
+    "next-themes": "^0.3.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router-dom": "^6.27.0",
     "react-webcam": "^7.2.0",
+    "sonner": "^1.5.0",
     "tailwind-merge": "^2.5.3",
     "tailwindcss-animate": "^1.0.7",
     "zustand": "^5.0.1"
