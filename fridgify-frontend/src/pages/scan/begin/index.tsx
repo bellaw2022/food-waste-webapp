@@ -13,7 +13,7 @@ import { useScanningCart } from "@/store/scanning-cart";
 import { ManualInputModal } from "./modal";
 // import { Webcam } from "./utils/webcam";
 
-export const ScanningPage = () => {
+export const BeginScanningPage = () => {
     // const webcamRef = new Webcam();
     const webcamRef = useRef<Webcam>(null);
     // const cameraRef = useRef(null);
@@ -118,7 +118,9 @@ const Overlay = () => {
                 <Link to="/inventory">
                     <Button variant="outline">Back</Button>
                 </Link>
-                <Button>Finish</Button>
+                <Link to="/scan/finish">
+                    <Button>Finish</Button>
+                </Link>
             </div>
             <div className="mt-[390px] flex flex-row items-center justify-center">
                 <Alert className="w-[200px] p-2 bg-white rounded-r-none text-center text-xl">
