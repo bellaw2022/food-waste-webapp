@@ -12,7 +12,7 @@ const buttonRoutes = [
 export const Navbar = () => {
     const location = useLocation();
 
-    if (location.pathname === "/scan") return null;
+    if (location.pathname.startsWith("/scan")) return null;
 
     return (
         <div className="m-3 flex flex-row items-center justify-between">
