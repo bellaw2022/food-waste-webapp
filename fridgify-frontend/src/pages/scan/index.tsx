@@ -1,7 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { CheckIcon } from "lucide-react";
+import { BookOpenIcon, CheckIcon } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useWindowDimensions } from "@/hooks";
 import { Alert } from "@/components/ui/alert";
@@ -11,6 +9,8 @@ import "@tensorflow/tfjs-backend-webgl"; // set backend to webgl
 import { detectVideo } from "./utils/detect";
 import Webcam from "react-webcam";
 import { Link } from "react-router-dom";
+import { useScanningCart } from "@/store/scanning-cart";
+import { ManualInputModal } from "./modal";
 // import { Webcam } from "./utils/webcam";
 
 export const ScanningPage = () => {
@@ -109,36 +109,31 @@ export const ScanningPage = () => {
 }
 
 const Overlay = () => {
+    const { openModal } = useScanningCart();
+
     return (
         <div className="p-4 h-full flex flex-col items-center h-screen overflow-hidden">
+            <ManualInputModal />
             <div className="flex flex-row items-center justify-between w-full">
                 <Link to="/inventory">
                     <Button variant="outline">Back</Button>
                 </Link>
                 <Button>Finish</Button>
             </div>
-            <Alert className="mt-[380px] flex flex-col items-center gap-2 bg-white/50">
-                <Input type="text" className="bg-white"></Input>
-                <div className="flex flex-row gap-4">
-                    <Input type="number" className="bg-white"></Input>
-                    <Select>
-                        <SelectTrigger className="w-[180px] bg-white">
-                            <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="count">count</SelectItem>
-                            {/* <SelectItem value="dark">Dark</SelectItem> */}
-                        </SelectContent>
-                    </Select>
-                </div>
-                <div>
-                    Expires in: <Input type="number" className="inline mx-2 w-14 bg-white"></Input> days
-                </div>
-            </Alert>
+            <div className="mt-[390px] flex flex-row items-center justify-center">
+                <Alert className="w-[200px] p-2 bg-white rounded-r-none text-center text-xl">
+                    Scan an item
+                </Alert>
+                <Button className="h-full rounded-l-none bg-orange-300" variant="outline"
+                    onClick={openModal}
+                >
+                    <BookOpenIcon />
+                </Button>            
+            </div>
 
-            <div className="mt-8 w-fit h-fit rounded-full bg-white">
+            <div className="mt-16 w-fit h-fit rounded-full bg-white">
                 <Button variant="outline" 
-                    className="rounded-full w-14 h-14 border-[green] bg-[green]/30 hover:bg-[green]/50"
+                    className="rounded-full w-16 h-16 border-[green] bg-[green]/30 hover:bg-[green]/50"
                 >
                     <CheckIcon color="green" />
                 </Button>
