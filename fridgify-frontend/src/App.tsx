@@ -1,7 +1,8 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { HomePage, ScanningPage, InventoryPage, RecipePage, ProfilePage} from '@/pages';
 import { useOAuth } from "@/hooks";
-import { Navbar } from './components/shared';
+import { Navbar } from '@/components/shared';
+import { Toaster } from '@/components/ui/sonner';
 
 function App() {
     const { profile, login, logOut } = useOAuth();
@@ -16,6 +17,7 @@ function App() {
                     <Route path="/profile" element={<ProfilePage />} />
                     <Route path="/scan" element={<ScanningPage />} />
                 </Routes>
+                <Toaster />
             </div>
         </Router>
     )
