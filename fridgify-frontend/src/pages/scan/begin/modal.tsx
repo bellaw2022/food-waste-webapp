@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { useScanningCart } from "@/store/scanning-cart"
+import { CartItem, UnitTypes, useScanningCart } from "@/store/scanning-cart"
 import { XIcon } from "lucide-react"
 import { useCallback, useEffect, useState } from "react"
 
@@ -151,6 +151,16 @@ export const ManualInputModal = () => {
         closeModal();
     }, [setItems, updatedItems, closeModal]);
 
+    const makeItem = useCallback((): CartItem => {
+        // (name: string) => {
+        // when expDates and unit types are available in database, use them here
+        return {
+            quantity: 1,
+            unit: UnitTypes.COUNT,
+            expirationDays: 5,
+        }
+    }, []);
+
     if (!isModalOpen) return null;
 
     return (
@@ -174,9 +184,9 @@ export const ManualInputModal = () => {
                         value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}
                     />
                     <div className="mt-2 flex items-center gap-4">
-                        <Label htmlFor="framework">Category:</Label>
+                        <Label htmlFor="category-selection">Category:</Label>
                         <Select value={categoryQuery} onValueChange={setCategoryQuery}>
-                            <SelectTrigger id="framework">
+                            <SelectTrigger id="category-selection">
                                 <SelectValue />
                             </SelectTrigger>
                             <SelectContent position="popper">
@@ -206,7 +216,7 @@ export const ManualInputModal = () => {
                                                         defaultChecked={catalogItem.name in updatedItems}
                                                         onCheckedChange={(e) => {
                                                             if (e) {
-                                                                setUpdatedItems({ ...updatedItems, [catalogItem.name]: 1 })
+                                                                setUpdatedItems({ ...updatedItems, [catalogItem.name]: makeItem() })
                                                             } else {
                                                                 setUpdatedItems((items) => {
                                                                     if (catalogItem.name in items) delete items[catalogItem.name];
