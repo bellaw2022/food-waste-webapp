@@ -4,10 +4,17 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { UnitTypes, useScanningCart } from "@/store/scanning-cart";
 import { CheckCircleIcon, PlusCircleIcon, XIcon } from "lucide-react";
-import { Link } from "react-router-dom";
+import { useCallback } from "react";
+import { Link, useNavigate } from "react-router-dom";
 
 export const FinishScanningPage = () => {
-    const { cartItems, removeItem, updateItem } = useScanningCart();
+    const { cartItems, removeItem, updateItem, setItems } = useScanningCart();
+    const navigate = useNavigate();
+
+    const onFinish = useCallback(() => {
+        setItems({}); // Clear local storage
+        navigate("/inventory")
+    }, [setItems, navigate]);
 
     return (
         <div className="mx-10 my-10">
@@ -19,7 +26,9 @@ export const FinishScanningPage = () => {
                             <PlusCircleIcon size={24} color="white" />
                         </Button>
                     </Link>
-                    <Button className="p-2 h-fit w-fit border-[green]" variant="outline">
+                    <Button className="p-2 h-fit w-fit border-[green]" variant="outline"
+                        onClick={onFinish}
+                    >
                         <CheckCircleIcon size={24} color="green" />
                     </Button>
                 </div>   
