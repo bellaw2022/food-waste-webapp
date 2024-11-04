@@ -1,4 +1,3 @@
-
 # Fridgify Web Application
 
 ## Overview
@@ -72,7 +71,7 @@ npm install
 ### Step 3: Running the Frontend
 Start the React development server:
 ```bash
-npm start
+npm run dev
 ```
 The frontend will run on http://localhost:3000.
 
