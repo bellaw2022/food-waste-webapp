@@ -17,7 +17,7 @@ export const Navbar = () => {
     return (
         <div className="m-3 flex flex-row items-center justify-between">
             <Link to="/scan">
-                <Button className="p-2 h-fit w-fit rounded-full bg-[green]" variant="outline">
+                <Button className="p-2 h-fit w-fit rounded-full bg-[#783C5B]" variant="outline">
                     <PlusCircleIcon size={32} color="white" />
                 </Button>
             </Link>
@@ -33,10 +33,11 @@ export const Navbar = () => {
                 ))}
             </div>
             <Link to="/profile/#share">
-                <Button className="px-2 w-fit h-fit rounded-sm bg-[green]/50" variant="outline">
+                <Button className="px-2 w-fit h-fit rounded-sm bg-[#783C5B]" variant="outline">
                     <Share2Icon size={18} />
                 </Button>
             </Link>
+
         </div>
     );
 }
