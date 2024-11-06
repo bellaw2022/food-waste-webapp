@@ -6,7 +6,6 @@ from config import Config
 from models import db
 from routes.user_routes import user_routes
 from routes.userwastesaving_routes import userwastesaving_routes
-from routes.detection_routes import detection_routes
 
 app = Flask(__name__)
 
@@ -19,7 +18,6 @@ migrate = Migrate(app, db)
 # routes
 app.register_blueprint(user_routes)
 app.register_blueprint(userwastesaving_routes)
-app.register_blueprint(detection_routes)
 
 
 @app.route('/')
