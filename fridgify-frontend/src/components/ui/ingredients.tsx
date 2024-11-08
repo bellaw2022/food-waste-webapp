@@ -42,7 +42,7 @@ const Ingredients: React.FC<IngredientsProps> = ({
         ))}
       {ingredients.length > 10 && (
         <button onClick={toggleShowAll} className="ingredient-button">
-          {showAll ? "Show Less" : "More..."}
+          {showAll ? "▲" : "... ▼"}
         </button>
       )}
     </div>
