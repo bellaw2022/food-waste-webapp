@@ -10,7 +10,6 @@ def get_user_waste_saving(user_id):
         {
             "user_waste_id": record.user_waste_id,
             "date": record.date.strftime('%Y-%m-%d'),
-            "amount_saved": record.amount_saved,
             "co2_saved": record.co2_saved
         } for record in waste_savings
     ]
