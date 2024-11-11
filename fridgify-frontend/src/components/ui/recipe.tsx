@@ -1,4 +1,7 @@
 import BackButton from "../shared/back-button";
+import React, { useState, useEffect } from "react";
+import { FaCirclePlus } from "react-icons/fa6";
+import { FaCircleMinus } from "react-icons/fa6";
 interface CompleteRecipe {
   id: number;
   title: string;
@@ -13,6 +16,26 @@ interface CompleteRecipe {
 }
 
 const Recipe: React.FC<{ recipe: CompleteRecipe }> = ({ recipe }) => {
+  console.log("recipe: ", recipe);
+  const [servings, setServings] = useState<number>(recipe.servings);
+
+  useEffect(() => {
+    setServings(recipe.servings);
+  }, [recipe.servings]);
+
+  const handleServingIncrease = () => {
+    console.log("increase");
+    setServings(servings + 1);
+    recipe.servings += 1;
+  };
+  const handleServingDecrease = () => {
+    console.log("decrease");
+    if (servings > 0) {
+      setServings(servings - 1);
+      recipe.servings -= 1;
+    }
+  };
+
   return (
     <>
       <BackButton></BackButton>
@@ -22,8 +45,19 @@ const Recipe: React.FC<{ recipe: CompleteRecipe }> = ({ recipe }) => {
         <p className="recipes-missed-count">+{recipe.missedIngredientCount}</p>
       </div>
       <img src={recipe.image} alt={recipe.title} className="recipe-image" />
+      <div className="serving-section">
+        <button></button>
+        <FaCircleMinus
+          onClick={handleServingDecrease}
+          style={{ cursor: "pointer" }}
+        ></FaCircleMinus>
+        <div className="serving-text">{servings} serves</div>
+        <FaCirclePlus
+          onClick={handleServingIncrease}
+          style={{ cursor: "pointer" }}
+        ></FaCirclePlus>
+      </div>
       <div className="ingredients-section">
-        <div className="serving-section">{recipe.servings} serves</div>
         <div className="ingredient-list">
           {recipe.ingredients.map((ingredient, index) => (
             <div className="ingredient" key={index}>
@@ -33,6 +67,9 @@ const Recipe: React.FC<{ recipe: CompleteRecipe }> = ({ recipe }) => {
             </div>
           ))}
         </div>
+      </div>
+      <div className="instructions">
+        Refer to the following website: {recipe.sourceURL}
       </div>
     </>
   );
