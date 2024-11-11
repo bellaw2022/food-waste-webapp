@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { BookOpenIcon, CameraIcon, CheckIcon, XIcon } from "lucide-react";
-import { RefObject, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { useWindowDimensions } from "@/hooks";
 import Webcam from "react-webcam";
 import { Link } from "react-router-dom";
