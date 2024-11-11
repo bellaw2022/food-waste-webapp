@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { CartItem, UnitTypes, useScanningCart } from "@/store/scanning-cart"
+import { CartItem, makeDefaultItem, UnitTypes, useScanningCart } from "@/store/scanning-cart"
 import { XIcon } from "lucide-react"
 import { useCallback, useEffect, useState } from "react"
 
@@ -151,16 +151,6 @@ export const ManualInputModal = () => {
         closeModal();
     }, [setItems, updatedItems, closeModal]);
 
-    const makeItem = useCallback((): CartItem => {
-        // (name: string) => {
-        // when expDates and unit types are available in database, use them here
-        return {
-            quantity: 1,
-            unit: UnitTypes.COUNT,
-            expirationDays: 5,
-        }
-    }, []);
-
     if (!isModalOpen) return null;
 
     return (
@@ -216,7 +206,7 @@ export const ManualInputModal = () => {
                                                         defaultChecked={catalogItem.name in updatedItems}
                                                         onCheckedChange={(e) => {
                                                             if (e) {
-                                                                setUpdatedItems({ ...updatedItems, [catalogItem.name]: makeItem() })
+                                                                setUpdatedItems({ ...updatedItems, [catalogItem.name]: makeDefaultItem() })
                                                             } else {
                                                                 setUpdatedItems((items) => {
                                                                     if (catalogItem.name in items) delete items[catalogItem.name];
