@@ -1715,8 +1715,8 @@ def search_recipes_by_ingredients():
     
 @recipes_routes.route('/api/recipe/recipe_by_id', methods=['POST'])
 def get_recipe_info():
-    id = request.json 
-    print("searching for recipe with id: ", id)
+    id = request.get_json().get("id") 
+
     api = 'https://api.spoonacular.com/recipes/'+id+'/information?apiKey='+os.getenv('RECIPE_API_KEY')
 
     try:
@@ -1725,19 +1725,6 @@ def get_recipe_info():
         #response.raise_for_status()  # Raise an exception for HTTP errors
 
         response = {
-    "vegetarian": true,
-    "vegan": false,
-    "glutenFree": false,
-    "dairyFree": false,
-    "veryHealthy": false,
-    "cheap": false,
-    "veryPopular": false,
-    "sustainable": false,
-    "lowFodmap": false,
-    "weightWatcherSmartPoints": 77,
-    "gaps": "no",
-    "preparationMinutes": null,
-    "cookingMinutes": null,
     "aggregateLikes": 1,
     "healthScore": 40,
     "creditsText": "Foodista.com – The Cooking Encyclopedia Everyone Can Edit",
@@ -2106,7 +2093,6 @@ def get_recipe_info():
             ]
         }
     ],
-    "originalId": null,
     "spoonacularScore": 19.9471492767334,
     "spoonacularSourceUrl": "https://spoonacular.com/italian-vegetable-soup-648287"
 }
@@ -2118,20 +2104,17 @@ def get_recipe_info():
 
          # title, image, servings, cookingMinutes, preparationMinutes, extendedIngredients.name, extendedIngredients.measures.us.amount, extendedIngredients.measures.us.unitLong
         response_data = {
-        "recipe":[
-            {
+        
             "title": external_data["title"],
             "image": external_data["image"],
             "servings": external_data["servings"],
-            "cookingMinutes": external_data["cookingMinutes"],
-            "prepMinutes" : external_data["preparationMinutes"],
             "ingredients": [
                 {"name": ingredient["name"], "unit": ingredient["measures"]["us"]["unitLong"], "amount": ingredient["measures"]["us"]["amount"]}
                 for ingredient in external_data["extendedIngredients"]
             ],
             "sourceURL" : external_data["sourceUrl"]}
-            ]
-        }
+            
+        
         return jsonify(response_data)
     except requests.exceptions.RequestException as e:
         print(f"Error querying external API: {e}")
