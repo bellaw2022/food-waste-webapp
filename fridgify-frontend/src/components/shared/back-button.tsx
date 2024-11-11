@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { SlArrowLeftCircle } from "react-icons/sl";
 
-const backButton = () => {
+const BackButton = () => {
   const navigate = useNavigate();
 
   const handleBack = () => {
@@ -27,4 +27,4 @@ const backButtonStyle = {
   borderRadius: "4px",
 };
 
-export default backButton;
+export default BackButton;

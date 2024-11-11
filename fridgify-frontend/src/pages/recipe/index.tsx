@@ -5,12 +5,35 @@ import NoRecipesModal from "@/components/ui/noRecipesModal";
 import RecipeList from "../../components/ui/recipeList";
 
 interface Recipe {
-  title: string;
+  /*title: string;
   number: number;
   pictureUrl: string;
   ingredients: string[];
   instructions: string[];
-  index: number;
+  index: number;*/
+
+  id: number;
+  title: string;
+  missedIngredientCount: number;
+  usedIngredientCount: number;
+  image: string;
+  missedIngredients: string[];
+  usedIngredients: string[];
+}
+
+interface CompleteRecipe {
+  id: number;
+  title: string;
+  missedIngredientCount: number;
+  usedIngredientCount: number;
+  image: string;
+  missedIngredients: string[];
+  usedIngredients: string[];
+  servings: number;
+  cookingMinutes: number;
+  prepMinutes: number;
+  sourceURL: string;
+  ingredients: { name: string; unit: string; amount: number }[];
 }
 
 export const RecipePage: React.FC = () => {
@@ -35,6 +58,7 @@ export const RecipePage: React.FC = () => {
 
   const [selectedIngredients, setSelectedIngredients] = useState<string[]>([]);
   const [recipes, setRecipes] = useState<Recipe[]>([]);
+  const [completeRecipe, setCompleteRecipe] = useState<CompleteRecipe>();
   // whether or not the button is clicked - true if loading or already loaded
   const [loading, setLoading] = useState(false);
   const [showNoRecipesModal, setShowNoRecipesModal] = useState(true);
@@ -46,25 +70,74 @@ export const RecipePage: React.FC = () => {
     setSelectedIngredients(selectedIngredients);
   };
 
-  const handleRecipeSelection = (selectedRecipe: Recipe) => {
+  const handleRecipeSelection = async (selectedRecipe: Recipe) => {
     console.log("Selected recipe: " + selectedRecipe.title);
     setSelectedRecipe(selectedRecipe);
+
+    try {
+      /*
+        title, image, servings, cookingMinutes, prepMinutes, ingredients, sourceURL
+        */
+      const response = await fetch(
+        "http://127.0.0.1:5000/api/recipe/recipe_by_id",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ id: selectedRecipe.id }),
+        }
+      );
+      if (response.ok) {
+        const data: CompleteRecipe = await response.json();
+        const updatedData = {
+          ...data, // Spread the existing data
+          missedIngredientCount: selectedRecipe.missedIngredientCount,
+          usedIngredientsCount: selectedRecipe.usedIngredientCount,
+          missedIngredients: selectedRecipe.missedIngredients,
+          usedIngredients: selectedRecipe.usedIngredients,
+          id: selectedRecipe.id,
+        };
+        setCompleteRecipe(updatedData);
+        console.log(updatedData);
+      } else {
+        console.error("Error fetching recipes");
+      }
+    } catch (error) {
+      console.error("Error: ", error);
+    } finally {
+    }
   };
 
   const searchRecipes = async () => {
     setLoading(true);
     try {
-      const response = await fetch("http://127.0.0.1:5000/api/recipes", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ ingredients: selectedIngredients }),
-      });
+      const response = await fetch(
+        "http://127.0.0.1:5000/api/recipe/recipes_by_ingredients",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ ingredients: selectedIngredients }),
+        }
+      );
       if (response.ok) {
-        const data: Recipe[] = await response.json();
-        setRecipes(data);
-        console.log(data);
+        const data = await response.json();
+
+        const fetchedRecipes: Recipe[] = data.recipes.map((recipe: any) => ({
+          id: recipe.id,
+          title: recipe.title,
+          missedIngredientCount: recipe.missedIngredientCount,
+          usedIngredientCount: recipe.usedIngredientCount,
+          image: recipe.image,
+          missedIngredients: recipe.missedIngredients, // If missedIngredients is a string array
+          usedIngredients: recipe.usedIngredients, // If usedIngredients is a string array
+        }));
+
+        console.log(fetchedRecipes);
+        setRecipes(fetchedRecipes);
+        console.log(recipes);
       } else {
         console.error("Error fetching recipes");
       }
@@ -79,7 +152,7 @@ export const RecipePage: React.FC = () => {
   return (
     <div className="mx-4">
       <h1 className="text-3xl font-bold">Recipe Rec</h1>
-      {recipes.length === 0 && (
+      {recipes.length < 1 && (
         <>
           <Ingredients
             ingredients={ingredients}
