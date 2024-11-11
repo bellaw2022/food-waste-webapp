@@ -46,5 +46,5 @@
 
 .ingredient {
   display: grid;
-  grid-template-columns: 50px 20px 1fr;
+  grid-template-columns: 80px 1fr 2fr;
 }

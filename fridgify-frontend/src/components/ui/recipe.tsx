@@ -8,38 +8,24 @@ interface CompleteRecipe {
   missedIngredients: string[];
   usedIngredients: string[];
   servings: number;
-  cookingMinutes: number;
-  prepMinutes: number;
   sourceURL: string;
   ingredients: { name: string; unit: string; amount: number }[];
 }
 
-const Recipe: React.FC<CompleteRecipe> = ({
-  id,
-  title,
-  missedIngredientCount,
-  usedIngredientCount,
-  image,
-  missedIngredients,
-  usedIngredients,
-  servings,
-  cookingMinutes,
-  prepMinutes,
-  sourceURL,
-  ingredients,
-}) => {
+const Recipe: React.FC<{ recipe: CompleteRecipe }> = ({ recipe }) => {
   return (
     <>
+      <BackButton></BackButton>
       <div className="recipes-text">
-        <h2 className="recipes-title">{title}</h2>
-        <p className="recipes-used-count">-{usedIngredientCount}</p>
-        <p className="recipes-missed-count">+{missedIngredientCount}</p>
+        <h2 className="recipes-title">{recipe.title}</h2>
+        <p className="recipes-used-count">-{recipe.usedIngredientCount}</p>
+        <p className="recipes-missed-count">+{recipe.missedIngredientCount}</p>
       </div>
-      <img src={image} alt={title} className="recipe-image" />
+      <img src={recipe.image} alt={recipe.title} className="recipe-image" />
       <div className="ingredients-section">
-        <div className="serving-section">{servings} serves</div>
+        <div className="serving-section">{recipe.servings} serves</div>
         <div className="ingredient-list">
-          {ingredients.map((ingredient, index) => (
+          {recipe.ingredients.map((ingredient, index) => (
             <div className="ingredient" key={index}>
               <div className="ingredient-amount">{ingredient.amount} </div>
               <div className="ingredient-unit"> {ingredient.unit}</div>
@@ -51,3 +37,5 @@ const Recipe: React.FC<CompleteRecipe> = ({
     </>
   );
 };
+
+export default Recipe;

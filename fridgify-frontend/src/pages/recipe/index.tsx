@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import "./index.css";
 import NoRecipesModal from "@/components/ui/noRecipesModal";
 import RecipeList from "../../components/ui/recipeList";
+import Recipe from "../../components/ui/recipe";
 
 interface Recipe {
   /*title: string;
@@ -30,8 +31,6 @@ interface CompleteRecipe {
   missedIngredients: string[];
   usedIngredients: string[];
   servings: number;
-  cookingMinutes: number;
-  prepMinutes: number;
   sourceURL: string;
   ingredients: { name: string; unit: string; amount: number }[];
 }
@@ -58,7 +57,18 @@ export const RecipePage: React.FC = () => {
 
   const [selectedIngredients, setSelectedIngredients] = useState<string[]>([]);
   const [recipes, setRecipes] = useState<Recipe[]>([]);
-  const [completeRecipe, setCompleteRecipe] = useState<CompleteRecipe>();
+  const [completeRecipe, setCompleteRecipe] = useState<CompleteRecipe>({
+    id: 0,
+    title: "",
+    missedIngredientCount: 0,
+    usedIngredientCount: 0,
+    image: "",
+    missedIngredients: [],
+    usedIngredients: [],
+    servings: 0,
+    sourceURL: "",
+    ingredients: [],
+  });
   // whether or not the button is clicked - true if loading or already loaded
   const [loading, setLoading] = useState(false);
   const [showNoRecipesModal, setShowNoRecipesModal] = useState(true);
@@ -85,21 +95,23 @@ export const RecipePage: React.FC = () => {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ id: selectedRecipe.id }),
+          body: JSON.stringify({ id: selectedRecipe.id.toString() }),
         }
       );
       if (response.ok) {
         const data: CompleteRecipe = await response.json();
+        console.log(data);
         const updatedData = {
           ...data, // Spread the existing data
           missedIngredientCount: selectedRecipe.missedIngredientCount,
-          usedIngredientsCount: selectedRecipe.usedIngredientCount,
+          usedIngredientCount: selectedRecipe.usedIngredientCount,
           missedIngredients: selectedRecipe.missedIngredients,
           usedIngredients: selectedRecipe.usedIngredients,
           id: selectedRecipe.id,
         };
         setCompleteRecipe(updatedData);
         console.log(updatedData);
+        console.log(completeRecipe);
       } else {
         console.error("Error fetching recipes");
       }
@@ -176,7 +188,7 @@ export const RecipePage: React.FC = () => {
               onSelectRecipe={handleRecipeSelection}
             ></RecipeList>
           ) : (
-            <div>{selectedRecipe.title}</div>
+            <Recipe recipe={completeRecipe}></Recipe>
           )
         ) : (
           showNoRecipesModal && (
