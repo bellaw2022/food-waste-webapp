@@ -4,12 +4,13 @@ import BackButton from "../shared/back-button";
 import "./recipe.css";
 
 interface Recipe {
+  id: number;
   title: string;
-  number: number;
-  pictureUrl: string;
-  ingredients: string[];
-  instructions: string[];
-  index: number;
+  missedIngredientCount: number;
+  usedIngredientCount: number;
+  image: string;
+  missedIngredients: string[];
+  usedIngredients: string[];
 }
 
 interface RecipeList {
@@ -21,20 +22,27 @@ const RecipeList: React.FC<RecipeList> = ({ recipes, onSelectRecipe }) => {
   return (
     <>
       <BackButton></BackButton>
-      <div className="recipe-list">
+      <div className="recipes-list">
         {recipes.map((recipe, index) => (
           <div
             key={index}
-            className="recipe-card"
+            className="recipes-card"
             onClick={() => onSelectRecipe(recipe)}
           >
-            <h2 className="recipe-title">{recipe.title}</h2>
             <img
-              src={recipe.pictureUrl}
+              src={recipe.image}
               alt={recipe.title}
-              className="recipe-image"
+              className="recipes-image"
             />
-            <p className="recipe-number">{+recipe.number}</p>
+            <div className="recipes-text">
+              <h2 className="recipes-title">{recipe.title}</h2>
+              <p className="recipes-used-count">
+                -{recipe.usedIngredientCount}
+              </p>
+              <p className="recipes-missed-count">
+                +{recipe.missedIngredientCount}
+              </p>
+            </div>
           </div>
         ))}
       </div>
