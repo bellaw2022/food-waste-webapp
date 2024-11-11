@@ -6,6 +6,8 @@ from config import Config
 from models import db
 from routes.user_routes import user_routes
 from routes.userwastesaving_routes import userwastesaving_routes
+from routes.produce_routes import produce_routes
+from routes.user_produce_routes import user_produce_routes
 
 app = Flask(__name__)
 
@@ -18,6 +20,8 @@ migrate = Migrate(app, db)
 # routes
 app.register_blueprint(user_routes)
 app.register_blueprint(userwastesaving_routes)
+app.register_blueprint(produce_routes)
+app.register_blueprint(user_produce_routes)
 
 
 @app.route('/')
@@ -25,4 +29,4 @@ def index():
     return "Hello, Fridgify is running!"
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=10000, debug=True)
