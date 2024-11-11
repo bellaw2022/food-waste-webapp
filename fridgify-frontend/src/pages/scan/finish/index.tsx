@@ -64,7 +64,7 @@ export const FinishScanningPage = () => {
                                     </SelectTrigger>
                                     <SelectContent position="popper">
                                         {Object.values(UnitTypes).map((unit) => (
-                                            <SelectItem key={unit} value={unit}>{unit}</SelectItem>
+                                            <SelectItem key={unit} value={unit}>{unit.toLowerCase()}</SelectItem>
                                         ))}
                                     </SelectContent>
                                 </Select>
