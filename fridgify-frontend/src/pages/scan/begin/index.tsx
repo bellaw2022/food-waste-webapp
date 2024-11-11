@@ -25,6 +25,10 @@ export const BeginScanningPage = () => {
     const [isLoadingGuess, setLoadingGuess] = useState(false);
     const [pictureTaken, setPictureTaken] = useState(false);
     const [guess, setGuess] = useState("");
+    
+    const clearPicture = useCallback(() => {
+        setLoadingGuess(false); setPictureTaken(false); setGuess("");
+    }, [setLoadingGuess, setPictureTaken, setGuess]);
 
     const takePicture = useCallback(() => {
         if (isLoadingGuess || pictureTaken) return;
@@ -54,7 +58,7 @@ export const BeginScanningPage = () => {
             const fullData = canvasRef.current.toDataURL("image/png");
             fullImageRef.current.setAttribute("src", fullData);
 
-            fullImageRef.current.onload = () => {
+            fullImageRef.current.onload = async () => {
                 if (
                     canvasRef.current && 
                     fullImageRef.current && 
@@ -77,21 +81,41 @@ export const BeginScanningPage = () => {
                     croppedImageRef.current.setAttribute("src", croppedData);
                     
                     setPictureTaken(true);
+                    
+                    // query api and wait then set guess
+                    
+                    try {
+                        const formData = new FormData();
+                        const blob = await (await fetch(croppedData)).blob();
+                        formData.append('image', blob, 'scan.jpg');
+
+                        const res = await fetch("http://localhost:8000/scan", {
+                            method: "POST",
+                            body: formData
+                        });
+                        
+                        if (!res.ok) {
+                            throw new Error(`Failed reason: ${res.statusText}`);
+                        }
+                        
+                        const guessData = await res.json();
+                        console.log(guessData);
+                        setGuess(guessData?.results?.product_name || "");
+                        setLoadingGuess(false);
+                    } catch (error) {
+                        console.log("Failed to send result to backend:", error);
+                        alert("Error while sending result to backend!");
+                        clearPicture();
+                    }
                 }
             }
-
-            // query api and wait then set isGuessReady to true
         }
-    }, [isLoadingGuess, pictureTaken, setLoadingGuess, setPictureTaken]);
+    }, [isLoadingGuess, pictureTaken, setLoadingGuess, setPictureTaken, setGuess, clearPicture]);
 
-    const clearPicture = useCallback(() => {
-        setLoadingGuess(false); setPictureTaken(false); setGuess("");
-    }, [setLoadingGuess, setPictureTaken, setGuess]);
-
-    const { addItem } = useScanningCart();    
+    const { addItem } = useScanningCart();
 
     const confirmGuess = useCallback(() => {
-        if (guess !== "") return;
+        if (guess === "") return;
 
         // add to store then clear
         addItem(guess);
@@ -164,7 +188,7 @@ const Overlay = ({ takePicture, clearPicture, confirmGuess, isLoadingGuess, isGu
                 </Link>
             </div>
             <div className="mt-[410px] flex flex-col items-center justify-center gap-10">
-                {!isLoadingGuess ?
+                {!isLoadingGuess && !isGuessReady ?
                     <div className="w-fit h-fit rounded-full bg-white">
                         <Button variant="outline" 
                             className="rounded-full w-16 h-16 border-[orange] bg-[orange]/30 hover:bg-[orange]/50"
