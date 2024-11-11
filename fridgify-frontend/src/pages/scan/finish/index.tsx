@@ -37,7 +37,7 @@ export const FinishScanningPage = () => {
                 {Object.entries(cartItems).map(([name, item]) => (
                     <Card className="w-[300px]" key={name}>
                         <CardHeader className="flex flex-row justify-between items-center">
-                            <CardTitle className="text-2xl">{name}</CardTitle>
+                            <CardTitle className="text-2xl">{name.charAt(0).toUpperCase() + name.slice(1)}</CardTitle>
                             <Button variant="destructive" className="p-2 w-fit h-fit rounded-full"
                                 onClick={() => removeItem(name)}
                             >
