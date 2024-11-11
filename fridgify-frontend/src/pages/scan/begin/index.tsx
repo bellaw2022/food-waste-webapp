@@ -1,23 +1,20 @@
 import { Button } from "@/components/ui/button";
-import { BookOpenIcon, CheckIcon } from "lucide-react";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { BookOpenIcon, CameraIcon, CheckIcon, XIcon } from "lucide-react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { useWindowDimensions } from "@/hooks";
-import { Alert } from "@/components/ui/alert";
-
-import * as tf from "@tensorflow/tfjs";
-import "@tensorflow/tfjs-backend-webgl"; // set backend to webgl
-import { detectVideo } from "./utils/detect";
 import Webcam from "react-webcam";
 import { Link } from "react-router-dom";
 import { useScanningCart } from "@/store/scanning-cart";
 import { ManualInputModal } from "./modal";
-// import { Webcam } from "./utils/webcam";
+import { cn } from "@/lib/utils";
+import { LoadingSpinner } from "@/components/shared/spinner";
+import { Alert } from "@/components/ui/alert";
 
 export const BeginScanningPage = () => {
-    // const webcamRef = new Webcam();
     const webcamRef = useRef<Webcam>(null);
-    // const cameraRef = useRef(null);
     const canvasRef = useRef<HTMLCanvasElement>(null);
+    const fullImageRef = useRef<HTMLImageElement>(null);
+    const croppedImageRef = useRef<HTMLImageElement>(null);
 
     const { width, height } = useWindowDimensions();
     const videoConstraints = useMemo(() => ({
@@ -25,47 +22,105 @@ export const BeginScanningPage = () => {
         facingMode: "environment",
     }), [width, height]);
 
-    // const [loading, setLoading] = useState({ loading: true, progress: 0 }); // loading state
-    const [model, setModel] = useState({
-        net: null,
-        inputShape: [1, 0, 0, 3],
-    }); // init model & input shape
+    const [isLoadingGuess, setLoadingGuess] = useState(false);
+    const [pictureTaken, setPictureTaken] = useState(false);
+    const [guess, setGuess] = useState("");
+    
+    const clearPicture = useCallback(() => {
+        setLoadingGuess(false); setPictureTaken(false); setGuess("");
+    }, [setLoadingGuess, setPictureTaken, setGuess]);
 
-    // references
+    const takePicture = useCallback(() => {
+        if (isLoadingGuess || pictureTaken) return;
 
-    // model configs
-    const modelName = "yolov8n";
+        setLoadingGuess(true);
 
-    // useEffect(() => {
-    //     webcam.open(cameraRef.current); // open webcam
-    //     // cameraRef.current.style.display = "block"; // show camera
-    // }, []);
+        if (
+            canvasRef.current && 
+            fullImageRef.current && 
+            croppedImageRef.current && 
+            webcamRef.current
+        ) {
+            const video = webcamRef.current.video;
+            if (!video) {
+                setPictureTaken(false); setLoadingGuess(false);
+                return;
+            };
 
-    useEffect(() => {
-        tf.ready().then(async () => {
-        const yolov8 = await tf.loadGraphModel(
-            `/${modelName}_web_model/model.json`,
-            {
-            onProgress: (fractions) => {
-                // setLoading({ loading: true, progress: fractions }); // set loading fractions
-                console.log(fractions);
-            },
+            const ctx = canvasRef.current.getContext("2d");
+
+            // Capture full image first
+            ctx?.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+            canvasRef.current.width = video.videoWidth;
+            canvasRef.current.height = video.videoHeight;
+
+            ctx?.drawImage(video, 0, 0, canvasRef.current.width, canvasRef.current.height);
+            const fullData = canvasRef.current.toDataURL("image/png");
+            fullImageRef.current.setAttribute("src", fullData);
+
+            fullImageRef.current.onload = async () => {
+                if (
+                    canvasRef.current && 
+                    fullImageRef.current && 
+                    croppedImageRef.current && 
+                    webcamRef.current
+                ) {
+                    // Capture cropped image
+                    ctx?.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+                    canvasRef.current.width = 340;
+                    canvasRef.current.height = 340;
+
+                    console.log(video.videoWidth, video.videoHeight);
+
+                    ctx?.drawImage(
+                        fullImageRef.current,
+                        video.videoWidth/2-170, video.videoHeight*0.36-170, 340, 340, // region in the full image
+                        0, 0, 340, 340 // destination in the canvas
+                    );
+                    const croppedData = canvasRef.current.toDataURL("image/png");
+                    croppedImageRef.current.setAttribute("src", croppedData);
+                    
+                    setPictureTaken(true);
+                    
+                    // query api and wait then set guess
+                    
+                    try {
+                        const formData = new FormData();
+                        const blob = await (await fetch(croppedData)).blob();
+                        formData.append('image', blob, 'scan.jpg');
+
+                        const res = await fetch("http://localhost:8000/scan", {
+                            method: "POST",
+                            body: formData
+                        });
+                        
+                        if (!res.ok) {
+                            throw new Error(`Failed reason: ${res.statusText}`);
+                        }
+                        
+                        const guessData = await res.json();
+                        console.log(guessData);
+                        setGuess(guessData?.results?.product_name || "");
+                        setLoadingGuess(false);
+                    } catch (error) {
+                        console.log("Failed to send result to backend:", error);
+                        alert("Error while sending result to backend!");
+                        clearPicture();
+                    }
+                }
             }
-        ); // load model
+        }
+    }, [isLoadingGuess, pictureTaken, setLoadingGuess, setPictureTaken, setGuess, clearPicture]);
 
-            // warming up model
-            const dummyInput = tf.ones(yolov8.inputs[0].shape);
-            const warmupResults = yolov8.execute(dummyInput);
+    const { addItem } = useScanningCart();
 
-            // setLoading({ loading: false, progress: 1 });
-            setModel({
-                net: yolov8,
-                inputShape: yolov8.inputs[0].shape,
-            }); // set model & input shape
+    const confirmGuess = useCallback(() => {
+        if (guess === "") return;
 
-            tf.dispose([warmupResults, dummyInput]); // cleanup memory
-        });
-    }, []);
+        // add to store then clear
+        addItem(guess);
+        clearPicture();
+    }, [addItem, guess, clearPicture]);
 
     return (
         <div className="relative w-full h-[100vh] overflow-hidden">
@@ -75,40 +130,50 @@ export const BeginScanningPage = () => {
                     audio={false}
                     screenshotFormat="image/jpeg"
                     videoConstraints={videoConstraints}
-                    onPlay={() => detectVideo(webcamRef.current?.video, model, canvasRef.current)}
                 />
-                {/* <video
-                    autoPlay
-                    muted
-                    ref={cameraRef}
-                    width={width}
-                    height={height}
-                    onPlay={() => detectVideo(cameraRef.current, model, canvasRef.current)}
-                /> */}
-                 {/* <canvas width={model.inputShape[1]} height={model.inputShape[2]} ref={canvasRef} /> */}
             </div>
-            <div className="absolute top-0 left-0">
-                <canvas width={model.inputShape[1]} height={model.inputShape[2]} ref={canvasRef} />
+            <div className="absolute top-[calc(36vh-170px)] left-[calc(50vw-170px)] border-black border-2 w-[340px] h-[340px] z-99
+                rounded-full overflow-hidden p-0
+            ">
+                <img className="hidden" ref={fullImageRef} />
+                <img className={
+                    pictureTaken ? "" : "hidden"
+                }
+                    width={340} height={340} ref={croppedImageRef} />
+                <canvas className="hidden" ref={canvasRef} />
+            </div>
+            <div className="absolute top-[calc(36vh-170px)] left-[calc(50vw-170px)] w-[340px] h-[340px] z-100
+                overflow-hidden p-0 flex items-center justify-center"
+            >
+                {isLoadingGuess && <LoadingSpinner size={72} color="lightblue" />}
+                {guess !== "" && <Alert className="w-fit" variant="default">{guess}</Alert>}
             </div>
             <div className="w-full h-full absolute top-0 left-0 z-10">
-                <Overlay />                
+                <Overlay takePicture={takePicture} clearPicture={clearPicture} isLoadingGuess={isLoadingGuess} 
+                    confirmGuess={confirmGuess} isGuessReady={guess !== ""}
+                />                
             </div>
             <div className="w-full h-[100vh] absolute top-0 left-0 z-5">
-                <svg viewBox="0 50 100 100" width="100%" height="100%">
+                <svg width="100%" height="100%">
                     <defs>
-                        <mask id="mask" x="0" y="0" width="100" height="100">
-                            <rect x="0" y="0" width="100" height="300" fill="#fff"/>
-                            <circle cx="50" cy="70" r="45" />
+                        <mask id="mask" x="0" y="0" width="100%" height="100%">
+                            <rect x="0" y="0" width="100%" height="100%" fill="#fff"/>
+                            <circle cx="50%" cy="36%" r="170" />
                         </mask>
                     </defs>
-                    <rect x="0" y="0" width="100" height="300" mask="url(#mask)" fillOpacity="0.3"/>    
+                    <rect x="0" y="0" width="100%" height="100%" mask="url(#mask)" fillOpacity="0.3"/>    
                 </svg>
             </div>
         </div>
     )
 }
 
-const Overlay = () => {
+const Overlay = ({ takePicture, clearPicture, confirmGuess, isLoadingGuess, isGuessReady }: 
+    { 
+        takePicture: () => void, clearPicture: () => void, 
+        confirmGuess: () => void, isLoadingGuess: boolean, isGuessReady: boolean 
+     }
+) => {
     const { openModal } = useScanningCart();
 
     return (
@@ -122,23 +187,45 @@ const Overlay = () => {
                     <Button>Finish</Button>
                 </Link>
             </div>
-            <div className="mt-[390px] flex flex-row items-center justify-center">
-                <Alert className="w-[200px] p-2 bg-white rounded-r-none text-center text-xl">
-                    Scan an item
-                </Alert>
-                <Button className="h-full rounded-l-none bg-orange-300" variant="outline"
-                    onClick={openModal}
-                >
-                    <BookOpenIcon />
-                </Button>            
-            </div>
-
-            <div className="mt-16 w-fit h-fit rounded-full bg-white">
-                <Button variant="outline" 
-                    className="rounded-full w-16 h-16 border-[green] bg-[green]/30 hover:bg-[green]/50"
-                >
-                    <CheckIcon color="green" />
-                </Button>
+            <div className="mt-[410px] flex flex-col items-center justify-center gap-10">
+                {!isLoadingGuess && !isGuessReady ?
+                    <div className="w-fit h-fit rounded-full bg-white">
+                        <Button variant="outline" 
+                            className="rounded-full w-16 h-16 border-[orange] bg-[orange]/30 hover:bg-[orange]/50"
+                            onClick={takePicture}
+                        >
+                            <CameraIcon color="orange" />
+                        </Button>
+                    </div>
+                    :
+                    <div className="flex flex-row items-center justify-center gap-8">
+                        <div className="w-fit h-fit rounded-full bg-white">
+                            <Button variant="outline" 
+                                className="rounded-full w-16 h-16 border-[red] bg-[red]/30 hover:bg-[red]/50"
+                                onClick={clearPicture}
+                            >
+                                <XIcon color="red" />
+                            </Button>
+                        </div>
+                        <div className={cn("w-fit h-fit rounded-full", !isGuessReady ? "bg-[gray]": "bg-white")}>
+                            <Button variant="outline" 
+                                className="rounded-full w-16 h-16 border-[green] bg-[green]/30 hover:bg-[green]/50"
+                                disabled={!isGuessReady}
+                                onClick={confirmGuess}
+                            >
+                                <CheckIcon color="green" />
+                            </Button>
+                        </div>
+                    </div>}
+                <div className={cn("w-fit h-fit rounded-full", isLoadingGuess || isGuessReady ? "bg-[gray]" : "bg-white")}>
+                    <Button variant="outline" 
+                        className="rounded-full w-16 h-16 border-[gray] bg-[gray]/30 hover:bg-[gray]/50"
+                        onClick={openModal}
+                        disabled={isLoadingGuess || isGuessReady}
+                    >
+                        <BookOpenIcon />
+                    </Button>
+                </div>
             </div>
         </div>
     )

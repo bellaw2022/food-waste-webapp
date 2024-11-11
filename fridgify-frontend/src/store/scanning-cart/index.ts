@@ -13,6 +13,16 @@ export interface CartItem {
     expirationDays: number,
 };
 
+export const makeDefaultItem = (): CartItem => {
+    // (name: string) => {
+    // when expDates and unit types are available in database, use them here
+    return {
+        quantity: 1,
+        unit: UnitTypes.COUNT,
+        expirationDays: 5,
+    }
+};
+
 interface ScanningCartState {
     // Modal State
     isModalOpen: boolean;
@@ -24,6 +34,7 @@ interface ScanningCartState {
         [name: string]: CartItem;
     },
     setItems: (items: { [name: string]: CartItem }) => void;
+    addItem: (name: string) => void;
     removeItem: (name: string) => void;
     updateItem: (name: string, updates: { quantity?: number, unit?: UnitTypes, expirationDays?: number }) => void;
 }
@@ -37,6 +48,10 @@ export const useScanningCart = create<ScanningCartState>()(
             closeModal: () => set(() => ({ isModalOpen: false })),
             cartItems: {},
             setItems: (items: { [name: string]: CartItem }) => set(() => ({ cartItems: items })),
+            addItem: (name: string) => set((state) => {
+                state.cartItems[name] = makeDefaultItem();
+                return state;
+            }),
             removeItem: (name: string) => set((state) => {
                 if (name in state.cartItems) {
                     const newItems = state.cartItems;
