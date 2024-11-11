@@ -8,7 +8,7 @@ function App() {
     const { profile, login, logOut } = useOAuth();
     return (
         <Router>
-            <div className="m-0">
+            <div className="m-0 p-0">
                 <Navbar/>
                 <Routes>
                     <Route path="/" element={<HomePage profile={profile} login={login} logOut={logOut} />} />
