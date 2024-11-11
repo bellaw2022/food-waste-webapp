@@ -20,12 +20,17 @@
   transform: scale(1.02);
 }
 
-.recipes-text {
+.recipes-text,
+.recipe-text {
   display: grid;
   grid-template-columns: 1fr 25px 25px;
   align-items: center;
   padding: 5px 5px;
   border-top: 1px solid #adadad;
+}
+
+.recipe-text {
+  border-top: none;
 }
 
 .recipes-image {
@@ -39,9 +44,27 @@
 }
 
 .recipes-missed-count,
-.recipes-used-count {
+.recipes-used-count,
+.recipe-missed-count,
+.recipe-used-count {
   font-size: 0.9em;
   padding: 0px 5px;
+}
+
+.recipe {
+  padding: 0px 20px;
+  border: 2px solid #adadad;
+}
+
+.recipe-title {
+  font-size: 1.3em;
+  font-weight: bold;
+}
+
+.recipe-image {
+  max-width: 300px;
+  height: auto;
+  border-radius: 4px;
 }
 
 .ingredient {
@@ -55,5 +78,6 @@
   display: flex;
   flex-direction: row;
   align-items: center;
+  justify-content: flex-start;
   column-gap: 20px;
 }
