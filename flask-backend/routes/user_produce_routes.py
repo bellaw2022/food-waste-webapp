@@ -73,7 +73,7 @@ def add_user_produce(user_id):
     return jsonify(result), 201
     
 # Delete entry from UserAndProduce table of user_id and produce_id
-@user_produce_routes.route('/api/user/<int:user_id>/produce/<int:produce_id>', method=['DELETE'])
+@user_produce_routes.route('/api/user/<int:user_id>/produce/<int:produce_id>', methods=['DELETE'])
 def delete_user_produce(user_id, produce_id):
     user_produce = UserAndProduce.query.filter_by(user_id=user_id, produce_id=produce_id).first()
     
@@ -87,7 +87,7 @@ def delete_user_produce(user_id, produce_id):
         return jsonify({"message": "Record not found"}), 404
 
 # Allows update to produce name, expiration date, and quantity (final quantity <= original quantity)
-@user_produce_routes.route('/api/user/<int:user_id>/produce/<int:produce_id>', method=['UPDATE'])
+@user_produce_routes.route('/api/user/<int:user_id>/produce/<int:produce_id>', methods=['UPDATE'])
 def update_user_produce(user_id, produce_id):
     user_produce = UserAndProduce.query.filter_by(user_id=user_id, produce_id=produce_id).first()
     if not user_produce:
