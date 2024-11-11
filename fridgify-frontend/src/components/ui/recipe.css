@@ -1,0 +1,35 @@
+.recipe-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 16px;
+  padding: 16px;
+}
+
+.recipe-card {
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 12px;
+  text-align: center;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+.recipe-card:hover {
+  transform: scale(1.02);
+}
+
+.recipe-image {
+  width: 100%;
+  height: auto;
+  border-radius: 4px;
+}
+
+.recipe-title {
+  font-size: 1.2em;
+  margin: 8px 0;
+}
+
+.recipe-number {
+  font-size: 0.9em;
+  color: #555;
+}
