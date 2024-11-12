@@ -54,6 +54,7 @@
 .recipe {
   padding: 0px 20px;
   border: 2px solid #adadad;
+  background-color: #ededed;
 }
 
 .recipe-title {
@@ -69,7 +70,7 @@
 
 .ingredient {
   display: grid;
-  grid-template-columns: 80px 1fr 2fr;
+  grid-template-columns: 80px 1fr 2fr 1fr;
 }
 .ingredients-section {
   padding: 20px 0px;
@@ -80,4 +81,19 @@
   align-items: center;
   justify-content: flex-start;
   column-gap: 20px;
+  padding: 10px 0px;
+}
+.instructions-title,
+.ingredients-title {
+  font-weight: bold;
+  font-size: 1em;
+  padding-bottom: 5px;
+}
+
+.instructions {
+  padding-top: 10px;
+  padding-bottom: 20px;
+}
+.instructions-text {
+  text-decoration: underline;
 }

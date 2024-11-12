@@ -7,7 +7,8 @@ user_produce_routes = Blueprint('user_produce_routes', __name__)
 # Get all entries from UserAndProduce table of user_id
 @user_produce_routes.route('/api/user/<int:user_id>/produce', methods=['GET'])
 def get_user_produce(user_id):
-    user_produce = UserAndProduce.query.filter_by(user_id=user_id).all()
+    # user_produce = UserAndProduce.query.filter_by(user_id=user_id).all()
+    data =  db.session.query(UserAndProduce).join(Produce, UserAndProduce.produce_id == Produce.produce_id).filter(UserAndProduce.user_id == user_id)  # Replace with your user filter.all()
 
     result = [
         {
@@ -16,9 +17,10 @@ def get_user_produce(user_id):
             "expiration_date": record.expiration_date.strftime('%Y-%m-%d'),
             "produce_id": record.produce_id,
             "quantity": record.quantity,
-            "image_url" : record.image_url
+            "image_url" : record.image_url,
+            "produce_name": record.produce.produce_name 
 
-        } for record in user_produce
+        } for record in data
     ]
     return jsonify(result)
 
