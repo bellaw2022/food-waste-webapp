@@ -2155,4 +2155,74 @@ def get_recipe_info():
         print(f"Error querying external API: {e}")
         return jsonify({"error": "Failed to query external API"}), 500
     
-   
+@recipes_routes.route('/api/recipe/ai', methods = ['POST'])
+def get_ai_recipe_info():
+    data = {
+    "recipe": "Spicy Tomato and Potato Stir-Fry",
+    "ingredients": [
+        [
+            "Tomato",
+            "200",
+            "Grams"
+        ],
+        [
+            "Onion",
+            "100",
+            "Grams"
+        ],
+        [
+            "Potato",
+            "200",
+            "Grams"
+        ],
+        [
+            "Red chili powder",
+            "1",
+            "Teaspoon"
+        ],
+        [
+            "Garlic",
+            "2",
+            "Cloves"
+        ],
+        [
+            "Salt",
+            "to taste",
+            ""
+        ],
+        [
+            "Olive oil",
+            "2",
+            "Tablespoons"
+        ],
+        [
+            "Fresh cilantro",
+            "for garnish",
+            ""
+        ]
+    ],
+    "instructions": [
+        "Step 1: Wash and dice the tomatoes, onions, and potatoes.",
+        "Step 2: Heat olive oil in a pan over medium heat.",
+        "Step 3: Add chopped garlic and onions to the pan. Sauté until onions are golden brown.",
+        "Step 4: Add diced potatoes to the pan and stir well. Cover and cook for about 10 minutes until potatoes are tender.",
+        "Step 5: Add the diced tomatoes, red chili powder, and salt. Stir everything together and cook for another 5 minutes.",
+        "Step 6: Garnish with fresh cilantro before serving. Enjoy your spicy tomato and potato stir-fry!"
+    ]
+
+    }
+    response_data = {
+        "title":data["recipe"],
+        "image" : None,
+        "servings": 1,
+        "ingredients": [
+            {"name" : ingredient[0], "unit" : ingredient[2], "amount" : ingredient[1]}
+            for ingredient in data["ingredients"]
+        ],
+        "instructions" : data["instructions"],
+        "missedIngredients" : ["Potato", "Red chili powder"]
+    }
+
+    print(response_data)
+
+    return jsonify(response_data)

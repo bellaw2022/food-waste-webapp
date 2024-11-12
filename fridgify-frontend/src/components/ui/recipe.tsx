@@ -3,6 +3,8 @@ import BackButton from "../shared/back-button";
 import React, { useState, useEffect } from "react";
 import { FaCirclePlus } from "react-icons/fa6";
 import { FaCircleMinus } from "react-icons/fa6";
+import defaultImage from "../../Food.png";
+
 interface CompleteRecipe {
   id: number;
   title: string;
@@ -13,7 +15,8 @@ interface CompleteRecipe {
   usedIngredients: string[];
   servings: number;
   sourceURL: string;
-  ingredients: { name: string; unit: string; amount: number }[];
+  ingredients: { name: string; unit: string; amount: string }[];
+  instructions: string[];
 }
 
 interface Props {
@@ -36,6 +39,17 @@ const Recipe: React.FC<CombinedProps> = ({
     recipe.ingredients
   );
 
+  function parseAmount(amount: string): number | string {
+    const parsedAmount = parseFloat(amount);
+
+    // Check if parsedAmount is a valid number
+    if (!isNaN(parsedAmount)) {
+      return parsedAmount; // Return as number for calculations
+    } else {
+      return amount; // Return as-is if it can't be converted
+    }
+  }
+
   const checkIngredient = (ingredientName: string): boolean => {
     // Return true if ingredient exists in usedIngredients, false if in missedIngredients
     return !recipe.missedIngredients.includes(ingredientName);
@@ -44,10 +58,16 @@ const Recipe: React.FC<CombinedProps> = ({
   const getScaledIngredients = (newServings: number) => {
     const multiplier = newServings / recipe.servings;
 
-    const newIngredients = recipe.ingredients.map((ingredient) => ({
-      ...ingredient,
-      amount: ingredient.amount * multiplier,
-    }));
+    const newIngredients = recipe.ingredients.map((ingredient) => {
+      const parsedAmount = parseAmount(ingredient.amount);
+      return {
+        ...ingredient,
+        amount:
+          typeof parsedAmount === "number"
+            ? (parsedAmount * multiplier).toString()
+            : parsedAmount.toString(),
+      };
+    });
     return newIngredients;
   };
 
@@ -80,17 +100,33 @@ const Recipe: React.FC<CombinedProps> = ({
 
   return (
     <>
-      <BackButton
-        setToFalsePage={setRecipePage}
-        setToTruePage={setListPage}
-      ></BackButton>
+      {recipe.instructions.length > 0 ? (
+        <BackButton
+          setToFalsePage={[setRecipePage, setBasePage]}
+          setToTruePage={[setListPage]}
+          setToBasePage={setBasePage}
+          backToBase={true}
+        ></BackButton>
+      ) : (
+        <BackButton
+          setToFalsePage={[setRecipePage, setBasePage]}
+          setToTruePage={[setListPage]}
+          setToBasePage={setBasePage}
+          backToBase={false}
+        ></BackButton>
+      )}
+
       <div className="recipe">
         <div className="recipe-text">
           <h2 className="recipe-title">{recipe.title}</h2>
           <p className="recipe-used-count">-{recipe.usedIngredientCount}</p>
           <p className="recipe-missed-count">+{recipe.missedIngredientCount}</p>
         </div>
-        <img src={recipe.image} alt={recipe.title} className="recipe-image" />
+        <img
+          src={recipe.image || defaultImage}
+          alt={recipe.title}
+          className="recipe-image"
+        />
         <div className="serving-section">
           <FaCircleMinus
             onClick={handleServingDecrease}
@@ -107,9 +143,7 @@ const Recipe: React.FC<CombinedProps> = ({
           <div className="ingredient-list">
             {scaledIngredients.map((ingredient, index) => (
               <div className="ingredient" key={index}>
-                <div className="ingredient-amount">
-                  {parseFloat(ingredient.amount.toFixed(1))}{" "}
-                </div>
+                <div className="ingredient-amount">{ingredient.amount} </div>
                 <div className="ingredient-unit"> {ingredient.unit}</div>
                 <div className="ingredient-title"> {ingredient.name}</div>
                 <span
@@ -130,14 +164,22 @@ const Recipe: React.FC<CombinedProps> = ({
         </div>
         <div className="instructions">
           <div className="instructions-title"> Instructions</div>
-          <a
-            href={recipe.sourceURL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="instructions-text"
-          >
-            Refer to this website
-          </a>
+          {recipe.instructions.length < 1 ? (
+            <a
+              href={recipe.sourceURL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="instructions-text"
+            >
+              Refer to this website
+            </a>
+          ) : (
+            recipe.instructions.map((instruction, index) => (
+              <div key={index} className="instructions-step">
+                {instruction}
+              </div>
+            ))
+          )}
         </div>
       </div>
     </>
