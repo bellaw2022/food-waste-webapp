@@ -16,7 +16,20 @@ interface CompleteRecipe {
   ingredients: { name: string; unit: string; amount: number }[];
 }
 
-const Recipe: React.FC<{ recipe: CompleteRecipe }> = ({ recipe }) => {
+interface Props {
+  setBasePage: React.Dispatch<React.SetStateAction<boolean>>;
+  setListPage: React.Dispatch<React.SetStateAction<boolean>>;
+  setRecipePage: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+type CombinedProps = { recipe: CompleteRecipe } & Props;
+
+const Recipe: React.FC<CombinedProps> = ({
+  recipe,
+  setBasePage,
+  setListPage,
+  setRecipePage,
+}) => {
   console.log("recipe: ", recipe);
   const [servings, setServings] = useState<number>(recipe.servings);
   const [scaledIngredients, setScaledIngredients] = useState(
@@ -67,7 +80,10 @@ const Recipe: React.FC<{ recipe: CompleteRecipe }> = ({ recipe }) => {
 
   return (
     <>
-      <BackButton></BackButton>
+      <BackButton
+        setToFalsePage={setRecipePage}
+        setToTruePage={setListPage}
+      ></BackButton>
       <div className="recipe">
         <div className="recipe-text">
           <h2 className="recipe-title">{recipe.title}</h2>

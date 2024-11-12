@@ -13,15 +13,32 @@ interface Recipe {
   usedIngredients: string[];
 }
 
+interface Props {
+  setBasePage: React.Dispatch<React.SetStateAction<boolean>>;
+  setListPage: React.Dispatch<React.SetStateAction<boolean>>;
+  setRecipePage: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
 interface RecipeList {
   recipes: Recipe[];
   onSelectRecipe: (recipe: Recipe) => void;
 }
 
-const RecipeList: React.FC<RecipeList> = ({ recipes, onSelectRecipe }) => {
+type CombinedProps = RecipeList & Props;
+
+const RecipeList: React.FC<CombinedProps> = ({
+  recipes,
+  onSelectRecipe,
+  setBasePage,
+  setListPage,
+  setRecipePage,
+}) => {
   return (
     <>
-      <BackButton></BackButton>
+      <BackButton
+        setToFalsePage={setListPage}
+        setToTruePage={setBasePage}
+      ></BackButton>
       <div className="recipes-list">
         {recipes.map((recipe, index) => (
           <div
