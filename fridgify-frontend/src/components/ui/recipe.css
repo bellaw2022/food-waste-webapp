@@ -55,6 +55,8 @@
   padding: 0px 20px;
   border: 2px solid #adadad;
   background-color: #ededed;
+  margin-bottom: 40px;
+  border-radius: 10px;
 }
 
 .recipe-title {
@@ -100,7 +102,7 @@
 
 .instructions-step {
   background-color: white;
-  border-radius: 10px;
+  border-radius: 5px;
   margin: 10px 0px;
   padding: 5px 2px;
 }
