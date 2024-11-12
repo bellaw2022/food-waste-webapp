@@ -33,8 +33,22 @@ def get_produce_info():
 @produce_routes.route('/api/all_produces', methods=['GET'])
 def get_all_produces():
     try:
-        produces = Produce.query.all()
-        result = [p.produce_name for p in produces]
-        return jsonify({"status": 200, "data": result})
+        produces = Produce.query.order_by(Produce.category, Produce.produce_name).all()
+
+        result = {}
+
+        for p in produces:
+            if p.category not in result:
+                result[p.category] = []
+            result[p.category].append(p.produce_name)
+
+        return jsonify({
+            "status": 200,
+            "data": result
+        })
+
     except Exception as e:
-        return jsonify({"status": 202, "data": str(e)})
+        return jsonify({
+            "status": 202,
+            "data": str(e)
+        })
