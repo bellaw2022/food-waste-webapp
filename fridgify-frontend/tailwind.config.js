@@ -53,7 +53,7 @@ export default {
                     '4': 'hsl(var(--chart-4))',
                     '5': 'hsl(var(--chart-5))',
                 },
-                magenta: '#783C5B', 
+                magenta: '#3EA32E', 
                 lightGray: '#DDDFE0', 
             },
         },

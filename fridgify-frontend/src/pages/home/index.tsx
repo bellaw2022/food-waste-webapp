@@ -1,24 +1,3 @@
-// export const HomePage = ({ profile, login, logOut }) => {
-//     return (
-//         <div className="mx-4">
-//             <h1 className="text-3xl font-bold">Home</h1>
-//             <br />
-//             {profile ? (
-//                 <div>
-//                     <img src={profile.picture} alt="User" />
-//                     <h3>User Logged in</h3>
-//                     <p>Name: {profile.name}</p>
-//                     <p>Email Address: {profile.email}</p>
-//                     <br />
-//                     <button onClick={logOut}>Log out</button>
-//                 </div>
-//             ) : (
-//                 <button onClick={() => login()}>Sign in with Google </button>
-//             )}
-//         </div>
-//     );
-// }
-
 export const HomePage = ({ profile, login, logOut }) => {
     return (
         <div className="mx-6 my-8 max-w-md lg:max-w-lg mx-auto">
@@ -40,7 +19,7 @@ export const HomePage = ({ profile, login, logOut }) => {
                     </p>
                     <button 
                         onClick={logOut} 
-                        className="px-6 py-2 bg-magenta text-white font-semibold rounded-md hover:bg-pink-600 transition duration-150"
+                        className="px-6 py-2 bg-magenta text-white font-semibold rounded-md hover:bg-[#2D7A1F] transition duration-150"
                     >
                         Log Out
                     </button>
@@ -52,7 +31,7 @@ export const HomePage = ({ profile, login, logOut }) => {
                     </p>
                     <button 
                         onClick={login} 
-                        className="px-6 py-2 bg-magenta text-white font-semibold rounded-md hover:bg-pink-600 transition duration-150"
+                        className="px-6 py-2 bg-magenta text-white font-semibold rounded-md hover:bg-[#2D7A1F] transition duration-150"
                     >
                         Sign in with Google
                     </button>

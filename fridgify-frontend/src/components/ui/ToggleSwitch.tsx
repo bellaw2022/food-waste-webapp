@@ -83,7 +83,7 @@ const Slider = styled.span<{ checked: boolean }>`
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: ${({ checked }) => (checked ? '#783C5B' : '#ccc')}; 
+  background-color: ${({ checked }) => (checked ? '#3EA32E' : '#ccc')}; 
   transition: 0.4s;
   border-radius: 24px;
 

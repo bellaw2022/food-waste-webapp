@@ -1,6 +1,6 @@
 from flask import Blueprint, request, Response
 import requests
-from openai import AsyncOpenAI
+# from openai import AsyncOpenAI
 import os
 import base64
 import json
@@ -8,9 +8,9 @@ import asyncio
 
 detection_routes = Blueprint('detection_routes', __name__)
 
-client = AsyncOpenAI(
-    api_key=os.getenv('OPENAI_API_KEY')
-)
+# client = AsyncOpenAI(
+#     api_key=os.getenv('OPENAI_API_KEY')
+# )
 
 RECEIPT_PROMPT = """
     Does this image contain a receipt?
