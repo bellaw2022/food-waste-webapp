@@ -1,9 +1,11 @@
 import Ingredients from "@/components/ui/ingredients";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./index.css";
 import NoRecipesModal from "@/components/ui/noRecipesModal";
 import RecipeList from "../../components/ui/recipeList";
 import Recipe from "../../components/ui/recipe";
+import { Route, Routes, useNavigate } from "react-router-dom";
+import { SERVFAIL } from "dns";
 
 interface Recipe {
   /*title: string;
@@ -72,7 +74,11 @@ export const RecipePage: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [showNoRecipesModal, setShowNoRecipesModal] = useState(true);
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe>();
-  const [generateRecipes, setGenerateRecipes] = useState<boolean>(false);
+  //const [generateRecipes, setGenerateRecipes] = useState<boolean>(false);
+
+  const [basePage, setBasePage] = useState<boolean>(true);
+  const [listPage, setListPage] = useState<boolean>(false);
+  const [recipePage, setRecipePage] = useState<boolean>(false);
 
   const handleSelectionChange = (selectedIngredients: string[]) => {
     console.log("Selected ingredients:", selectedIngredients);
@@ -117,8 +123,32 @@ export const RecipePage: React.FC = () => {
     } catch (error) {
       console.error("Error: ", error);
     } finally {
+      setRecipePage(true);
+      setBasePage(false);
+      setListPage(false);
     }
   };
+
+  useEffect(() => {
+    if (basePage) {
+      // Clear the recipe list when baseRecipe changes to true
+      setRecipes([]);
+      setSelectedIngredients([]);
+      setCompleteRecipe({
+        id: 0,
+        title: "",
+        missedIngredientCount: 0,
+        usedIngredientCount: 0,
+        image: "",
+        missedIngredients: [],
+        usedIngredients: [],
+        servings: 0,
+        sourceURL: "",
+        ingredients: [],
+      });
+      console.log("zero everything");
+    }
+  }, [basePage]);
 
   const searchRecipes = async () => {
     setLoading(true);
@@ -156,7 +186,10 @@ export const RecipePage: React.FC = () => {
       console.error("Error: ", error);
     } finally {
       setLoading(false);
-      setGenerateRecipes(true);
+      //setGenerateRecipes(true);
+      setRecipePage(false);
+      setBasePage(false);
+      setListPage(true);
     }
   };
 
@@ -179,21 +212,29 @@ export const RecipePage: React.FC = () => {
         </>
       )}
 
-      {generateRecipes &&
+      {listPage &&
         (recipes.length > 0 ? (
-          selectedRecipe == null ? (
-            <RecipeList
-              recipes={recipes}
-              onSelectRecipe={handleRecipeSelection}
-            ></RecipeList>
-          ) : (
-            <Recipe recipe={completeRecipe}></Recipe>
-          )
+          <RecipeList
+            recipes={recipes}
+            onSelectRecipe={handleRecipeSelection}
+            setBasePage={setBasePage}
+            setListPage={setListPage}
+            setRecipePage={setRecipePage}
+          ></RecipeList>
         ) : (
           showNoRecipesModal && (
             <NoRecipesModal onClose={() => setShowNoRecipesModal(false)} />
           )
         ))}
+
+      {recipePage && (
+        <Recipe
+          recipe={completeRecipe}
+          setBasePage={setBasePage}
+          setListPage={setListPage}
+          setRecipePage={setRecipePage}
+        ></Recipe>
+      )}
     </div>
   );
 };
