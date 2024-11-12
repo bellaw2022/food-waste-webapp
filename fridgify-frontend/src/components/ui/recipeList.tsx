@@ -36,8 +36,10 @@ const RecipeList: React.FC<CombinedProps> = ({
   return (
     <>
       <BackButton
-        setToFalsePage={setListPage}
-        setToTruePage={setBasePage}
+        setToFalsePage={[setListPage, setRecipePage]}
+        setToTruePage={[setBasePage]}
+        setToBasePage={setBasePage}
+        backToBase={false}
       ></BackButton>
       <div className="recipes-list">
         {recipes.map((recipe, index) => (

@@ -34,7 +34,8 @@ interface CompleteRecipe {
   usedIngredients: string[];
   servings: number;
   sourceURL: string;
-  ingredients: { name: string; unit: string; amount: number }[];
+  ingredients: { name: string; unit: string; amount: string }[];
+  instructions: string[];
 }
 
 export const RecipePage: React.FC = () => {
@@ -69,6 +70,7 @@ export const RecipePage: React.FC = () => {
     servings: 0,
     sourceURL: "",
     ingredients: [],
+    instructions: [],
   });
   // whether or not the button is clicked - true if loading or already loaded
   const [loading, setLoading] = useState(false);
@@ -145,6 +147,7 @@ export const RecipePage: React.FC = () => {
         servings: 0,
         sourceURL: "",
         ingredients: [],
+        instructions: [],
       });
       console.log("zero everything");
     }
@@ -193,22 +196,55 @@ export const RecipePage: React.FC = () => {
     }
   };
 
+  const searchAPIRecipe = async () => {
+    try {
+      const response = await fetch("http://127.0.0.1:5000/api/recipe/ai", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ ingredients: selectedIngredients }),
+      });
+      if (response.ok) {
+        const data = await response.json();
+
+        setCompleteRecipe(data);
+        console.log(completeRecipe);
+      }
+    } catch (error) {
+      console.error("Error: ", error);
+    } finally {
+      setRecipePage(true);
+      setBasePage(false);
+      setListPage(false);
+    }
+  };
+
   return (
     <div className="mx-4">
       <h1 className="text-3xl font-bold">Recipe Rec</h1>
-      {recipes.length < 1 && (
+      {basePage && (
         <>
           <Ingredients
             ingredients={ingredients}
             onSelectionChange={handleSelectionChange}
           ></Ingredients>
-          <button
-            className="recipe-button"
-            onClick={searchRecipes}
-            disabled={loading}
-          >
-            {loading ? "Searching..." : "Generate Recipes"}
-          </button>
+          <div className="recipe-buttons">
+            <button
+              className="recipe-button"
+              onClick={searchAPIRecipe}
+              disabled={loading}
+            >
+              {loading ? "Searching..." : "Generate AI Recipes"}
+            </button>
+            <button
+              className="recipe-button"
+              onClick={searchRecipes}
+              disabled={loading}
+            >
+              {loading ? "Searching..." : "Generate Recipes"}
+            </button>
+          </div>
         </>
       )}
 
