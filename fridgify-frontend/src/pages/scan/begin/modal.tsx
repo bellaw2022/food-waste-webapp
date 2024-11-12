@@ -74,10 +74,10 @@ export const ManualInputModal = () => {
                             </SelectTrigger>
                             <SelectContent position="popper">
                                 <SelectItem value="All">All Foods</SelectItem>
-                                <SelectItem value="Fruit">Fruit</SelectItem>
-                                <SelectItem value="Eggs & Dairy">Eggs & Dairy</SelectItem>
-                                <SelectItem value="Meat">Meat</SelectItem>
+                                <SelectItem value="Fruits">Fruits</SelectItem>
+                                <SelectItem value="Egg & Dairy">Egg & Dairy</SelectItem>
                                 <SelectItem value="Vegetables">Vegetables</SelectItem>
+                                <SelectItem value="Other">Other</SelectItem>
                             </SelectContent>
                         </Select>
                     </div>
@@ -86,7 +86,7 @@ export const ManualInputModal = () => {
                             <TableBody>
                                 {Object.entries(produceCatalog).map(([name, item]) => {
                                     if (
-                                        (item.category === categoryQuery || categoryQuery=== "All") &&
+                                        (item.category.toUpperCase() === categoryQuery.toUpperCase() || categoryQuery=== "All") &&
                                         (searchQuery === "" || name.toUpperCase().includes(searchQuery.toUpperCase()))
                                     ) {
                                         return (

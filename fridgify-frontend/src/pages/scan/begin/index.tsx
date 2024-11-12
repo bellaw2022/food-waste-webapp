@@ -13,7 +13,6 @@ import { useProduceCatalog } from "@/api";
 
 export const BeginScanningPage = () => {
     const { isCatalogLoading, isCatalogError, produceCatalog } = useProduceCatalog();
-    console.log(produceCatalog);
 
     const webcamRef = useRef<Webcam>(null);
     const canvasRef = useRef<HTMLCanvasElement>(null);

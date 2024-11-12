@@ -31,7 +31,7 @@ export const useInventory = () => {
             }
 
             const data2 = await response2.json();
-            console.log(data2.data);
+            
             const result = data2.data;
             Object.keys(result).forEach((name) => {
                 result[name] = {
