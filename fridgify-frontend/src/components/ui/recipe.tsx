@@ -23,6 +23,11 @@ const Recipe: React.FC<{ recipe: CompleteRecipe }> = ({ recipe }) => {
     recipe.ingredients
   );
 
+  const checkIngredient = (ingredientName: string): boolean => {
+    // Return true if ingredient exists in usedIngredients, false if in missedIngredients
+    return !recipe.missedIngredients.includes(ingredientName);
+  };
+
   const getScaledIngredients = (newServings: number) => {
     const multiplier = newServings / recipe.servings;
 
@@ -82,6 +87,7 @@ const Recipe: React.FC<{ recipe: CompleteRecipe }> = ({ recipe }) => {
           ></FaCirclePlus>
         </div>
         <div className="ingredients-section">
+          <div className="ingredients-title">Ingredients</div>
           <div className="ingredient-list">
             {scaledIngredients.map((ingredient, index) => (
               <div className="ingredient" key={index}>
@@ -89,13 +95,33 @@ const Recipe: React.FC<{ recipe: CompleteRecipe }> = ({ recipe }) => {
                   {parseFloat(ingredient.amount.toFixed(1))}{" "}
                 </div>
                 <div className="ingredient-unit"> {ingredient.unit}</div>
-                <div className="ingredient-count"> {ingredient.name}</div>
+                <div className="ingredient-title"> {ingredient.name}</div>
+                <span
+                  style={{
+                    width: "10px",
+                    height: "10px",
+                    borderRadius: "50%",
+                    backgroundColor: checkIngredient(ingredient.name)
+                      ? "green"
+                      : "red",
+                    display: "inline-block",
+                    marginLeft: "10px",
+                  }}
+                />
               </div>
             ))}
           </div>
         </div>
         <div className="instructions">
-          Refer to the following website: {recipe.sourceURL}
+          <div className="instructions-title"> Instructions</div>
+          <a
+            href={recipe.sourceURL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="instructions-text"
+          >
+            Refer to this website
+          </a>
         </div>
       </div>
     </>

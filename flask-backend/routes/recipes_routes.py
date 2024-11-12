@@ -1,6 +1,8 @@
 from flask import Blueprint, jsonify, request, Flask
 import requests  
 import os
+from routes.user_produce_routes import get_user_produce
+from difflib import get_close_matches
 
 recipes_routes = Blueprint('recipes_routes', __name__)
 
@@ -60,7 +62,8 @@ def generate_recipes():
 # sort by least ingredients needed
 @recipes_routes.route('/api/recipe/recipes_by_ingredients', methods=['POST', 'GET'])
 def search_recipes_by_ingredients():
-    ingredients = request.json 
+    ingredients = request.get_json().get("ingredients") 
+    #user_id = request.get_json().get("user_id") 
     print("searching for recipes with ingredients: ", ingredients)
     api = 'https://api.spoonacular.com/recipes/findByIngredients?apiKey='+os.getenv('RECIPE_API_KEY')
     if len(ingredients) > 0:
@@ -1679,7 +1682,7 @@ def search_recipes_by_ingredients():
         external_data = response
         print(external_data)
 
-        responsen_data = {
+        response_data = {
         "recipes": [
             {
                 "id": recipe["id"],
@@ -1705,13 +1708,38 @@ def search_recipes_by_ingredients():
             for recipe in external_data
         ]
         }
+
+        #response_data = update_ingredients_with_inventory(user_id, response_data)
         
-        return jsonify(responsen_data)
+        return jsonify(response_data)
     except requests.exceptions.RequestException as e:
         print(f"Error querying external API: {e}")
         return jsonify({"error": "Failed to query external API"}), 500
     
 
+def update_ingredients_with_inventory(user_id, response_data):
+    inventory = get_user_produce(user_id)
+    
+    for recipe in response_data["recipes"]:
+        # Set to store matched ingredients from missedIngredients
+        matched_ingredients = set()
+        
+        for ingredient in recipe["missedIngredients"]:
+            # Try to match ingredient with inventory items by produce_name
+            matched_item = get_close_matches(ingredient, [item["produce_name"] for item in inventory], n=1, cutoff=0.6)
+            
+            if matched_item:
+                # If a close match is found, move it to usedIngredients
+                matched_ingredients.add(ingredient)
+                recipe["usedIngredients"].append(ingredient)
+        
+        # Filter out matched ingredients from missedIngredients
+        recipe["missedIngredients"] = [
+            ingredient for ingredient in recipe["missedIngredients"]
+            if ingredient not in matched_ingredients
+        ]
+
+    return response_data
     
 @recipes_routes.route('/api/recipe/recipe_by_id', methods=['POST'])
 def get_recipe_info():
