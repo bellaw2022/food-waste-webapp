@@ -78,10 +78,11 @@ def search_recipes_by_ingredients():
     print("api: ", api)
 
     try:
-        # Make a GET request to the external API with the query parameter
-        #response = requests.get(api)
-        ##response.raise_for_status()  # Raise an exception for HTTP errors
 
+        # Make a GET request to the external API with the query parameter
+        response = requests.get(api).json()
+        #response.raise_for_status()  # Raise an exception for HTTP errors
+        '''
         response = [
     {
         "id": 660273,
@@ -1677,8 +1678,12 @@ def search_recipes_by_ingredients():
     }
 ]
         
+
+        '''
         # Parse and return the data from the external API
         #external_data = response.json()
+        print("response: ")
+        print(response)
         external_data = response
         print(external_data)
 
@@ -1749,9 +1754,10 @@ def get_recipe_info():
 
     try:
         # Make a GET request to the external API with the query parameter
-        #response = requests.get(api)
-        #response.raise_for_status()  # Raise an exception for HTTP errors
-
+        response = requests.get(api).json()
+        #
+        # response.raise_for_status()  # Raise an exception for HTTP errors
+        '''
         response = {
     "aggregateLikes": 1,
     "healthScore": 40,
@@ -2125,6 +2131,7 @@ def get_recipe_info():
     "spoonacularSourceUrl": "https://spoonacular.com/italian-vegetable-soup-648287"
 }
         
+        '''
         # Parse and return the data from the external API
         #external_data = response.json()
         external_data = response
