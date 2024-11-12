@@ -1,8 +1,13 @@
 import React, { useState } from "react";
 import "./ingredients.css";
 
+interface Pairs {
+  name: string;
+  days: number;
+}
+
 interface IngredientsProps {
-  ingredients: string[];
+  ingredients: Pairs[];
   onSelectionChange: (selectedIngredients: string[]) => void;
 }
 
@@ -29,8 +34,16 @@ const Ingredients: React.FC<IngredientsProps> = ({
 
   // Filter ingredients based on the search query
   const filteredIngredients = ingredients.filter((ingredient) =>
-    ingredient.toLowerCase().startsWith(searchQuery.toLowerCase())
+    ingredient.name.toLowerCase().startsWith(searchQuery.toLowerCase())
   );
+
+  const sortedIngredients = filteredIngredients.sort((a, b) => a.days - b.days);
+
+  const getDotColor = (days: number): string => {
+    if (days <= 2) return "red";
+    if (days >= 3 && days <= 5) return "yellow";
+    return "green";
+  };
 
   return (
     <div>
@@ -42,17 +55,28 @@ const Ingredients: React.FC<IngredientsProps> = ({
         className="search-bar"
       ></input>
       <div className="ingredients">
-        {filteredIngredients
+        {sortedIngredients
           .slice(0, showAll ? ingredients.length : 10)
           .map((ingredient, index) => (
             <button
               className={`ingredient-button ${
-                selectedIngredients.includes(ingredient) ? "selected" : ""
+                selectedIngredients.includes(ingredient.name) ? "selected" : ""
               }`}
               key={index}
-              onClick={() => handleIngredientClick(ingredient)}
+              onClick={() => handleIngredientClick(ingredient.name)}
             >
-              {ingredient}
+              {ingredient.name}
+              <span
+                className="dot"
+                style={{
+                  backgroundColor: getDotColor(ingredient.days),
+                  borderRadius: "50%",
+                  width: "8px",
+                  height: "8px",
+                  marginLeft: "8px",
+                  display: "inline-block", //
+                }}
+              ></span>
             </button>
           ))}
         {filteredIngredients.length > 10 && (

@@ -37,22 +37,21 @@ interface CompleteRecipe {
 
 export const RecipePage: React.FC = () => {
   const ingredients = [
-    "Tomato",
-    "Lettuce",
-    "Cheese",
-    "Bacon",
-    "Onion",
-    "Pickle",
-    "Ketchup",
-    "Mayo",
-    "Mustard",
-    "Relish",
-    "Cucumber",
-    "Carrot",
-    "Radish",
-    "Olive",
-    "Pepper",
-    "Garlic",
+    { name: "Tomato", days: 2 },
+    { name: "Lettuce", days: 5 },
+    { name: "Cheese", days: 3 },
+    { name: "Bacon", days: 1 },
+    { name: "Onion", days: 1 },
+    { name: "Pickle", days: 13 },
+    { name: "Ketchup", days: 13 },
+    { name: "Mayo", days: 13 },
+    { name: "Mustard", days: 3 },
+    { name: "Relish", days: 4 },
+    { name: "Cucumber", days: 3 },
+    { name: "Carrot", days: 1 },
+    { name: "Radish", days: 2 },
+    { name: "Olive", days: 10 },
+    { name: "Garlic", days: 6 },
   ];
 
   const [selectedIngredients, setSelectedIngredients] = useState<string[]>([]);
