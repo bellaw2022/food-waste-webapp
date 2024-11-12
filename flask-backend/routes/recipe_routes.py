@@ -12,6 +12,7 @@ from openai import AsyncOpenAI
 import os
 import asyncio
 from models import UserAndProduce, Produce
+import json
 
 recipe_routes = Blueprint('recipe_routes', __name__)
 
@@ -27,6 +28,15 @@ def get_recipe():
     """summary_
     """
     NotImplementedError
+
+
+def response_to_json(data):
+    try:
+        data = data.split('```json')[-1].split('```')[0]
+        data = json.loads(data)
+        return data
+    except Exception:
+        return None
 
 
 async def query(prompt, max_retries=3):
@@ -54,10 +64,13 @@ async def query(prompt, max_retries=3):
                         "content": prompt
                     }
                 ],
-                timeout=30
+                timeout=60
             )
             content = response.choices[0].message.content
-            return content
+            content = response_to_json(content)
+            if content:
+                return content
+            await asyncio.sleep(2**i * 0.1)
         except Exception as e:
             print(e)
             await asyncio.sleep(2**i * 0.1)
@@ -85,43 +98,54 @@ async def generate_recipe(user_id):
     
     data = request.get_json()
     ingredient_ids = data.get('ingredients', [])
-    preferences = data.get('preferences', {})
+    user_preferences = data.get('preferences', {})
 
-    ingredients = get_user_ingredients(user_id, ingredient_ids)
-    if not ingredients:
-        return jsonify({"error": "No ingredients found"}), 404
-    ingredients = [produce.produce_name for produce in ingredients]
+    # Gather data
+    inventory = UserAndProduce.query.filter_by(user_id=user_id).all()
+    if not inventory:
+        return jsonify({"error": "User has no ingredients"}), 404
+    if not ingredient_ids:
+        # Get list of all Produce from user inventory
+        produce = [Produce.query.get(produce.produce_id) for produce in inventory]
+        counts = [produce.quantity for produce in inventory]
+    else:
+        # Get list of Produce based on ingredient_ids
+        produce = [Produce.query.get(produce_id) for produce_id in ingredient_ids]
+        counts = [inventory.quantity for inventory in inventory if inventory.produce_id in ingredient_ids]
+    produce_name = [produce.produce_name for produce in produce]
+    units = [produce.unit for produce in produce]
+
+    # ingredients = list(zip(produce_name, counts, units))
+    ingredients = ""
+    for i in range(len(produce)):
+        ingredients += f'{produce_name[i]}: {counts[i]} {units[i]}\n'
 
     # Generate recipe based on user preferences and ingredients
     recipe_prompt = """
-        User preferences: {preferences}
+        User preferences: {user_preferences}
         User ingredients: {ingredients}
 
         Please create a recipe based on the user preferences and ingredients.
         Please ensure that the recipe is safe for the user to consume.
 
-    """.format(preferences=preferences, ingredients=ingredients)
+        Format your response as a json object as such:
+        {{
+            "recipe": "<Recipe name>",
+            "ingredients": [
+                ["Ingredient 1", "<quantity>", "<unit>"],
+                ["Ingredient 2", "<quantity>", "<unit>"]
+            ],
+            "instructions": ["Step 1", "Step 2", ...],
+            "reason": "Unable to generate recipe because ..."
+        }}
 
-    recipe = await query(recipe_prompt)
-    return jsonify({"recipe": recipe})
+        If you are unable to generate a recipe, please provide a reason, otherwise don't add the reason key.
+        Ensure that the recipe is safe for the user to consume.
+        Unless the ingredient unit is specified above, use traditional units of measurement.
+        Don't number the steps, just list them in order.
+        Don't use more of an ingredient than the user has in their inventory.
 
+    """.format(user_preferences=user_preferences, ingredients=ingredients)
 
-def get_user_ingredients(user_id, ingredient_ids):
-    """summary_
-    Get the user's ingredients based on the selected ingredient ids.
-    If no ingredient ids are provided, get the user's inventory.
-
-    Args:
-        user_id (int): The id of the user
-        ingredient_ids (list): A list of ingredient ids
-
-    Returns:
-        list: A list of Produce objects
-    """
-    if ingredient_ids:
-        produce = [Produce.query.get(produce_id) for produce_id in ingredient_ids]
-        produce = [produce for produce in produce if produce] # Remove None values
-        return produce
-    user_inventory = UserAndProduce.query.filter_by(user_id=user_id).all()
-    produce = [Produce.query.get(produce.produce_id) for produce in user_inventory]
-    return produce
+    data = await query(recipe_prompt)
+    return Response(json.dumps(data), mimetype='application/json')
