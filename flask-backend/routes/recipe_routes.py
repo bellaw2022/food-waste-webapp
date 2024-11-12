@@ -136,7 +136,11 @@ async def generate_recipe(user_id):
                 ["Ingredient 2", "<quantity>", "<unit>"]
             ],
             "instructions": ["Step 1", "Step 2", ...],
-            "reason": "Unable to generate recipe because ..."
+        }}
+
+        IF the recipe is unsafe for the user to consume format your response as such:
+        {{
+            "error": "Recipe is unsafe for user because ..."
         }}
 
         If you are unable to generate a recipe, please provide a reason, otherwise don't add the reason key.
