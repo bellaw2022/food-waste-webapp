@@ -1,10 +1,24 @@
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { API_URL } from "@/api/constants";
-import { CatalogItem } from "@/store";
+import { CartItem, CatalogItem } from "@/store";
+
+export const useUpdateInventory = () => {
+    const mutation = useMutation({
+        mutationFn: async () => {
+            await fetch(`${API_URL}/user/`)
+        }
+    })
+
+    return {
+        updateInventory: (items: CartItem[]) => {
+            mutation.mutate()
+        }
+    }
+}
 
 export const useInventory = () => {
     const query = useQuery({
-        queryKey: ["produce-catalog"],
+        queryKey: ["inventory"],
         queryFn: async () => {
             const response1 = await fetch(`${API_URL}/all_produces`);
             if (response1.status !== 200) {
