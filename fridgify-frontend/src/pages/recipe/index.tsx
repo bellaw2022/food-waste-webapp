@@ -88,6 +88,13 @@ export const RecipePage: React.FC = () => {
   const [listPage, setListPage] = useState<boolean>(false);
   const [recipePage, setRecipePage] = useState<boolean>(false);
 
+  const [searchOption, setSearchOption] = useState<number>(1);
+
+  const handleSearchOptionChange = (option: number) => {
+    setSearchOption(option);
+    console.log("search option changed to ", option);
+  };
+
   const handleSelectionChange = (selectedIngredients: string[]) => {
     console.log("Selected ingredients:", selectedIngredients);
     setSelectedIngredients(selectedIngredients);
@@ -155,7 +162,11 @@ export const RecipePage: React.FC = () => {
       const response = await axios.get(
         baseURL + "/api/recipe/recipes_by_ingredients",
         {
-          params: { ingredients: selectedIngredients },
+          params: {
+            ingredients: selectedIngredients,
+            userId: globalUserId,
+            option: searchOption,
+          },
         }
       );
 
@@ -213,6 +224,27 @@ export const RecipePage: React.FC = () => {
             ingredients={ingredients}
             onSelectionChange={handleSelectionChange}
           ></Ingredients>
+          <div className="option">
+            <h2 className="option-text">Option</h2>
+            <div className="option-buttons">
+              <button
+                className={`option-button ${
+                  searchOption === 1 ? "selected" : ""
+                }`}
+                onClick={() => handleSearchOptionChange(1)}
+              >
+                Maximize existing ingredients usage
+              </button>
+              <button
+                className={`option-button ${
+                  searchOption !== 1 ? "selected" : ""
+                }`}
+                onClick={() => handleSearchOptionChange(2)}
+              >
+                Minimize missing ingredients usage
+              </button>
+            </div>
+          </div>
           <div className="recipe-buttons">
             <button
               className="recipe-button"

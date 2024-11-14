@@ -65,8 +65,11 @@ def generate_recipes():
 def search_recipes_by_ingredients():
     #ingredients = request.get_json().get("ingredients") 
     ingredients = request.args.getlist('ingredients')
-    #user_id = request.get_json().get("user_id") 
+    user_id = request.args.get("userId") 
+    option = request.args.get('option')
     print("searching for recipes with ingredients: ", ingredients)
+    print("user id: ", user_id)
+    print("option: ", option)
     api = 'https://api.spoonacular.com/recipes/findByIngredients?apiKey='+os.getenv('RECIPE_API_KEY')
     if len(ingredients) > 0:
         api += '&ingredients='
@@ -76,7 +79,10 @@ def search_recipes_by_ingredients():
     
     print("api: ", api)
     # maximize used ingredients
-    api += '&ranking=1'
+    if(option == 1):
+        api += '&ranking=1'
+    else:
+        api += '&ranking=2'
     print("api: ", api)
 
     try:

@@ -1,4 +1,5 @@
-.recipe-button {
+.recipe-button,
+.option-button {
   background-color: #d9d9d9;
   color: #333;
   padding: 8px 12px;
@@ -14,4 +15,26 @@
   position: absolute;
   right: 30px;
   bottom: 50px;
+}
+
+.option-buttons {
+  display: flex;
+}
+
+.option-button {
+  font-weight: normal;
+}
+.option-button.selected {
+  background-color: #5b9a5b;
+  color: white;
+}
+.option {
+  margin-top: 40px;
+}
+
+.option-text {
+  color: #333;
+  margin: 5px;
+  margin-bottom: 5px;
+  font-weight: bold;
 }
