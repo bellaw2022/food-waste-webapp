@@ -70,6 +70,14 @@
   border-radius: 4px;
 }
 
+.recipe-subtract-button {
+  border: 2px solid #adadad;
+  background-color: #ededed;
+  border-radius: 5px;
+  padding: 0px 10px;
+  height: 70%;
+}
+
 .ingredient {
   display: grid;
   grid-template-columns: 80px 1fr 2fr 1fr;
@@ -105,4 +113,12 @@
   border-radius: 5px;
   margin: 10px 0px;
   padding: 5px 2px;
+}
+
+.recipe-top {
+  display: grid;
+  grid-template-columns: 1fr 200px;
+}
+
+.recipe-page {
 }

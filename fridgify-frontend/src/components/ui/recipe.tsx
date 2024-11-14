@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { FaCirclePlus } from "react-icons/fa6";
 import { FaCircleMinus } from "react-icons/fa6";
 import defaultImage from "../../Food.png";
+import RemoveInventory from "./removeInventory";
 
 interface CompleteRecipe {
   id: number;
@@ -38,6 +39,7 @@ const Recipe: React.FC<CombinedProps> = ({
   const [scaledIngredients, setScaledIngredients] = useState(
     recipe.ingredients
   );
+  const [showPopup, setShowPopup] = useState<boolean>(false);
 
   function parseAmount(amount: string): number | string {
     const parsedAmount = parseFloat(amount);
@@ -49,6 +51,10 @@ const Recipe: React.FC<CombinedProps> = ({
       return amount; // Return as-is if it can't be converted
     }
   }
+
+  const handlePopup = () => {
+    setShowPopup(!showPopup);
+  };
 
   const checkIngredient = (ingredientName: string): boolean => {
     // Return true if ingredient exists in usedIngredients, false if in missedIngredients
@@ -99,23 +105,28 @@ const Recipe: React.FC<CombinedProps> = ({
   };
 
   return (
-    <>
-      {recipe.instructions.length > 0 ? (
-        <BackButton
-          setToFalsePage={[setRecipePage, setBasePage]}
-          setToTruePage={[setListPage]}
-          setToBasePage={setBasePage}
-          backToBase={true}
-        ></BackButton>
-      ) : (
-        <BackButton
-          setToFalsePage={[setRecipePage, setBasePage]}
-          setToTruePage={[setListPage]}
-          setToBasePage={setBasePage}
-          backToBase={false}
-        ></BackButton>
-      )}
-
+    <div className="recipe-page">
+      <div className="recipe-top">
+        {recipe.instructions != null ? (
+          <BackButton
+            setToFalsePage={[setRecipePage, setBasePage]}
+            setToTruePage={[setListPage]}
+            setToBasePage={setBasePage}
+            backToBase={true}
+          ></BackButton>
+        ) : (
+          <BackButton
+            setToFalsePage={[setRecipePage, setBasePage]}
+            setToTruePage={[setListPage]}
+            setToBasePage={setBasePage}
+            backToBase={false}
+          ></BackButton>
+        )}
+        <button className="recipe-subtract-button" onClick={handlePopup}>
+          Subtract Ingredients
+        </button>
+      </div>
+      {showPopup && <RemoveInventory></RemoveInventory>}
       <div className="recipe">
         <div className="recipe-text">
           <h2 className="recipe-title">{recipe.title}</h2>
@@ -164,7 +175,7 @@ const Recipe: React.FC<CombinedProps> = ({
         </div>
         <div className="instructions">
           <div className="instructions-title"> Instructions</div>
-          {recipe.instructions.length < 1 ? (
+          {recipe.instructions == null ? (
             <a
               href={recipe.sourceURL}
               target="_blank"
@@ -182,7 +193,7 @@ const Recipe: React.FC<CombinedProps> = ({
           )}
         </div>
       </div>
-    </>
+    </div>
   );
 };
 

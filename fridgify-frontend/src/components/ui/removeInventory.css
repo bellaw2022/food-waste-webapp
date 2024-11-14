@@ -1,0 +1,46 @@
+.popup-ingredient {
+  display: grid;
+  grid-template-columns: 80px 1fr 2fr;
+  padding: 10px 0px;
+  column-gap: 10px;
+}
+.popup-ingredient-amount {
+  background-color: white;
+  border-radius: 5px;
+}
+
+.popup-section {
+  position: fixed;
+  background-color: #ededed;
+  border: 1px solid black;
+  border-radius: 10px;
+  z-index: 10;
+  padding: 10px;
+  width: 70%;
+  right: 17px;
+}
+
+.popup-title {
+  font-weight: bold;
+  font-size: 1em;
+  padding-bottom: 5px;
+}
+
+.popup-button {
+  background-color: white;
+  border-radius: 5px;
+  padding: 5px 10px;
+  border: 1px solid gray;
+  position: relative;
+  margin-top: 20px;
+  margin-bottom: 5px;
+  margin-right: 10px;
+}
+
+.popup-bottom {
+  display: flex;
+}
+
+.popup-empty {
+  flex: 1;
+}
