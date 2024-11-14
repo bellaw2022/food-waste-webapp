@@ -7,6 +7,7 @@ import Recipe from "../../components/ui/recipe";
 import { Route, Routes, useNavigate } from "react-router-dom";
 import { SERVFAIL } from "dns";
 import axios from "axios";
+import { useAppContext } from "../../AppContext";
 
 let baseURL = import.meta.env.VITE_API_URL;
 
@@ -42,6 +43,8 @@ interface CompleteRecipe {
 }
 
 export const RecipePage: React.FC = () => {
+  const { globalUserId, setGlobalUserId } = useAppContext();
+  console.log("userid: ", globalUserId);
   const ingredients = [
     { name: "Tomato", days: 2 },
     { name: "Lettuce", days: 5 },

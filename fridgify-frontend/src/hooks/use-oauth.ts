@@ -1,11 +1,13 @@
 import { googleLogout, useGoogleLogin } from "@react-oauth/google";
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext, createContext } from "react";
+import { useAppContext } from "../AppContext";
 
 export const useOAuth = () => {
     const [user, setUser] = useState(null);
     const [profile, setProfile] = useState(null);
     const [userId, setUserId] = useState(null);
+    const { globalUserId, setGlobalUserId } = useAppContext();
 
     const login = useGoogleLogin({
         onSuccess: (codeResponse) => {
@@ -45,9 +47,12 @@ export const useOAuth = () => {
                         user_id: backendLoginRes.data.user_id
                     };
 
+                    
+
                     console.log('Combined Profile Data:', combinedProfile);
                     setProfile(combinedProfile);
                     setUserId(backendLoginRes.data.user_id);
+                    setGlobalUserId(backendLoginRes.data.user_id);
 
                     localStorage.setItem('user_id', backendLoginRes.data.user_id);
                 } else {
