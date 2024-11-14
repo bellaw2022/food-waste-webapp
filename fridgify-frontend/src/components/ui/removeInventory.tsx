@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import "./removeInventory.css";
+import { SlClose } from "react-icons/sl";
 
 interface Ingredient {
   name: string;
@@ -9,9 +10,17 @@ interface Ingredient {
 
 interface IngredientProps {
   ingredient: Ingredient;
+  deleteIngredient: (name: string) => void; // Add delete function prop
 }
 
-const IngredientItem: React.FC<IngredientProps> = ({ ingredient }) => {
+interface Ingredients {
+  ingredients: Ingredient[];
+}
+
+const IngredientItem: React.FC<IngredientProps> = ({
+  ingredient,
+  deleteIngredient,
+}) => {
   // Initialize amount state with the default value (1 if undefined)
   const [amount, setAmount] = useState<number>(ingredient.amount || 1);
 
@@ -21,6 +30,10 @@ const IngredientItem: React.FC<IngredientProps> = ({ ingredient }) => {
     if (!isNaN(newAmount) && newAmount >= 0) {
       setAmount(newAmount);
     }
+  };
+
+  const handleDelete = () => {
+    deleteIngredient(ingredient.name);
   };
 
   return (
@@ -34,22 +47,40 @@ const IngredientItem: React.FC<IngredientProps> = ({ ingredient }) => {
       />
       <span className="popup-ingredient-unit">{ingredient.unit}</span>
       <span className="popup-ingredient-name">{ingredient.name}</span>
+      <button className="popup-ingredient-delete" onClick={handleDelete}>
+        <SlClose size={16}></SlClose>
+      </button>
     </div>
   );
 };
 
-const IngredientList: React.FC = () => {
-  const ingredients = [
+const IngredientList: React.FC<Ingredients> = ({
+  ingredients: initialIngredients,
+}) => {
+  /*const ingredients = [
     { name: "Flour", unit: "g", amount: 1 },
     { name: "Sugar", unit: "tbsp", amount: 1 },
     { name: "Milk", unit: "ml", amount: 1 },
-  ];
+  ];*/
+
+  const [ingredients, setIngredients] =
+    useState<Ingredient[]>(initialIngredients);
+
+  const deleteIngredient = (name: string) => {
+    setIngredients(
+      ingredients.filter((ingredient) => ingredient.name !== name)
+    );
+  };
 
   return (
     <div className="popup-section">
       <h1 className="popup-title">Ingredients List</h1>
       {ingredients.map((ingredient, index) => (
-        <IngredientItem key={index} ingredient={ingredient} />
+        <IngredientItem
+          key={index}
+          ingredient={ingredient}
+          deleteIngredient={deleteIngredient}
+        />
       ))}
       <div className="popup-bottom">
         <div className="popup-empty"></div>

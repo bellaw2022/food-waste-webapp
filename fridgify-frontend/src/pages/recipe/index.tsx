@@ -6,6 +6,7 @@ import RecipeList from "../../components/ui/recipeList";
 import Recipe from "../../components/ui/recipe";
 import { Route, Routes, useNavigate } from "react-router-dom";
 import { SERVFAIL } from "dns";
+import axios from "axios";
 
 interface Recipe {
   /*title: string;
@@ -95,33 +96,26 @@ export const RecipePage: React.FC = () => {
       /*
         title, image, servings, cookingMinutes, prepMinutes, ingredients, sourceURL
         */
-      const response = await fetch(
+      const response = await axios.get(
         "http://127.0.0.1:5000/api/recipe/recipe_by_id",
         {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ id: selectedRecipe.id.toString() }),
+          params: { id: selectedRecipe.id.toString() },
         }
       );
-      if (response.ok) {
-        const data: CompleteRecipe = await response.json();
-        console.log(data);
-        const updatedData = {
-          ...data, // Spread the existing data
-          missedIngredientCount: selectedRecipe.missedIngredientCount,
-          usedIngredientCount: selectedRecipe.usedIngredientCount,
-          missedIngredients: selectedRecipe.missedIngredients,
-          usedIngredients: selectedRecipe.usedIngredients,
-          id: selectedRecipe.id,
-        };
-        setCompleteRecipe(updatedData);
-        console.log(updatedData);
-        console.log(completeRecipe);
-      } else {
-        console.error("Error fetching recipes");
-      }
+
+      const data: CompleteRecipe = await response.data;
+      console.log(data);
+      const updatedData = {
+        ...data, // Spread the existing data
+        missedIngredientCount: selectedRecipe.missedIngredientCount,
+        usedIngredientCount: selectedRecipe.usedIngredientCount,
+        missedIngredients: selectedRecipe.missedIngredients,
+        usedIngredients: selectedRecipe.usedIngredients,
+        id: selectedRecipe.id,
+      };
+      setCompleteRecipe(updatedData);
+      console.log(updatedData);
+      console.log(completeRecipe);
     } catch (error) {
       console.error("Error: ", error);
     } finally {
@@ -156,35 +150,28 @@ export const RecipePage: React.FC = () => {
   const searchRecipes = async () => {
     setLoading(true);
     try {
-      const response = await fetch(
+      const response = await axios.get(
         "http://127.0.0.1:5000/api/recipe/recipes_by_ingredients",
         {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ ingredients: selectedIngredients }),
+          params: { ingredients: selectedIngredients },
         }
       );
-      if (response.ok) {
-        const data = await response.json();
 
-        const fetchedRecipes: Recipe[] = data.recipes.map((recipe: any) => ({
-          id: recipe.id,
-          title: recipe.title,
-          missedIngredientCount: recipe.missedIngredientCount,
-          usedIngredientCount: recipe.usedIngredientCount,
-          image: recipe.image,
-          missedIngredients: recipe.missedIngredients, // If missedIngredients is a string array
-          usedIngredients: recipe.usedIngredients, // If usedIngredients is a string array
-        }));
+      const data = await response.data;
 
-        console.log(fetchedRecipes);
-        setRecipes(fetchedRecipes);
-        console.log(recipes);
-      } else {
-        console.error("Error fetching recipes");
-      }
+      const fetchedRecipes: Recipe[] = data.recipes.map((recipe: any) => ({
+        id: recipe.id,
+        title: recipe.title,
+        missedIngredientCount: recipe.missedIngredientCount,
+        usedIngredientCount: recipe.usedIngredientCount,
+        image: recipe.image,
+        missedIngredients: recipe.missedIngredients, // If missedIngredients is a string array
+        usedIngredients: recipe.usedIngredients, // If usedIngredients is a string array
+      }));
+
+      console.log(fetchedRecipes);
+      setRecipes(fetchedRecipes);
+      console.log(recipes);
     } catch (error) {
       console.error("Error: ", error);
     } finally {
@@ -198,19 +185,14 @@ export const RecipePage: React.FC = () => {
 
   const searchAPIRecipe = async () => {
     try {
-      const response = await fetch("http://127.0.0.1:5000/api/recipe/ai", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ ingredients: selectedIngredients }),
+      const response = await axios.get("http://127.0.0.1:5000/api/recipe/ai", {
+        params: { ingredients: selectedIngredients },
       });
-      if (response.ok) {
-        const data = await response.json();
 
-        setCompleteRecipe(data);
-        console.log(completeRecipe);
-      }
+      const data = await response.data;
+
+      setCompleteRecipe(data);
+      console.log(completeRecipe);
     } catch (error) {
       console.error("Error: ", error);
     } finally {
