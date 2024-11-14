@@ -5,6 +5,7 @@ import { FaCirclePlus } from "react-icons/fa6";
 import { FaCircleMinus } from "react-icons/fa6";
 import defaultImage from "../../Food.png";
 import RemoveInventory from "./removeInventory";
+import axios from "axios";
 
 interface CompleteRecipe {
   id: number;
@@ -40,7 +41,13 @@ const Recipe: React.FC<CombinedProps> = ({
     recipe.ingredients
   );
   const [showPopup, setShowPopup] = useState<boolean>(false);
-
+  const [removeableIngredients, setRemoveableIngredients] = useState<
+    {
+      name: string;
+      amount: number;
+      unit: string;
+    }[]
+  >([]);
   function parseAmount(amount: string): number | string {
     const parsedAmount = parseFloat(amount);
 
@@ -51,6 +58,22 @@ const Recipe: React.FC<CombinedProps> = ({
       return amount; // Return as-is if it can't be converted
     }
   }
+
+  const fetchInitialIngredients = async () => {
+    try {
+      const response = await axios.get(
+        "http://127.0.0.1:5000/api/recipe/ingredients",
+        {
+          params: { ingredients: recipe.usedIngredients },
+        }
+      );
+
+      const data = await response.data;
+      setRemoveableIngredients(data);
+    } catch (error) {
+      console.error("Error fetching ingredients:", error);
+    }
+  };
 
   const handlePopup = () => {
     setShowPopup(!showPopup);
@@ -78,6 +101,7 @@ const Recipe: React.FC<CombinedProps> = ({
   };
 
   useEffect(() => {
+    fetchInitialIngredients();
     setServings(recipe.servings);
     setScaledIngredients(getScaledIngredients(recipe.servings));
   }, [recipe]);
@@ -126,7 +150,9 @@ const Recipe: React.FC<CombinedProps> = ({
           Subtract Ingredients
         </button>
       </div>
-      {showPopup && <RemoveInventory></RemoveInventory>}
+      {showPopup && (
+        <RemoveInventory ingredients={removeableIngredients}></RemoveInventory>
+      )}
       <div className="recipe">
         <div className="recipe-text">
           <h2 className="recipe-title">{recipe.title}</h2>

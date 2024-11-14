@@ -60,9 +60,11 @@ def generate_recipes():
 # maximize ingredients we chose - typical
 # sort by max ingredients used
 # sort by least ingredients needed
-@recipes_routes.route('/api/recipe/recipes_by_ingredients', methods=['POST', 'GET'])
+# NEED TO UPDATE WITH USER ID
+@recipes_routes.route('/api/recipe/recipes_by_ingredients', methods=['GET'])
 def search_recipes_by_ingredients():
-    ingredients = request.get_json().get("ingredients") 
+    #ingredients = request.get_json().get("ingredients") 
+    ingredients = request.args.getlist('ingredients')
     #user_id = request.get_json().get("user_id") 
     print("searching for recipes with ingredients: ", ingredients)
     api = 'https://api.spoonacular.com/recipes/findByIngredients?apiKey='+os.getenv('RECIPE_API_KEY')
@@ -1745,9 +1747,10 @@ def update_ingredients_with_inventory(user_id, response_data):
 
     return response_data
     
-@recipes_routes.route('/api/recipe/recipe_by_id', methods=['POST'])
+@recipes_routes.route('/api/recipe/recipe_by_id', methods=['GET'])
 def get_recipe_info():
-    id = request.get_json().get("id") 
+    #id = request.get_json().get("id") 
+    id = request.args.get("id")
 
     api = 'https://api.spoonacular.com/recipes/'+id+'/information?apiKey='+os.getenv('RECIPE_API_KEY')
 
@@ -2153,7 +2156,9 @@ def get_recipe_info():
         print(f"Error querying external API: {e}")
         return jsonify({"error": "Failed to query external API"}), 500
     
-@recipes_routes.route('/api/recipe/ai', methods = ['POST'])
+
+# NEED TO IMPLEMENT CONNECTION WITH AI ENDPOINT
+@recipes_routes.route('/api/recipe/ai', methods = ['GET'])
 def get_ai_recipe_info():
     data = {
     "recipe": "Spicy Tomato and Potato Stir-Fry",
@@ -2222,5 +2227,17 @@ def get_ai_recipe_info():
     }
 
     print(response_data)
+
+    return jsonify(response_data)
+
+@recipes_routes.route('/api/recipe/ingredients', methods = ['GET'])
+def get_ingredient_units():
+    ingredients = request.args.getlist('ingredients')
+
+    response_data =  [{
+        "name" : "milk",
+        "amount" : 1,
+        "unit" : "mg"
+    }]
 
     return jsonify(response_data)

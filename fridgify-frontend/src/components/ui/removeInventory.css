@@ -1,8 +1,9 @@
 .popup-ingredient {
   display: grid;
-  grid-template-columns: 80px 1fr 2fr;
+  grid-template-columns: 80px 1fr 2fr 30px;
   padding: 10px 0px;
   column-gap: 10px;
+  align-items: center;
 }
 .popup-ingredient-amount {
   background-color: white;
@@ -43,4 +44,8 @@
 
 .popup-empty {
   flex: 1;
+}
+
+.popup-ingredient-delete {
+  cursor: pointer;
 }
