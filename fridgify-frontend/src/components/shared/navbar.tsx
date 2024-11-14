@@ -23,7 +23,7 @@ export const Navbar = () => {
             </Link>
             <div className="flex flex-row items-center justify-center gap-1">
                 {buttonRoutes.map((route) => (
-                    <Link to={route.path}>
+                    <Link key={route.path} to={route.path}>
                         <Button variant="outline"
                             className={cn("px-3", route.path === location.pathname ? "border-black" : "")}
                         >

@@ -38,9 +38,7 @@ interface ScanningCartState {
     closeModal: () => void;
 
     // Cart State
-    cartItems: {
-        [name: string]: CartItem;
-    },
+    cartItems: Record<string, CartItem>;
     setItems: (items: { [name: string]: CartItem }) => void;
     addItem: (name: string, itemInfo: CatalogItem) => void;
     removeItem: (name: string) => void;

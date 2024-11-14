@@ -2,17 +2,52 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { API_URL } from "@/api/constants";
 import { CartItem, CatalogItem } from "@/store";
 
+const MILLISECONDS_IN_DAY = 24 * 60 * 60 * 1000;
+
 export const useUpdateInventory = () => {
     const mutation = useMutation({
-        mutationFn: async () => {
-            await fetch(`${API_URL}/user/`)
+        mutationFn: async (cart: Record<string, CartItem>) => {
+            const userIdString = localStorage.getItem('user_id');
+            if (!userIdString) throw new Error("Could not fetch user_id from local_storage");
+            const userId = parseInt(userIdString);
+
+            const formattedInputs = Object.keys(cart).map((itemName) => ({
+                produce_name: itemName,
+                quantity: cart[itemName].quantity,
+                purchase_date: (
+                    new Date()
+                ).toISOString().split("T")[0],
+                expiration_date: (
+                    new Date(
+                        Date.now() + cart[itemName].expirationDays * MILLISECONDS_IN_DAY
+                    )
+                ).toISOString().split("T")[0],
+            }));
+
+            const res = await fetch(`${API_URL}/user/${userId}/produce`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(formattedInputs),
+            });
+
+            if (!res.ok) throw new Error("Error communicating with backend to update inventory!");
+            const resJson = await res.json();
+            console.log(resJson);
+            if (resJson.status !== 200) throw new Error("Error response from backend!");
+        },
+        onSuccess: () => {
+            // toast success
+        },
+        onError: () => {
+            // toast error
         }
     })
 
     return {
-        updateInventory: (items: CartItem[]) => {
-            mutation.mutate()
-        }
+        updateInventory: async (cart: Record<string, CartItem>) => {
+            await mutation.mutateAsync(cart);
+        },
+        isUpdating: mutation.isPending,
     }
 }
 
@@ -20,49 +55,32 @@ export const useInventory = () => {
     const query = useQuery({
         queryKey: ["inventory"],
         queryFn: async () => {
-            const response1 = await fetch(`${API_URL}/all_produces`);
-            if (response1.status !== 200) {
-              throw new Error('Could not fetch names of produce catalog items!');
-            }
+            const userIdString = localStorage.getItem('user_id');
+            if (!userIdString) throw new Error("Could not fetch user_id from local_storage");
+            const userId = parseInt(userIdString);
 
-            const data1 = await response1.json();
-            const names = data1?.data;
-            if (!names) {
-                throw new Error("Could not get names from backend response!");
-            }
-            
-            const response2 = await fetch(`${API_URL}/produce`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    produces: names,
-                }),
-            });
-            if (response2.status !== 200) {
-                throw new Error("Failed to get info about produce catalog items!");
-            }
+            const res = await fetch(`${API_URL}/user/${userId}/produce`, { method: "GET" }).then(
+                res => res.json()
+            ).catch((error) => { throw new Error(error) });
 
-            const data2 = await response2.json();
-            
-            const result = data2.data;
-            Object.keys(result).forEach((name) => {
-                result[name] = {
-                    category: result[name].category ?? undefined,
-                    unit: result[name].unit,
-                    expirationDays: result[name].common_expdate,
-                    productId: result[name].product_id,
+            const todayDate = new Date((new Date()).toISOString().split("T")[0]);
+
+            const inventory: Record<string, CartItem> = {};
+            res.data?.forEach((item) => {
+                inventory[item.produce_name] = {
+                    quantity: item.quantity,
+                    unit: item.unit,
+                    expirationDays: Math.floor((Date.parse(item.expiration_date) - todayDate.getTime()) / MILLISECONDS_IN_DAY),
                 }
-            });
+            })
 
-            return result as Record<string, CatalogItem>;
+            return inventory as Record<string, CartItem>;
         }
     });
 
     return {
-        isCatalogLoading: query.isFetching,
-        isCatalogError: query.isError,
-        produceCatalog: query.data,
+        isInventoryLoading: query.isFetching,
+        isInventoryError: query.isError,
+        inventory: query.data,
     }
 };

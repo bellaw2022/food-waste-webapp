@@ -73,8 +73,6 @@ export const BeginScanningPage = () => {
                     canvasRef.current.width = 340;
                     canvasRef.current.height = 340;
 
-                    console.log(video.videoWidth, video.videoHeight);
-
                     ctx?.drawImage(
                         fullImageRef.current,
                         video.videoWidth/2-170, video.videoHeight*0.36-170, 340, 340, // region in the full image
@@ -102,7 +100,6 @@ export const BeginScanningPage = () => {
                         }
                         
                         const guessData = await res.json();
-                        console.log(guessData);
                         setGuess(guessData?.results?.product_name || "");
                         setLoadingGuess(false);
                     } catch (error) {

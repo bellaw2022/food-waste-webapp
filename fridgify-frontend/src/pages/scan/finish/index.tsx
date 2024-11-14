@@ -1,3 +1,4 @@
+import { useUpdateInventory } from "@/api/inventory";
 import { NumberInput } from "@/components/shared";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,12 +10,17 @@ import { Link, useNavigate } from "react-router-dom";
 
 export const FinishScanningPage = () => {
     const { cartItems, removeItem, updateItem, setItems } = useScanningCart();
+    const { updateInventory, isUpdating } = useUpdateInventory();
     const navigate = useNavigate();
 
-    const onFinish = useCallback(() => {
-        setItems({}); // Clear local storage
-        navigate("/inventory")
-    }, [setItems, navigate]);
+    const onFinish = useCallback(async () => {
+        if (isUpdating) return;
+
+        await updateInventory(cartItems).then(() => {
+            setItems({}); // Clear local storage
+            navigate("/inventory");
+        });
+    }, [isUpdating, updateInventory, cartItems, setItems, navigate]);
 
     return (
         <div className="mx-10 my-10">
