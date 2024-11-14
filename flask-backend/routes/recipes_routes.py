@@ -1,7 +1,8 @@
 from flask import Blueprint, jsonify, request, Flask
 import requests  
-import os
+import os, json
 from routes.user_produce_routes import get_user_inventory
+from routes.produce_routes import fetch_produce_info
 from difflib import get_close_matches
 
 recipes_routes = Blueprint('recipes_routes', __name__)
@@ -1721,7 +1722,7 @@ def search_recipes_by_ingredients():
         ]
         }
 
-        response_data = update_ingredients_with_inventory(user_id, response_data)
+        #response_data = update_ingredients_with_inventory(user_id, response_data)
         print("updated with inventory: ", response_data)
         
         return jsonify(response_data)
@@ -1731,7 +1732,11 @@ def search_recipes_by_ingredients():
     
 
 def update_ingredients_with_inventory(user_id, response_data):
-    inventory = get_user_inventory(user_id)
+    inventory_data = json.loads(get_user_inventory(user_id).data.decode("utf-8"))
+    
+    print("user ", user_id, " inventory: ", inventory_data)
+
+    inventory = inventory_data.get("data", [])
     
     for recipe in response_data["recipes"]:
         # Set to store matched ingredients from missedIngredients
@@ -1751,6 +1756,7 @@ def update_ingredients_with_inventory(user_id, response_data):
             ingredient for ingredient in recipe["missedIngredients"]
             if ingredient not in matched_ingredients
         ]
+        recipe["missedIngredientCount"] = len(recipe["missedIngredients"])
 
     return response_data
     
@@ -2241,10 +2247,22 @@ def get_ai_recipe_info():
 def get_ingredient_units():
     ingredients = request.args.getlist('ingredients')
 
-    response_data =  [{
-        "name" : "milk",
-        "amount" : 1,
-        "unit" : "mg"
-    }]
+    try:
+        produce_data = fetch_produce_info(ingredients)
 
-    return jsonify(response_data)
+        units = {name: info['unit'] for name, info in produce_data.items() if 'unit' in info}
+        print(units)
+
+        return units
+        return jsonify(response_data)
+
+        response_data =  [{
+            "name" : "milk",
+            "amount" : 1,
+            "unit" : "mg"
+        }]
+    except Exception as e:
+        print(f"Error retrieving units: {e}")
+        return None
+
+    

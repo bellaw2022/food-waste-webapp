@@ -9,16 +9,8 @@ def get_produce_info():
         data = request.get_json()
         produces = data.get('produces', [])
 
-        result = {}
-        for produce_name in produces:
-            produce = Produce.query.filter_by(produce_name=produce_name).first()
-            if produce:
-                result[produce_name] = {
-                    "product_id": produce.produce_id,
-                    "common_expdate": produce.common_expdate,
-                    "unit": produce.unit
-                }
-
+        result = fetch_produce_info(produces)
+        
         return jsonify({
             "status": 200,
             "data": result
@@ -28,6 +20,20 @@ def get_produce_info():
             "status": 202,
             "data": str(e)
         })
+
+# helper function so I can reuse this function for another function  
+def fetch_produce_info(produces):
+    result = {}
+    for produce_name in produces:
+        produce = Produce.query.filter_by(produce_name=produce_name).first()
+        if produce:
+            result[produce_name] = {
+                "product_id": produce.produce_id,
+                "common_expdate": produce.common_expdate,
+                "unit": produce.unit
+            }
+    return result
+
 
 
 @produce_routes.route('/api/all_produces', methods=['GET'])
