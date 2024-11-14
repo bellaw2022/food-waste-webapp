@@ -8,6 +8,8 @@ import { Route, Routes, useNavigate } from "react-router-dom";
 import { SERVFAIL } from "dns";
 import axios from "axios";
 
+let baseURL = import.meta.env.VITE_API_URL;
+
 interface Recipe {
   /*title: string;
   number: number;
@@ -96,12 +98,9 @@ export const RecipePage: React.FC = () => {
       /*
         title, image, servings, cookingMinutes, prepMinutes, ingredients, sourceURL
         */
-      const response = await axios.get(
-        "http://127.0.0.1:5000/api/recipe/recipe_by_id",
-        {
-          params: { id: selectedRecipe.id.toString() },
-        }
-      );
+      const response = await axios.get(baseURL + "/api/recipe/recipe_by_id", {
+        params: { id: selectedRecipe.id.toString() },
+      });
 
       const data: CompleteRecipe = await response.data;
       console.log(data);
@@ -151,7 +150,7 @@ export const RecipePage: React.FC = () => {
     setLoading(true);
     try {
       const response = await axios.get(
-        "http://127.0.0.1:5000/api/recipe/recipes_by_ingredients",
+        baseURL + "/api/recipe/recipes_by_ingredients",
         {
           params: { ingredients: selectedIngredients },
         }
@@ -185,7 +184,7 @@ export const RecipePage: React.FC = () => {
 
   const searchAPIRecipe = async () => {
     try {
-      const response = await axios.get("http://127.0.0.1:5000/api/recipe/ai", {
+      const response = await axios.get(baseURL + "/api/recipe/ai", {
         params: { ingredients: selectedIngredients },
       });
 

@@ -77,3 +77,5 @@ The frontend will run on http://localhost:3000.
 
 ### Step 4: Checking the Statistics Page
 To confirm that the frontend is correctly connected to the backend, navigate to the Statistics page by clicking on the link from the homepage. This page will fetch user waste data from the backend and display it.
+
+hello world

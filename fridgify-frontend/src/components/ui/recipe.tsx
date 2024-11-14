@@ -7,6 +7,8 @@ import defaultImage from "../../Food.png";
 import RemoveInventory from "./removeInventory";
 import axios from "axios";
 
+let baseURL = import.meta.env.VITE_API_URL;
+
 interface CompleteRecipe {
   id: number;
   title: string;
@@ -61,12 +63,9 @@ const Recipe: React.FC<CombinedProps> = ({
 
   const fetchInitialIngredients = async () => {
     try {
-      const response = await axios.get(
-        "http://127.0.0.1:5000/api/recipe/ingredients",
-        {
-          params: { ingredients: recipe.usedIngredients },
-        }
-      );
+      const response = await axios.get(baseURL + "/api/recipe/ingredients", {
+        params: { ingredients: recipe.usedIngredients },
+      });
 
       const data = await response.data;
       setRemoveableIngredients(data);
