@@ -67,7 +67,7 @@ def search_recipes_by_ingredients():
     ingredients = request.args.getlist('ingredients')
     user_id = request.args.get("userId") 
     option = request.args.get('option')
-    print("searching for recipes with ingredients: ", ingredients)
+    print("searching for recipes by ingredients: ", ingredients)
     print("user id: ", user_id)
     print("option: ", option)
     api = 'https://api.spoonacular.com/recipes/findByIngredients?apiKey='+os.getenv('RECIPE_API_KEY')
@@ -1721,7 +1721,8 @@ def search_recipes_by_ingredients():
         ]
         }
 
-        #response_data = update_ingredients_with_inventory(user_id, response_data)
+        response_data = update_ingredients_with_inventory(user_id, response_data)
+        print("updated with inventory: ", response_data)
         
         return jsonify(response_data)
     except requests.exceptions.RequestException as e:
@@ -1730,7 +1731,7 @@ def search_recipes_by_ingredients():
     
 
 def update_ingredients_with_inventory(user_id, response_data):
-    inventory = get_user_produce(user_id)
+    inventory = get_user_inventory(user_id)
     
     for recipe in response_data["recipes"]:
         # Set to store matched ingredients from missedIngredients

@@ -11,14 +11,23 @@ import { useAppContext } from "../../AppContext";
 
 let baseURL = import.meta.env.VITE_API_URL;
 
-interface Recipe {
-  /*title: string;
-  number: number;
-  pictureUrl: string;
-  ingredients: string[];
-  instructions: string[];
-  index: number;*/
+interface BackendIngredient {
+  userproduce_id: number;
+  produce_name: string;
+  quantity: number;
+  unit: string;
+  purchase_date: string; // Date as string in 'YYYY-MM-DD' format
+  expiration_date: string; // Date as string in 'YYYY-MM-DD' format
+}
+interface BackendData {
+  data: BackendIngredient[];
+}
+interface Ingredient {
+  name: string;
+  days: number;
+}
 
+interface Recipe {
   id: number;
   title: string;
   missedIngredientCount: number;
@@ -43,8 +52,10 @@ interface CompleteRecipe {
 }
 
 export const RecipePage: React.FC = () => {
-  const { globalUserId, setGlobalUserId } = useAppContext();
+  //const { globalUserId, setGlobalUserId } = useAppContext();
+  const globalUserId = 38;
   console.log("userid: ", globalUserId);
+  /*
   const ingredients = [
     { name: "Tomato", days: 2 },
     { name: "Lettuce", days: 5 },
@@ -61,7 +72,9 @@ export const RecipePage: React.FC = () => {
     { name: "Radish", days: 2 },
     { name: "Olive", days: 10 },
     { name: "Garlic", days: 6 },
-  ];
+  ];*/
+
+  const [ingredients, setIngredients] = useState<Ingredient[]>([]);
 
   const [selectedIngredients, setSelectedIngredients] = useState<string[]>([]);
   const [recipes, setRecipes] = useState<Recipe[]>([]);
@@ -82,7 +95,6 @@ export const RecipePage: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [showNoRecipesModal, setShowNoRecipesModal] = useState(true);
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe>();
-  //const [generateRecipes, setGenerateRecipes] = useState<boolean>(false);
 
   const [basePage, setBasePage] = useState<boolean>(true);
   const [listPage, setListPage] = useState<boolean>(false);
@@ -138,6 +150,7 @@ export const RecipePage: React.FC = () => {
     if (basePage) {
       // Clear the recipe list when baseRecipe changes to true
       setRecipes([]);
+      retrieveIngredients();
       setSelectedIngredients([]);
       setCompleteRecipe({
         id: 0,
@@ -155,6 +168,30 @@ export const RecipePage: React.FC = () => {
       console.log("zero everything");
     }
   }, [basePage]);
+
+  const retrieveIngredients = async () => {
+    try {
+      const response = await axios.get<BackendData>(
+        baseURL + "/api/user/" + globalUserId + "/produce"
+      );
+      const responseData = await response.data;
+      console.log(responseData);
+      const fetchedIngredients: Ingredient[] = responseData.data.map((item) => {
+        const expirationDate = new Date(item.expiration_date);
+        const today = new Date();
+        const daysUntilExpiration = Math.ceil(
+          (expirationDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)
+        );
+        return {
+          name: item.produce_name,
+          days: daysUntilExpiration,
+        };
+      });
+      setIngredients(fetchedIngredients);
+    } catch (error) {
+      console.error("Error fetching inventory in retrieveIngredients: ", error);
+    }
+  };
 
   const searchRecipes = async () => {
     setLoading(true);
