@@ -1,125 +1,122 @@
 from flask import Blueprint, jsonify, request
 from datetime import datetime, timedelta
-from models import db, UserAndProduce, Produce
+from models import db, UserAndProduce, Produce, UserWasteSaving
 
 user_produce_routes = Blueprint('user_produce_routes', __name__)
 
-# Get all entries from UserAndProduce table of user_id
+
 @user_produce_routes.route('/api/user/<int:user_id>/produce', methods=['GET'])
-def get_user_produce(user_id):
-    # user_produce = UserAndProduce.query.filter_by(user_id=user_id).all()
-    data =  db.session.query(UserAndProduce).join(Produce, UserAndProduce.produce_id == Produce.produce_id).filter(UserAndProduce.user_id == user_id)  # Replace with your user filter.all()
+def get_user_inventory(user_id):
+    try:
+        inventory = db.session.query(
+            UserAndProduce, Produce
+        ).join(
+            Produce
+        ).filter(
+            UserAndProduce.user_id == user_id,
+            UserAndProduce.quantity > 0
+        ).all()
 
-    result = [
-        {
-            "user_produce_id": record.userproduce_id,
-            "purchase_date": record.purchase_date.strftime('%Y-%m-%d'),
-            "expiration_date": record.expiration_date.strftime('%Y-%m-%d'),
-            "produce_id": record.produce_id,
-            "quantity": record.quantity,
-            "image_url" : record.image_url,
-            "produce_name": record.produce.produce_name 
+        result = [{
+            "userproduce_id": user_produce.userproduce_id,
+            "produce_name": produce.produce_name,
+            "quantity": user_produce.quantity,
+            "unit": produce.unit,
+            "purchase_date": user_produce.purchase_date.strftime('%Y-%m-%d'),
+            "expiration_date": user_produce.expiration_date.strftime('%Y-%m-%d')
+        } for user_produce, produce in inventory]
 
-        } for record in data
-    ]
-    return jsonify(result)
+        return jsonify({"status": 200, "data": result})
+    except Exception as e:
+        return jsonify({"status": 202, "data": str(e)})
+
 
 # Add entry to UserAndProduce table of user_id
 @user_produce_routes.route('/api/user/<int:user_id>/produce', methods=['POST'])
 def add_user_produce(user_id):
-    data = request.get_json()
-    produce_name = data.get('produce_name')
-    quantity = data.get('quantity')
-    image_url = data.get('image_url')
+    try:
+        produces_data = request.json
+        for produce_data in produces_data:
+            produce = Produce.query.filter_by(produce_name=produce_data['produce_name']).first()
+            if not produce:
+                raise ValueError(f"Produce {produce_data['produce_name']} not found")
 
-    # Validate required data
-    if not produce_name or not quantity:
-        return jsonify({"error": "Produce name and quantity are required"}), 400
-   
-    # Fetch the produce details from the Produce table
-    produce = Produce.query.filter_by(produce_name=produce_name).first()
+            user_produce = UserAndProduce(
+                user_id=user_id,
+                produce_id=produce.produce_id,
+                quantity=produce_data['quantity'],
+                purchase_date=datetime.strptime(produce_data['purchase_date'], '%Y-%m-%d'),
+                expiration_date=datetime.strptime(produce_data['expiration_date'], '%Y-%m-%d')
+            )
+            db.session.add(user_produce)
 
-    # Calculate the expiration date based on common_expdate and current date
-    purchase_date = datetime.now().date()  # Assume purchase_date is the current date
-    expiration_date = purchase_date + timedelta(days=produce.common_expdate)
-    
-    # Set expiration date to 1 day if produce not in database
-    if not produce:
-        expiration_date = purchase_date + timedelta(days=1)
+        db.session.commit()
+        return jsonify({"status": 200, "data": "Success to add produces!"})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"status": 202, "data": str(e)})
 
-    # Create a new UserAndProduce record
-    new_user_produce = UserAndProduce(
-        user_id=user_id,
-        produce_id=produce.produce_id,
-        quantity=quantity,
-        purchase_date=purchase_date,
-        expiration_date=expiration_date,
-        image_url=image_url
-    )
 
-    # Add the record to the database
-    db.session.add(new_user_produce)
-    db.session.commit()
+@user_produce_routes.route('/api/user/<int:user_id>/produce', methods=['PUT'])
+def update_user_produce(user_id):
+    try:
+        data = request.get_json()
+        today = datetime.now().date()
 
-    # Return the created record as a response
-    result = {
-        "user_produce_id": new_user_produce.userproduce_id,
-        "user_id": new_user_produce.user_id,
-        "produce_id": new_user_produce.produce_id,
-        "quantity": new_user_produce.quantity,
-        "purchase_date": new_user_produce.purchase_date.strftime('%Y-%m-%d'),
-        "expiration_date": new_user_produce.expiration_date.strftime('%Y-%m-%d'),
-        "image_url": new_user_produce.image_url
-    }
-    
-    return jsonify(result), 201
-    
-# Delete entry from UserAndProduce table of user_id and produce_id
-@user_produce_routes.route('/api/user/<int:user_id>/produce/<int:produce_id>', methods=['DELETE'])
-def delete_user_produce(user_id, produce_id):
-    user_produce = UserAndProduce.query.filter_by(user_id=user_id, produce_id=produce_id).first()
-    
-    if user_produce:
-        # If the record exists, delete it
-        db.session.delete(user_produce)
-        db.session.commit()  # Commit the change to the database
-        return jsonify({"message": "Record deleted successfully"}), 200
-    else:
-        # If the record does not exist, return an error
-        return jsonify({"message": "Record not found"}), 404
+        total_co2_saved = 0
 
-# Allows update to produce name, expiration date, and quantity (final quantity <= original quantity)
-@user_produce_routes.route('/api/user/<int:user_id>/produce/<int:produce_id>', methods=['UPDATE'])
-def update_user_produce(user_id, produce_id):
-    user_produce = UserAndProduce.query.filter_by(user_id=user_id, produce_id=produce_id).first()
-    if not user_produce:
-        return jsonify({"message": "Record not found"}), 404
-    
-    data = request.get_json()
+        for userproduce_id, new_quantity in data.items():
+            # Convert userproduce_id to integer
+            userproduce_id = int(userproduce_id)
 
-    if 'quantity' in data:
-        new_quantity = data['quantity']
-        if new_quantity > user_produce.quantity:
-            return jsonify({"message": "New quantity cannot exceed original quantity"}), 400
-        user_produce.quantity = new_quantity
-    
-    # Handle expiration_date update (if provided)
-    if 'expiration_date' in data:
-        try:
-            user_produce.expiration_date = data['expiration_date']  # Assuming correct format (YYYY-MM-DD)
-        except ValueError:
-            return jsonify({"message": "Invalid expiration date format"}), 400
-        
-     # Handle produce_name update (if provided) by fetching the new produce_id from the Produce table
-    if 'produce_name' in data:
-        new_produce_name = data['produce_name']
-        produce = Produce.query.filter_by(produce_name=new_produce_name).first()
-        if produce:
-            user_produce.produce_id = produce.produce_id
+            # Get the user produce record
+            user_produce = UserAndProduce.query.filter_by(
+                userproduce_id=userproduce_id,
+                user_id=user_id
+            ).first()
+
+            if not user_produce:
+                raise ValueError(
+                    f"UserAndProduce record {userproduce_id} not found or doesn't belong to user {user_id}")
+
+            # Get the associated produce record to get co2 value
+            produce = Produce.query.get(user_produce.produce_id)
+            if not produce:
+                raise ValueError(f"Produce not found for UserAndProduce record {userproduce_id}")
+
+            # Calculate used quantity and co2 saved
+            used_quantity = user_produce.quantity - float(new_quantity)
+            co2_saved = used_quantity * produce.co2
+            total_co2_saved += co2_saved
+
+            # Update the quantity
+            user_produce.quantity = float(new_quantity)
+            # Note: We keep the record even if quantity becomes 0
+
+        # Update or create waste saving record for today
+        waste_saving = UserWasteSaving.query.filter_by(
+            user_id=user_id,
+            date=today
+        ).first()
+
+        if waste_saving:
+            waste_saving.co2_saved += total_co2_saved
         else:
-            return jsonify({"message": "Produce name not found"}), 404
-        
-     # Commit the updated information to the database
-    db.session.commit()
+            new_waste_saving = UserWasteSaving(
+                user_id=user_id,
+                date=today,
+                co2_saved=total_co2_saved
+            )
+            db.session.add(new_waste_saving)
 
-    return jsonify({"message": "Record updated successfully"}), 200
+        db.session.commit()
+        return jsonify({
+            "status": 200,
+            "data": "Successfully updated produces"
+        })
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({
+            "status": 202,
+            "data": str(e)
+        })

@@ -1,7 +1,7 @@
 from flask import Blueprint, jsonify, request, Flask
 import requests  
 import os
-from routes.user_produce_routes import get_user_produce
+from routes.user_produce_routes import get_user_inventory
 from difflib import get_close_matches
 
 recipes_routes = Blueprint('recipes_routes', __name__)
