@@ -1,5 +1,6 @@
 from flask import Blueprint, jsonify, request
 from datetime import datetime, timedelta
+from sqlalchemy import text
 from models import db, UserAndProduce, Produce, UserWasteSaving
 
 user_produce_routes = Blueprint('user_produce_routes', __name__)
@@ -35,7 +36,16 @@ def get_user_inventory(user_id):
 @user_produce_routes.route('/api/user/<int:user_id>/produce', methods=['POST'])
 def add_user_produce(user_id):
     try:
+        max_id = db.session.query(db.func.max(UserAndProduce.userproduce_id)).scalar() or 0
+
+        db.session.execute(
+            text("SELECT setval('userandproduce_userproduce_id_seq', :max_id)")
+            .bindparams(max_id=max_id)
+        )
+
         produces_data = request.json
+        added_produces = []
+
         for produce_data in produces_data:
             produce = Produce.query.filter_by(produce_name=produce_data['produce_name']).first()
             if not produce:
@@ -49,27 +59,44 @@ def add_user_produce(user_id):
                 expiration_date=datetime.strptime(produce_data['expiration_date'], '%Y-%m-%d')
             )
             db.session.add(user_produce)
+            added_produces.append(produce_data['produce_name'])
 
         db.session.commit()
-        return jsonify({"status": 200, "data": "Success to add produces!"})
+        return jsonify({
+            "status": 200,
+            "data": f"Successfully added produces!"
+        })
+
     except Exception as e:
         db.session.rollback()
-        return jsonify({"status": 202, "data": str(e)})
-
+        error_message = str(e)
+        if "UniqueViolation" in error_message:
+            error_message = "Database sequence error: Please contact administrator"
+        return jsonify({
+            "status": 202,
+            "error": error_message
+        })
 
 @user_produce_routes.route('/api/user/<int:user_id>/produce', methods=['PUT'])
 def update_user_produce(user_id):
     try:
+        # Reset the sequence for UserWasteSaving table to prevent unique key violations
+        max_waste_id = db.session.query(db.func.max(UserWasteSaving.user_waste_id)).scalar() or 0
+        db.session.execute(
+            text("SELECT setval('userwastesaving_user_waste_id_seq', :max_id)")
+            .bindparams(max_id=max_waste_id)
+        )
+
         data = request.get_json()
         today = datetime.now().date()
-
         total_co2_saved = 0
 
+        # Process each produce update
         for userproduce_id, new_quantity in data.items():
             # Convert userproduce_id to integer
             userproduce_id = int(userproduce_id)
 
-            # Get the user produce record
+            # Get the user produce record and verify ownership
             user_produce = UserAndProduce.query.filter_by(
                 userproduce_id=userproduce_id,
                 user_id=user_id
@@ -79,19 +106,18 @@ def update_user_produce(user_id):
                 raise ValueError(
                     f"UserAndProduce record {userproduce_id} not found or doesn't belong to user {user_id}")
 
-            # Get the associated produce record to get co2 value
+            # Fetch produce information to calculate CO2 savings
             produce = Produce.query.get(user_produce.produce_id)
             if not produce:
                 raise ValueError(f"Produce not found for UserAndProduce record {userproduce_id}")
 
-            # Calculate used quantity and co2 saved
+            # Calculate CO2 savings based on quantity difference
             used_quantity = user_produce.quantity - float(new_quantity)
             co2_saved = used_quantity * produce.co2
             total_co2_saved += co2_saved
 
-            # Update the quantity
+            # Update the produce quantity
             user_produce.quantity = float(new_quantity)
-            # Note: We keep the record even if quantity becomes 0
 
         # Update or create waste saving record for today
         waste_saving = UserWasteSaving.query.filter_by(
@@ -100,8 +126,10 @@ def update_user_produce(user_id):
         ).first()
 
         if waste_saving:
+            # Add new CO2 savings to existing record
             waste_saving.co2_saved += total_co2_saved
         else:
+            # Create new waste saving record for today
             new_waste_saving = UserWasteSaving(
                 user_id=user_id,
                 date=today,
@@ -116,7 +144,11 @@ def update_user_produce(user_id):
         })
     except Exception as e:
         db.session.rollback()
+        # Improve error handling with more specific status codes
+        error_message = str(e)
+        if "UniqueViolation" in error_message:
+            error_message = "Database sequence error: Please contact administrator"
         return jsonify({
             "status": 202,
-            "data": str(e)
+            "error": error_message
         })
