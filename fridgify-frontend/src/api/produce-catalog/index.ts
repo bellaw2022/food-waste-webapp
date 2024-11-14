@@ -6,6 +6,7 @@ import { CatalogItem } from "@/store";
 
 export const useProduceCatalog = () => {
     const query = useQuery({
+        refetchOnWindowFocus: false,
         queryKey: ["produce-catalog"],
         queryFn: async () => {
             const response1 = await fetch(`${API_URL}/all_produces`);

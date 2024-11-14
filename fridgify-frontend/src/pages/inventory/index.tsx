@@ -37,10 +37,10 @@ export const InventoryPage = () => {
                 <div className="mt-8 flex flex-col items-start gap-4">
                     <h2 className="font-bold">Expiring Soon:</h2>
                     {expiringItems
-                        .map(([itemName, item]) => (
-                            <Card className="w-[300px]" key={itemName}>
+                        .map(([itemId, item]) => (
+                            <Card className="w-[300px]" key={itemId}>
                                 <CardHeader>
-                                    <CardTitle className="text-2xl">{itemName.charAt(0).toUpperCase() + itemName.slice(1)}</CardTitle>
+                                    <CardTitle className="text-2xl">{item.name.charAt(0).toUpperCase() + item.name.slice(1)}</CardTitle>
                                 </CardHeader>
                                 <CardContent className="flex flex-col gap-5">
                                     <div className="text-xl">
@@ -55,10 +55,10 @@ export const InventoryPage = () => {
                     }
                     <h2 className="font-bold">Still Fresh:</h2>
                     {freshItems
-                        .map(([itemName, item]) => (
-                            <Card className="w-[300px]" key={itemName}>
+                        .map(([itemId, item]) => (
+                            <Card className="w-[300px]" key={itemId}>
                                 <CardHeader>
-                                    <CardTitle className="text-2xl">{itemName.charAt(0).toUpperCase() + itemName.slice(1)}</CardTitle>
+                                    <CardTitle className="text-2xl">{item.name.charAt(0).toUpperCase() + item.name.slice(1)}</CardTitle>
                                 </CardHeader>
                                 <CardContent className="flex flex-col gap-5">
                                     <div className="text-xl">

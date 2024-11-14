@@ -1,6 +1,7 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { API_URL } from "@/api/constants";
-import { CartItem, CatalogItem } from "@/store";
+import { CartItem } from "@/store";
+import { EditingCartItem } from "@/store/editing-cart";
 
 const MILLISECONDS_IN_DAY = 24 * 60 * 60 * 1000;
 
@@ -65,16 +66,18 @@ export const useInventory = () => {
 
             const todayDate = new Date((new Date()).toISOString().split("T")[0]);
 
-            const inventory: Record<string, CartItem> = {};
+            const inventory: Record<string, EditingCartItem> = {};
             res.data?.forEach((item) => {
-                inventory[item.produce_name] = {
+                inventory[item.userproduce_id] = {
+                    cartItemId: item.userproduce_id,
+                    name: item.produce_name,
                     quantity: item.quantity,
                     unit: item.unit,
                     expirationDays: Math.floor((Date.parse(item.expiration_date) - todayDate.getTime()) / MILLISECONDS_IN_DAY),
                 }
             })
 
-            return inventory as Record<string, CartItem>;
+            return inventory as Record<string, EditingCartItem>;
         }
     });
 

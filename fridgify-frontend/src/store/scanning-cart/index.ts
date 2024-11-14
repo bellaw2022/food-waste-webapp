@@ -1,23 +1,18 @@
 import { create } from 'zustand'
 import { devtools, persist } from 'zustand/middleware';
 import type {} from '@redux-devtools/extension'; // required for devtools typing
-
-export enum UnitTypes {
-    COUNT = "Count",
-    GRAMS = "Gram",
-}
+import { UnitTypes } from '@/store/types';
 
 export interface CatalogItem {
     productId: string;
     category: string;
     expirationDays: number;
-    unit: string;
+    unit: UnitTypes;
 }
 
 export interface CartItem {
     quantity: number;
-    // unit: UnitTypes,
-    unit: string;
+    unit: UnitTypes;
     expirationDays: number;
 };
 
