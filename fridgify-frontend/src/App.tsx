@@ -11,7 +11,7 @@ function App() {
     return (
         <QueryClientProvider client={APIClient}>
             <Router>
-                <div className="m-0 p-0">
+                <div className="m-0 p-0 relative">
                     <Navbar/>
                     <Routes>
                         <Route path="/" element={<HomePage profile={profile} login={login} logOut={logOut} />} />

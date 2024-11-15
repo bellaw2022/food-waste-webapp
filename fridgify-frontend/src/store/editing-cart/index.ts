@@ -11,10 +11,8 @@ export interface EditingCartItem {
 };
 
 interface EditingCartState {
-    // Modal State
-    isModalOpen: boolean;
-    openModal: () => void;
-    closeModal: () => void;
+    isEditing: boolean;
+    toggleEditing: () => void;
 
     // Cart State
     cartItems: Record<string, EditingCartItem>; // uuid - item
@@ -28,19 +26,21 @@ export const useEditingCart = create<EditingCartState>()(
   devtools(
     persist(
         (set) => ({
-            isModalOpen: false,
-            openModal: () => set(() => ({ isModalOpen: true })),
-            closeModal: () => set(() => ({ isModalOpen: false })),
+            isEditing: false,
+            toggleEditing: () => set((state) => ({ isEditing: !state.isEditing })),
             cartItems: {},
             setItems: (items: { [name: string]: EditingCartItem }) => set(() => ({ cartItems: items })),
             addItem: (cartItemId: string, item: EditingCartItem) => set((state) => {
-                state.cartItems[cartItemId] = item;
-                return state;
+                if (cartItemId in state.cartItems) return {};
+
+                const newItems = { ...state.cartItems };
+                newItems[cartItemId] = item;
+                return { cartItems: newItems };
             }),
-            removeItem: (name: string) => set((state) => {
-                if (name in state.cartItems) {
-                    const newItems = state.cartItems;
-                    delete newItems[name];
+            removeItem: (cartItemId: string) => set((state) => {
+                if (cartItemId in state.cartItems) {
+                    const newItems = { ...state.cartItems };
+                    delete newItems[cartItemId];
                     return { cartItems: newItems };
                 }
                 return {};
