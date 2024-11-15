@@ -1,4 +1,4 @@
-import { useUpdateInventory } from "@/api/inventory";
+import { useAddInventory } from "@/api";
 import { NumberInput } from "@/components/shared";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,7 +10,7 @@ import { Link, useNavigate } from "react-router-dom";
 
 export const FinishScanningPage = () => {
     const { cartItems, removeItem, updateItem, setItems } = useScanningCart();
-    const { updateInventory, isUpdating } = useUpdateInventory();
+    const { updateInventory, isUpdating } = useAddInventory();
     const navigate = useNavigate();
 
     const onFinish = useCallback(async () => {

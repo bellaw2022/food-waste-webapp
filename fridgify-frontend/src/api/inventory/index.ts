@@ -5,7 +5,7 @@ import { EditingCartItem } from "@/store/editing-cart";
 
 const MILLISECONDS_IN_DAY = 24 * 60 * 60 * 1000;
 
-export const useUpdateInventory = () => {
+export const useAddInventory = () => {
     const mutation = useMutation({
         mutationFn: async (cart: Record<string, CartItem>) => {
             const userIdString = localStorage.getItem('user_id');

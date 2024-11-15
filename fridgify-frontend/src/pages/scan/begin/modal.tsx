@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { makeDefaultItem, useScanningCart } from "@/store/scanning-cart"
+import { makeDefaultItem, useScanningCart } from "@/store"
 import { XIcon } from "lucide-react"
 import { useCallback, useEffect, useState } from "react"
 
