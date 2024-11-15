@@ -1,5 +1,6 @@
 from flask import Blueprint, jsonify, request
 from models import db, Produce
+from sqlalchemy import func
 
 produce_routes = Blueprint('produce_routes', __name__)
 
@@ -27,7 +28,7 @@ def fetch_produce_info(produces):
     for produce_name in produces:
         if(len(produce_name) < 2):
             continue
-        produce = Produce.query.filter_by(produce_name=produce_name).first()
+        produce = Produce.query.filter(func.lower(Produce.produce_name)==produce_name.lower()).first()
         if produce:
             result[produce_name] = {
                 "product_id": produce.produce_id,

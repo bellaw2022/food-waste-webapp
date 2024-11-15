@@ -240,10 +240,10 @@ export const RecipePage: React.FC = () => {
     }
   };
 
-  const searchAPIRecipe = async () => {
+  const searchAIRecipe = async () => {
     try {
       const response = await axios.get(baseURL + "/api/recipe/ai", {
-        params: { ingredients: selectedIngredients },
+        params: { ingredients: selectedIngredients, id: 38 },
       });
 
       const data = await response.data;
@@ -292,7 +292,7 @@ export const RecipePage: React.FC = () => {
           <div className="recipe-buttons">
             <button
               className="recipe-button"
-              onClick={searchAPIRecipe}
+              onClick={searchAIRecipe}
               disabled={loading}
             >
               {loading ? "Searching..." : "Generate AI Recipes"}

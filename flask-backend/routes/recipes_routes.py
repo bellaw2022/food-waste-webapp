@@ -2173,6 +2173,7 @@ def get_recipe_info():
 # NEED TO IMPLEMENT CONNECTION WITH AI ENDPOINT
 @recipes_routes.route('/api/recipe/ai', methods = ['GET'])
 def get_ai_recipe_info():
+    user_id = request.args.get("id")
     data = {
     "recipe": "Spicy Tomato and Potato Stir-Fry",
     "ingredients": [
@@ -2227,6 +2228,28 @@ def get_ai_recipe_info():
     ]
 
     }
+
+    response_data = {
+        "recipes": [
+            {
+                "title": data["recipe"],
+                "missedIngredientCount": 0,
+                "usedIngredientCount": 0,
+                "image": None,
+                "servings": 1,
+                "missedIngredients": [
+                    ingredient[0]
+                    for ingredient in data["ingredients"]
+                ],
+                "usedIngredients": [
+                ],
+                "ingredients": [{"name" : ingredient[0], "unit" : ingredient[2], "amount" : ingredient[1]}
+                for ingredient in data["ingredients"]],
+                "instructions" : data["instructions"],
+            }
+        ]
+    }
+    '''
     response_data = {
         "title":data["recipe"],
         "image" : None,
@@ -2238,10 +2261,17 @@ def get_ai_recipe_info():
         "instructions" : data["instructions"],
         "missedIngredients" : ["Potato", "Red chili powder"]
     }
-
+    '''
+    print("response data")
     print(response_data)
+    print("\n\n")
 
-    return jsonify(response_data)
+    fetched_data = update_ingredients_with_inventory(user_id, response_data)["recipes"][0]
+
+    print("fetched data")
+    print(fetched_data)
+
+    return jsonify(fetched_data)
 
 @recipes_routes.route('/api/recipe/ingredients', methods = ['POST'])
 def get_ingredient_units():
@@ -2256,8 +2286,6 @@ def get_ingredient_units():
     
     try:
         produce_data = fetch_produce_info(ingredients)
-
-        print("produce_data: ", produce_data)
 
         result = []
         for key, values in produce_data.items():
