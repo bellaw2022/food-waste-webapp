@@ -62,15 +62,12 @@ def generate_recipes():
 # sort by max ingredients used
 # sort by least ingredients needed
 # NEED TO UPDATE WITH USER ID
-@recipes_routes.route('/api/recipe/recipes_by_ingredients', methods=['GET'])
+@recipes_routes.route('/api/recipe/recipes_by_ingredients', methods=['POST'])
 def search_recipes_by_ingredients():
-    #ingredients = request.get_json().get("ingredients") 
-    ingredients = request.args.getlist('ingredients')
-    user_id = request.args.get("userId") 
-    option = request.args.get('option')
-    print("searching for recipes by ingredients: ", ingredients)
-    print("user id: ", user_id)
-    print("option: ", option)
+    ingredients = request.get_json().get("ingredients") 
+    #ingredients = request.args.getlist('ingredients')
+    user_id = request.get_json().get("userId") 
+    option = request.get_json().get('option')
     api = 'https://api.spoonacular.com/recipes/findByIngredients?apiKey='+os.getenv('RECIPE_API_KEY')
     if len(ingredients) > 0:
         api += '&ingredients='
@@ -78,7 +75,10 @@ def search_recipes_by_ingredients():
             api+=i+',+'
         api = api[0:-2]
     
-    print("api: ", api)
+    print("ingredients: ", ingredients)
+    print("user id ", user_id)
+    print("option: ", option)
+    
     # maximize used ingredients
     if(option == 1):
         api += '&ranking=1'
@@ -89,9 +89,9 @@ def search_recipes_by_ingredients():
     try:
 
         # Make a GET request to the external API with the query parameter
-        #response = requests.get(api).json()
+        response = requests.get(api).json()
         #response.raise_for_status()  # Raise an exception for HTTP errors
-
+        '''
         response = [
     {
         "id": 660273,
@@ -1688,12 +1688,11 @@ def search_recipes_by_ingredients():
 ]
         
 
-        
+        '''
         # Parse and return the data from the external API
         #external_data = response.json()
       
         external_data = response
-        print(external_data)
 
         response_data = {
         "recipes": [
@@ -1721,6 +1720,7 @@ def search_recipes_by_ingredients():
             for recipe in external_data
         ]
         }
+        print("retrieved recipes: ", response_data)
 
         response_data = update_ingredients_with_inventory(user_id, response_data)
         print("updated with inventory: ", response_data)
@@ -1734,8 +1734,6 @@ def search_recipes_by_ingredients():
 def update_ingredients_with_inventory(user_id, response_data):
     inventory_data = json.loads(get_user_inventory(user_id).data.decode("utf-8"))
     
-    print("user ", user_id, " inventory: ", inventory_data)
-
     inventory = inventory_data.get("data", [])
     
     for recipe in response_data["recipes"]:
@@ -1750,16 +1748,12 @@ def update_ingredients_with_inventory(user_id, response_data):
                 # If a close match is found, move it to usedIngredients
                 matched_ingredients.add(ingredient)
                 recipe["usedIngredients"].append(ingredient)
-                print("appending " + ingredient + " to used item")
         
         # Filter out matched ingredients from missedIngredients
         recipe["missedIngredients"] = [
             ingredient for ingredient in recipe["missedIngredients"]
             if ingredient not in matched_ingredients
         ]
-
-        print(recipe["missedIngredients"])
-        print(recipe["usedIngredients"])
         
         recipe["missedIngredientCount"] = len(recipe["missedIngredients"])
         recipe["usedIngredientCount"] = len(recipe["usedIngredients"])
@@ -1775,9 +1769,9 @@ def get_recipe_info():
 
     try:
         # Make a GET request to the external API with the query parameter
-        # response = requests.get(api).json()
+        response = requests.get(api).json()
         #
-        
+        '''
         response = {
     "aggregateLikes": 1,
     "healthScore": 40,
@@ -2151,11 +2145,11 @@ def get_recipe_info():
     "spoonacularSourceUrl": "https://spoonacular.com/italian-vegetable-soup-648287"
 }
         
+        '''
         
         # Parse and return the data from the external API
         #external_data = response.json()
         external_data = response
-        print(external_data)
 
          # title, image, servings, cookingMinutes, preparationMinutes, extendedIngredients.name, extendedIngredients.measures.us.amount, extendedIngredients.measures.us.unitLong
         response_data = {
@@ -2260,9 +2254,6 @@ def get_ingredient_units():
     # Extract 'ingredients' array from the JSON payload
     ingredients = data.get("ingredients", [])
     
-
-    print("ingredients to search for: ", ingredients)
-    
     try:
         produce_data = fetch_produce_info(ingredients)
 
@@ -2276,17 +2267,9 @@ def get_ingredient_units():
                 "unit": values.get("unit", "")
             }
             result.append(item)
-        #units = {name: info['unit'] for name, info in produce_data.items() if 'unit' in info}
-        print(result)
-
+       
         return jsonify(result)
-        #return jsonify(response_data)
 
-        response_data =  [{
-            "name" : "milk",
-            "amount" : 1,
-            "unit" : "mg"
-        }]
     except Exception as e:
         print(f"Error retrieving units: {e}")
         return None
