@@ -1700,8 +1700,8 @@ def search_recipes_by_ingredients():
             {
                 "id": recipe["id"],
                 "title": recipe["title"],
-                "missedIngredientCount": recipe["missedIngredientCount"],
-                "usedIngredientCount": recipe["usedIngredientCount"],
+                "missedIngredientCount": 0,
+                "usedIngredientCount": 0,
                 "image": recipe["image"],
                 "missedIngredients": [
                     ingredient["name"]
@@ -1722,7 +1722,7 @@ def search_recipes_by_ingredients():
         ]
         }
 
-        #response_data = update_ingredients_with_inventory(user_id, response_data)
+        response_data = update_ingredients_with_inventory(user_id, response_data)
         print("updated with inventory: ", response_data)
         
         return jsonify(response_data)
@@ -1750,13 +1750,19 @@ def update_ingredients_with_inventory(user_id, response_data):
                 # If a close match is found, move it to usedIngredients
                 matched_ingredients.add(ingredient)
                 recipe["usedIngredients"].append(ingredient)
+                print("appending " + ingredient + " to used item")
         
         # Filter out matched ingredients from missedIngredients
         recipe["missedIngredients"] = [
             ingredient for ingredient in recipe["missedIngredients"]
             if ingredient not in matched_ingredients
         ]
+
+        print(recipe["missedIngredients"])
+        print(recipe["usedIngredients"])
+        
         recipe["missedIngredientCount"] = len(recipe["missedIngredients"])
+        recipe["usedIngredientCount"] = len(recipe["usedIngredients"])
 
     return response_data
     
@@ -2243,18 +2249,38 @@ def get_ai_recipe_info():
 
     return jsonify(response_data)
 
-@recipes_routes.route('/api/recipe/ingredients', methods = ['GET'])
+@recipes_routes.route('/api/recipe/ingredients', methods = ['POST'])
 def get_ingredient_units():
-    ingredients = request.args.getlist('ingredients')
 
+    data = request.get_json()
+
+    if data is None:
+        return jsonify({"error": "Invalid JSON payload"}), 400
+    
+    # Extract 'ingredients' array from the JSON payload
+    ingredients = data.get("ingredients", [])
+    
+
+    print("ingredients to search for: ", ingredients)
+    
     try:
         produce_data = fetch_produce_info(ingredients)
 
-        units = {name: info['unit'] for name, info in produce_data.items() if 'unit' in info}
-        print(units)
+        print("produce_data: ", produce_data)
 
-        return units
-        return jsonify(response_data)
+        result = []
+        for key, values in produce_data.items():
+            item = {
+                "name" : key,
+                "amount" : 1,
+                "unit": values.get("unit", "")
+            }
+            result.append(item)
+        #units = {name: info['unit'] for name, info in produce_data.items() if 'unit' in info}
+        print(result)
+
+        return jsonify(result)
+        #return jsonify(response_data)
 
         response_data =  [{
             "name" : "milk",
