@@ -47,6 +47,7 @@ const Ingredients: React.FC<IngredientsProps> = ({
 
   return (
     <div>
+      <div className="inv-title">Inventory</div>
       <input
         type="text"
         placeholder="Search ingredients..."
