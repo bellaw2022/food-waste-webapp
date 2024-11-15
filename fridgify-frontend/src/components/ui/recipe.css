@@ -80,7 +80,7 @@
 
 .ingredient {
   display: grid;
-  grid-template-columns: 80px 1fr 2fr 1fr;
+  grid-template-columns: 80px 1.2fr 2fr 1fr;
 }
 
 .ingredients-section {
