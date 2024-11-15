@@ -62,12 +62,14 @@ const Recipe: React.FC<CombinedProps> = ({
   }
 
   const fetchInitialIngredients = async () => {
+    console.log("fetching ingredient units ", recipe.usedIngredients);
     try {
-      const response = await axios.get(baseURL + "/api/recipe/ingredients", {
-        params: { ingredients: recipe.usedIngredients },
+      const response = await axios.post(baseURL + "/api/recipe/ingredients", {
+        ingredients: recipe.usedIngredients,
       });
 
       const data = await response.data;
+      console.log("initial ingredients: ", data);
       setRemoveableIngredients(data);
     } catch (error) {
       console.error("Error fetching ingredients:", error);
@@ -80,6 +82,7 @@ const Recipe: React.FC<CombinedProps> = ({
 
   const checkIngredient = (ingredientName: string): boolean => {
     // Return true if ingredient exists in usedIngredients, false if in missedIngredients
+    console.log("exist? ", ingredientName);
     return !recipe.missedIngredients.includes(ingredientName);
   };
 
@@ -183,12 +186,13 @@ const Recipe: React.FC<CombinedProps> = ({
                 <div className="ingredient-unit"> {ingredient.unit}</div>
                 <div className="ingredient-title"> {ingredient.name}</div>
                 <span
+                  className="ingredient-circle"
                   style={{
                     width: "10px",
                     height: "10px",
                     borderRadius: "50%",
                     backgroundColor: checkIngredient(ingredient.name)
-                      ? "green"
+                      ? "transparent"
                       : "red",
                     display: "inline-block",
                     marginLeft: "10px",

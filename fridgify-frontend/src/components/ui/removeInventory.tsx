@@ -1,11 +1,11 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./removeInventory.css";
 import { SlClose } from "react-icons/sl";
 
 interface Ingredient {
   name: string;
-  unit: string;
   amount: number;
+  unit: string;
 }
 
 interface IngredientProps {
@@ -62,6 +62,7 @@ const IngredientList: React.FC<Ingredients> = ({
     { name: "Sugar", unit: "tbsp", amount: 1 },
     { name: "Milk", unit: "ml", amount: 1 },
   ];*/
+  console.log("initial ingredients: ", initialIngredients);
 
   const [ingredients, setIngredients] =
     useState<Ingredient[]>(initialIngredients);
@@ -71,6 +72,10 @@ const IngredientList: React.FC<Ingredients> = ({
       ingredients.filter((ingredient) => ingredient.name !== name)
     );
   };
+
+  useEffect(() => {
+    setIngredients(initialIngredients);
+  }, []);
 
   return (
     <div className="popup-section">
