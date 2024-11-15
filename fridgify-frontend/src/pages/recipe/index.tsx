@@ -102,6 +102,13 @@ export const RecipePage: React.FC = () => {
 
   const [searchOption, setSearchOption] = useState<number>(1);
 
+  const handleNoRecipe = () => {
+    setShowNoRecipesModal(false);
+    setBasePage(true);
+    setListPage(false);
+    setRecipePage(false);
+  };
+
   const handleSearchOptionChange = (option: number) => {
     setSearchOption(option);
     console.log("search option changed to ", option);
@@ -196,14 +203,12 @@ export const RecipePage: React.FC = () => {
   const searchRecipes = async () => {
     setLoading(true);
     try {
-      const response = await axios.get(
+      const response = await axios.post(
         baseURL + "/api/recipe/recipes_by_ingredients",
         {
-          params: {
-            ingredients: selectedIngredients,
-            userId: globalUserId,
-            option: searchOption,
-          },
+          ingredients: selectedIngredients,
+          userId: globalUserId,
+          option: searchOption,
         }
       );
 
@@ -221,7 +226,6 @@ export const RecipePage: React.FC = () => {
 
       console.log(fetchedRecipes);
       setRecipes(fetchedRecipes);
-      console.log(recipes);
     } catch (error) {
       console.error("Error: ", error);
     } finally {
@@ -230,6 +234,9 @@ export const RecipePage: React.FC = () => {
       setRecipePage(false);
       setBasePage(false);
       setListPage(true);
+      if (recipes.length > 0) {
+        setShowNoRecipesModal(true);
+      }
     }
   };
 
@@ -312,7 +319,12 @@ export const RecipePage: React.FC = () => {
           ></RecipeList>
         ) : (
           showNoRecipesModal && (
-            <NoRecipesModal onClose={() => setShowNoRecipesModal(false)} />
+            <NoRecipesModal
+              onClose={() => setShowNoRecipesModal(false)}
+              setBasePage={setBasePage}
+              setListPage={setListPage}
+              setRecipePage={setRecipePage}
+            />
           )
         ))}
 

@@ -23,7 +23,6 @@ def get_produce_info():
 
 # helper function so I can reuse this function for another function  
 def fetch_produce_info(produces):
-    print("fetch_produce_info: ", produces)
     result = {}
     for produce_name in produces:
         if(len(produce_name) < 2):

@@ -62,7 +62,7 @@ const IngredientList: React.FC<Ingredients> = ({
     { name: "Sugar", unit: "tbsp", amount: 1 },
     { name: "Milk", unit: "ml", amount: 1 },
   ];*/
-  console.log("initial ingredients: ", initialIngredients);
+  //console.log("initial ingredients: ", initialIngredients);
 
   const [ingredients, setIngredients] =
     useState<Ingredient[]>(initialIngredients);
