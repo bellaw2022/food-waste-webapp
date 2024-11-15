@@ -82,7 +82,6 @@ const Recipe: React.FC<CombinedProps> = ({
 
   const checkIngredient = (ingredientName: string): boolean => {
     // Return true if ingredient exists in usedIngredients, false if in missedIngredients
-    console.log("exist? ", ingredientName);
     return !recipe.missedIngredients.includes(ingredientName);
   };
 
