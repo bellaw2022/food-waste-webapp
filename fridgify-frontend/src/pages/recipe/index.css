@@ -19,10 +19,12 @@
 
 .option-buttons {
   display: flex;
+  flex-direction: column;
 }
 
 .option-button {
   font-weight: normal;
+  width: 260px;
 }
 .option-button.selected {
   background-color: #5b9a5b;
