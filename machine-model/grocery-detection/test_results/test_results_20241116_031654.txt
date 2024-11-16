@@ -1,0 +1,345 @@
+Test Results Summary
+===================
+
+Total images tested: 522
+Correct predictions: 452
+Overall accuracy: 86.59%
+Average processing time per image: 0.0497 seconds
+
+Per-Class Performance
+====================
+apple:
+  Total: 11
+  Correct: 10
+  Accuracy: 90.91%
+
+orange juice:
+  Total: 3
+  Correct: 3
+  Accuracy: 100.00%
+
+blueberry:
+  Total: 5
+  Correct: 5
+  Accuracy: 100.00%
+
+turnip:
+  Total: 12
+  Correct: 11
+  Accuracy: 91.67%
+
+chilli pepper:
+  Total: 9
+  Correct: 7
+  Accuracy: 77.78%
+
+raddish:
+  Total: 9
+  Correct: 4
+  Accuracy: 44.44%
+
+bell pepper:
+  Total: 10
+  Correct: 4
+  Accuracy: 40.00%
+
+pear:
+  Total: 11
+  Correct: 10
+  Accuracy: 90.91%
+
+strawberry:
+  Total: 5
+  Correct: 4
+  Accuracy: 80.00%
+
+sweetpotato:
+  Total: 9
+  Correct: 8
+  Accuracy: 88.89%
+
+avocado:
+  Total: 5
+  Correct: 4
+  Accuracy: 80.00%
+
+pomegranate:
+  Total: 10
+  Correct: 9
+  Accuracy: 90.00%
+
+peas:
+  Total: 12
+  Correct: 10
+  Accuracy: 83.33%
+
+capsicum:
+  Total: 9
+  Correct: 5
+  Accuracy: 55.56%
+
+radish:
+  Total: 2
+  Correct: 0
+  Accuracy: 0.00%
+
+spinach:
+  Total: 12
+  Correct: 11
+  Accuracy: 91.67%
+
+beef:
+  Total: 5
+  Correct: 5
+  Accuracy: 100.00%
+
+lettuce:
+  Total: 12
+  Correct: 10
+  Accuracy: 83.33%
+
+green beans:
+  Total: 4
+  Correct: 4
+  Accuracy: 100.00%
+
+kiwi:
+  Total: 11
+  Correct: 11
+  Accuracy: 100.00%
+
+chicken_wing:
+  Total: 4
+  Correct: 4
+  Accuracy: 100.00%
+
+mushroom:
+  Total: 4
+  Correct: 4
+  Accuracy: 100.00%
+
+lemon:
+  Total: 11
+  Correct: 7
+  Accuracy: 63.64%
+
+onion:
+  Total: 12
+  Correct: 10
+  Accuracy: 83.33%
+
+cauliflower:
+  Total: 10
+  Correct: 10
+  Accuracy: 100.00%
+
+milk:
+  Total: 4
+  Correct: 4
+  Accuracy: 100.00%
+
+potato:
+  Total: 10
+  Correct: 7
+  Accuracy: 70.00%
+
+chicken breast:
+  Total: 4
+  Correct: 4
+  Accuracy: 100.00%
+
+jalepeno:
+  Total: 9
+  Correct: 7
+  Accuracy: 77.78%
+
+honeydew:
+  Total: 5
+  Correct: 3
+  Accuracy: 60.00%
+
+sweetcorn:
+  Total: 12
+  Correct: 8
+  Accuracy: 66.67%
+
+raspberry:
+  Total: 4
+  Correct: 4
+  Accuracy: 100.00%
+
+cucumber:
+  Total: 12
+  Correct: 11
+  Accuracy: 91.67%
+
+cheese:
+  Total: 5
+  Correct: 4
+  Accuracy: 80.00%
+
+plum:
+  Total: 5
+  Correct: 5
+  Accuracy: 100.00%
+
+paprika:
+  Total: 11
+  Correct: 8
+  Accuracy: 72.73%
+
+cherry:
+  Total: 4
+  Correct: 4
+  Accuracy: 100.00%
+
+watermelon:
+  Total: 11
+  Correct: 11
+  Accuracy: 100.00%
+
+cantaloupe:
+  Total: 5
+  Correct: 4
+  Accuracy: 80.00%
+
+lime:
+  Total: 4
+  Correct: 3
+  Accuracy: 75.00%
+
+mango:
+  Total: 11
+  Correct: 9
+  Accuracy: 81.82%
+
+shrimp:
+  Total: 5
+  Correct: 5
+  Accuracy: 100.00%
+
+cabbage:
+  Total: 12
+  Correct: 11
+  Accuracy: 91.67%
+
+coconut:
+  Total: 4
+  Correct: 4
+  Accuracy: 100.00%
+
+grapes:
+  Total: 12
+  Correct: 12
+  Accuracy: 100.00%
+
+beetroot:
+  Total: 12
+  Correct: 11
+  Accuracy: 91.67%
+
+jalapeno peppers:
+  Total: 4
+  Correct: 3
+  Accuracy: 75.00%
+
+yogurt:
+  Total: 5
+  Correct: 5
+  Accuracy: 100.00%
+
+brussel sprouts:
+  Total: 4
+  Correct: 4
+  Accuracy: 100.00%
+
+eggplant:
+  Total: 11
+  Correct: 11
+  Accuracy: 100.00%
+
+corn:
+  Total: 11
+  Correct: 5
+  Accuracy: 45.45%
+
+chilli peppers:
+  Total: 2
+  Correct: 2
+  Accuracy: 100.00%
+
+eggs:
+  Total: 4
+  Correct: 4
+  Accuracy: 100.00%
+
+broccoli:
+  Total: 4
+  Correct: 4
+  Accuracy: 100.00%
+
+asparagus:
+  Total: 4
+  Correct: 3
+  Accuracy: 75.00%
+
+celery:
+  Total: 4
+  Correct: 4
+  Accuracy: 100.00%
+
+soy beans:
+  Total: 12
+  Correct: 12
+  Accuracy: 100.00%
+
+banana:
+  Total: 11
+  Correct: 11
+  Accuracy: 100.00%
+
+ginger:
+  Total: 9
+  Correct: 9
+  Accuracy: 100.00%
+
+zucchini:
+  Total: 4
+  Correct: 4
+  Accuracy: 100.00%
+
+garlic:
+  Total: 12
+  Correct: 12
+  Accuracy: 100.00%
+
+fish:
+  Total: 4
+  Correct: 4
+  Accuracy: 100.00%
+
+pineapple:
+  Total: 12
+  Correct: 12
+  Accuracy: 100.00%
+
+tomato:
+  Total: 12
+  Correct: 12
+  Accuracy: 100.00%
+
+orange:
+  Total: 9
+  Correct: 7
+  Accuracy: 77.78%
+
+carrot:
+  Total: 11
+  Correct: 10
+  Accuracy: 90.91%
+
+peach:
+  Total: 5
+  Correct: 5
+  Accuracy: 100.00%
+

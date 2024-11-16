@@ -1,0 +1,71 @@
+True Label,Predicted Label,Image Path,Distance
+apple,mango,archive/test/apple/Image_57.jpg,23.72090721130371
+turnip,cauliflower,archive/test/turnip/Image_89.jpg,38.328163146972656
+chilli pepper,jalepeno,archive/test/chilli pepper/Image_13.jpg,14.309192657470703
+chilli pepper,green beans,archive/test/chilli pepper/Image_90.jpg,13.365601539611816
+raddish,radish,archive/test/raddish/Image_14.jpg,15.40042495727539
+raddish,beetroot,archive/test/raddish/Image_12.jpg,29.762359619140625
+raddish,pomegranate,archive/test/raddish/Image_43.jpg,30.583908081054688
+raddish,turnip,archive/test/raddish/Image_90.jpg,46.42441177368164
+raddish,beetroot,archive/test/raddish/Image_6.jpg,17.45220947265625
+bell pepper,capsicum,archive/test/bell pepper/bell pepper6.jpg,3.700115442276001
+bell pepper,jalepeno,archive/test/bell pepper/Image_61.jpg,10.925060272216797
+bell pepper,capsicum,archive/test/bell pepper/bell pepper14.jpg,24.25986099243164
+bell pepper,capsicum,archive/test/bell pepper/bell pepper10.jpg,8.052234649658203
+bell pepper,capsicum,archive/test/bell pepper/Image_44.jpg,0.14380213618278503
+bell pepper,paprika,archive/test/bell pepper/Image_85.jpg,13.373476028442383
+pear,tomato,archive/test/pear/Image_64.jpg,30.34796905517578
+strawberry,raspberry,archive/test/strawberry/strawberry22.jpg,27.963287353515625
+sweetpotato,beetroot,archive/test/sweetpotato/sweet potato15.jpg,18.10699462890625
+avocado,coconut,archive/test/avocado/avocado24.jpg,32.24723815917969
+pomegranate,plum,archive/test/pomegranate/pomegranate9.jpg,10.589483261108398
+peas,jalepeno,archive/test/peas/peas2.jpg,19.480480194091797
+peas,soy beans,archive/test/peas/Image_23.jpg,18.932750701904297
+capsicum,paprika,archive/test/capsicum/Image_62.jpg,23.755203247070312
+capsicum,bell pepper,archive/test/capsicum/Image_9.jpg,11.998479843139648
+capsicum,bell pepper,archive/test/capsicum/Image_42.jpg,15.576484680175781
+capsicum,bell pepper,archive/test/capsicum/Image_85.jpg,17.90687370300293
+radish,turnip,archive/test/radish/radish2.jpg,11.450492858886719
+radish,raddish,archive/test/radish/radish16.jpg,19.62859344482422
+spinach,peas,archive/test/spinach/Image_48.jpg,37.31282043457031
+lettuce,spinach,archive/test/lettuce/Image_28.JPG,16.97258758544922
+lettuce,cabbage,archive/test/lettuce/Image_76.jpg,13.657687187194824
+lemon,orange,archive/test/lemon/Image_63.jpg,15.291934967041016
+lemon,orange,archive/test/lemon/Image_74.jpg,23.044559478759766
+lemon,orange,archive/test/lemon/Image_54.jpg,7.988821983337402
+lemon,lime,archive/test/lemon/lemon20.jpg,15.764467239379883
+onion,cauliflower,archive/test/onion/Image_74.jpg,41.30577850341797
+onion,beetroot,archive/test/onion/Image_83.jpg,26.94564437866211
+potato,carrot,archive/test/potato/Image_89.jpg,31.837255477905273
+potato,sweetpotato,archive/test/potato/Image_77.jpg,17.4823055267334
+potato,sweetpotato,archive/test/potato/Image_31.jpg,18.33315658569336
+jalepeno,bell pepper,archive/test/jalepeno/Image_75.jpg,19.962276458740234
+jalepeno,chilli pepper,archive/test/jalepeno/Image_7.jpg,10.110855102539062
+honeydew,cantaloupe,archive/test/honeydew/honeydew33.jpg,11.051717758178711
+honeydew,cantaloupe,archive/test/honeydew/honeydew21.jpg,0.0
+sweetcorn,corn,archive/test/sweetcorn/Image_14.jpg,7.237843036651611
+sweetcorn,corn,archive/test/sweetcorn/Image_77.jpg,20.27145767211914
+sweetcorn,corn,archive/test/sweetcorn/Image_23.jpg,0.0
+sweetcorn,corn,archive/test/sweetcorn/Image_33.jpg,0.0
+cucumber,zucchini,archive/test/cucumber/cucumber20.jpg,6.647274017333984
+cheese,cantaloupe,archive/test/cheese/cheese23.jpeg,46.49432373046875
+paprika,jalapeno peppers,archive/test/paprika/paprika7.jpg,12.389932632446289
+paprika,jalepeno,archive/test/paprika/Image_9.jpg,19.838056564331055
+paprika,cauliflower,archive/test/paprika/Image_83.jpg,30.32556915283203
+cantaloupe,honeydew,archive/test/cantaloupe/cantaloupe15.jpg,0.0
+lime,brussel sprouts,archive/test/lime/lime40.jpg,19.539182662963867
+mango,pear,archive/test/mango/Image_38.jpg,13.763611793518066
+mango,pear,archive/test/mango/Image_59.jpg,36.07538986206055
+cabbage,brussel sprouts,archive/test/cabbage/cabbage10.jpg,15.34682559967041
+beetroot,sweetpotato,archive/test/beetroot/Image_48.jpg,23.521465301513672
+jalapeno peppers,lemon,archive/test/jalapeno peppers/jalapeño_pepper16.jpg,17.865867614746094
+corn,cauliflower,archive/test/corn/corn17.png,43.024658203125
+corn,sweetcorn,archive/test/corn/Image_11.jpg,3.7067832946777344
+corn,sweetcorn,archive/test/corn/Image_37.jpg,10.191829681396484
+corn,sweetcorn,archive/test/corn/Image_22.jpg,21.141084671020508
+corn,sweetcorn,archive/test/corn/Image_32.png,1.8181896209716797
+corn,sweetcorn,archive/test/corn/Image_33.jpg,15.185408592224121
+asparagus,celery,archive/test/asparagus/asparagus7.jpg,19.311168670654297
+orange,peach,archive/test/orange/orange20.jpg,20.757917404174805
+orange,lemon,archive/test/orange/Image_24.jpg,29.5948543548584
+carrot,chilli pepper,archive/test/carrot/Image_72.jpg,28.272624969482422
