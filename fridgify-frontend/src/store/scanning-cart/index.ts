@@ -3,23 +3,31 @@ import { devtools, persist } from 'zustand/middleware';
 import type {} from '@redux-devtools/extension'; // required for devtools typing
 
 export enum UnitTypes {
-    COUNT = "count",
-    GRAMS = "grams",
+    EACH = "Each",
+    GRAMS = "Gram",
+}
+
+export interface CatalogItem {
+    productId: string;
+    category?: string;
+    expirationDays: number;
+    unit: string;
 }
 
 export interface CartItem {
-    quantity: number,
-    unit: UnitTypes,
-    expirationDays: number,
+    quantity: number;
+    // unit: UnitTypes,
+    unit: string;
+    expirationDays: number;
 };
 
-export const makeDefaultItem = (): CartItem => {
+export const makeDefaultItem = (product: CatalogItem): CartItem => {
     // (name: string) => {
     // when expDates and unit types are available in database, use them here
     return {
         quantity: 1,
-        unit: UnitTypes.COUNT,
-        expirationDays: 5,
+        unit: product.unit,
+        expirationDays: product.expirationDays,
     }
 };
 
@@ -34,7 +42,7 @@ interface ScanningCartState {
         [name: string]: CartItem;
     },
     setItems: (items: { [name: string]: CartItem }) => void;
-    addItem: (name: string) => void;
+    addItem: (name: string, itemInfo: CatalogItem) => void;
     removeItem: (name: string) => void;
     updateItem: (name: string, updates: { quantity?: number, unit?: UnitTypes, expirationDays?: number }) => void;
 }
@@ -48,8 +56,8 @@ export const useScanningCart = create<ScanningCartState>()(
             closeModal: () => set(() => ({ isModalOpen: false })),
             cartItems: {},
             setItems: (items: { [name: string]: CartItem }) => set(() => ({ cartItems: items })),
-            addItem: (name: string) => set((state) => {
-                state.cartItems[name] = makeDefaultItem();
+            addItem: (name: string, itemInfo: CatalogItem) => set((state) => {
+                state.cartItems[name] = makeDefaultItem(itemInfo);
                 return state;
             }),
             removeItem: (name: string) => set((state) => {

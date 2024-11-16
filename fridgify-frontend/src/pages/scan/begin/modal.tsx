@@ -21,119 +21,11 @@ import {
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Checkbox } from "@/components/ui/checkbox"
 import { toast } from "sonner"
+import { useProduceCatalog } from "@/api"
   
-const catalog = [
-    {
-        name: "Whole Milk",
-        category: "Eggs & Dairy",
-    },
-    {
-        name: "2% Milk",
-        category: "Eggs & Dairy",
-    },
-    {
-        name: "Almond Milk",
-        category: "Eggs & Dairy",
-    },
-    {
-        name: "Eggs",
-        category: "Eggs & Dairy",
-    },
-    {
-        name: "Chicken Breasts",
-        category: "Meat",
-    },
-    {
-        name: "Chicken Thighs",
-        category: "Meat",
-    },
-    {
-        name: "Chicken Wings",
-        category: "Meat",
-    },
-    {
-        name: "Ground Beef",
-        category: "Meat",
-    },
-    {
-        name: "Ground Turkey",
-        category: "Meat",
-    },
-    {
-        name: "Pork Ribs",
-        category: "Meat",
-    },
-    {
-        name: "Ham",
-        category: "Meat",
-    },
-    {
-        name: "Apple",
-        category: "Fruit",
-    },
-    {
-        name: "Banana",
-        category: "Fruit",
-    },
-    {
-        name: "Orange",
-        category: "Fruit",
-    },
-    {
-        name: "Grapefruit",
-        category: "Fruit",
-    },
-    {
-        name: "Grape",
-        category: "Fruit",
-    },
-    {
-        name: "Mango",
-        category: "Fruit",
-    },
-    {
-        name: "Papaya",
-        category: "Fruit",
-    },
-    {
-        name: "Canteloupe",
-        category: "Fruit",
-    },
-    {
-        name: "Watermelon",
-        category: "Fruit",
-    },
-    {
-        name: "Antelope",
-        category: "Fruit",
-    },
-    {
-        name: "Lettuce",
-        category: "Vegetables",
-    },
-    {
-        name: "Cabbage",
-        category: "Vegetables",
-    },
-    {
-        name: "Broccoli",
-        category: "Vegetables",
-    },
-    {
-        name: "Carrots",
-        category: "Vegetables",
-    },
-    {
-        name: "Spinach",
-        category: "Vegetables",
-    },
-    {
-        name: "Celery",
-        category: "Vegetables",
-    },
-]
-
 export const ManualInputModal = () => {
+    const { produceCatalog } = useProduceCatalog();
+
     const { isModalOpen, closeModal, cartItems, setItems } = useScanningCart();
     const [searchQuery, setSearchQuery] = useState("");
     const [categoryQuery, setCategoryQuery] = useState("All");
@@ -152,6 +44,7 @@ export const ManualInputModal = () => {
     }, [setItems, updatedItems, closeModal]);
 
     if (!isModalOpen) return null;
+    if (!produceCatalog) return null;
 
     return (
         <div 
@@ -191,25 +84,26 @@ export const ManualInputModal = () => {
                     <div className="mt-5 h-[280px] border-[1px] border-black/10 rounded-md shadow-sm overflow-y-scroll">
                         <Table>
                             <TableBody>
-                                {catalog.map((catalogItem) => {
-                                    if ((catalogItem.category === categoryQuery || categoryQuery=== "All") &&
-                                        (searchQuery === "" || catalogItem.name.toUpperCase().includes(searchQuery.toUpperCase()))
+                                {Object.entries(produceCatalog).map(([name, item]) => {
+                                    if (
+                                        (item.category === categoryQuery || categoryQuery=== "All") &&
+                                        (searchQuery === "" || name.toUpperCase().includes(searchQuery.toUpperCase()))
                                     ) {
                                         return (
-                                            <TableRow key={catalogItem.name} className="h-10">
+                                            <TableRow key={item.productId} className="h-10">
                                                 <TableCell className="font-medium">
-                                                    <div className="ml-2">{catalogItem.name}</div>
+                                                    <div className="ml-2">{name.charAt(0).toUpperCase() + name.slice(1)}</div>
                                                 </TableCell>
                                                 <TableCell className="text-right">
                                                     <Checkbox 
                                                         className="mr-5" 
-                                                        defaultChecked={catalogItem.name in updatedItems}
+                                                        defaultChecked={name in updatedItems}
                                                         onCheckedChange={(e) => {
                                                             if (e) {
-                                                                setUpdatedItems({ ...updatedItems, [catalogItem.name]: makeDefaultItem() })
+                                                                setUpdatedItems({ ...updatedItems, [name]: makeDefaultItem(item) })
                                                             } else {
                                                                 setUpdatedItems((items) => {
-                                                                    if (catalogItem.name in items) delete items[catalogItem.name];
+                                                                    if (name in items) delete items[name];
                                                                     return items;
                                                                 })
                                                             }

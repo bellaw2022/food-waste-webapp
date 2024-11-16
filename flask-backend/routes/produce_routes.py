@@ -3,7 +3,7 @@ from models import db, Produce
 
 produce_routes = Blueprint('produce_routes', __name__)
 
-@produce_routes.route('/api/produce', methods=['GET'])
+@produce_routes.route('/api/produce', methods=['GET', 'POST'])
 def get_produce_info():
     try:
         data = request.get_json()
