@@ -6,6 +6,7 @@ import { FaCircleMinus } from "react-icons/fa6";
 import defaultImage from "../../Food.png";
 import RemoveInventory from "./removeInventory";
 import axios from "axios";
+import { useAppContext } from "../../AppContext";
 
 let baseURL = import.meta.env.VITE_API_URL;
 
@@ -40,6 +41,8 @@ const Recipe: React.FC<CombinedProps> = ({
   isAI,
 }) => {
   console.log("recipe: ", recipe);
+  //const { globalUserId, setGlobalUserId } = useAppContext();
+  const globalUserId = 38;
   const [servings, setServings] = useState<number>(recipe.servings);
   const [scaledIngredients, setScaledIngredients] = useState(
     recipe.ingredients
@@ -50,6 +53,7 @@ const Recipe: React.FC<CombinedProps> = ({
       name: string;
       amount: number;
       unit: string;
+      maxAmount: number;
     }[]
   >([]);
   function parseAmount(amount: string): number | string {
@@ -68,6 +72,7 @@ const Recipe: React.FC<CombinedProps> = ({
     try {
       const response = await axios.post(baseURL + "/api/recipe/ingredients", {
         ingredients: recipe.usedIngredients,
+        user_id: globalUserId,
       });
 
       const data = await response.data;
