@@ -38,7 +38,9 @@ const Ingredients: React.FC<IngredientsProps> = ({
     ingredient.name.toLowerCase().startsWith(searchQuery.toLowerCase())
   );
 
-  const sortedIngredients = filteredIngredients.sort((a, b) => a.days - b.days);
+  const sortedIngredients = filteredIngredients.sort(
+    (a, b) => a.shelfPercentage - b.shelfPercentage
+  );
 
   const getDotColor = (shelfPercentage: number): string => {
     if (shelfPercentage <= 0.25) return "red";
