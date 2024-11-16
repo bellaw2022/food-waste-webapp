@@ -6,9 +6,9 @@ import numpy as np
 from PIL import Image
 import pickle
 import sys
-from collections import defaultdict
 import ssl
 import urllib.request
+from collections import defaultdict, OrderedDict
 
 
 print("Python executable:", sys.executable)
@@ -21,48 +21,70 @@ device = "cuda" if torch.cuda.is_available() else "cpu"
 model, preprocess = clip.load("ViT-B/32", device=device)
 
 # Load FAISS Index
-faiss_index_path = "faiss_index_v2.index"
+faiss_index_path = "faiss_index.index"
 index = faiss.read_index(faiss_index_path)
 print(f"Loaded FAISS index, including {index.ntotal} indexes")
 
 # Load product names
-product_names_path = "product_names_v2.pkl"
+product_names_path = "product_names.pkl"
 with open(product_names_path, 'rb') as f:
     product_names = pickle.load(f)
 print(f"Loaded {len(product_names)} product names")
 
 
-def query_product(pil_image, top_k=1):
+def query_product(query_image_path, top_k=5):
+    """
+    Query and return top-k different products
+
+    Args:
+        query_image_path: Path to image or PIL Image object
+        top_k: Number of different products to return
+
+    Returns:
+        dict containing:
+        - predictions: list of top-k different products with their distances
+        - best_match: the closest matching product
+    """
     try:
+        # Handle both PIL Image and path input
+        if isinstance(query_image_path, str):
+            image = Image.open(query_image_path).convert("RGB")
+        else:
+            image = query_image_path
+
         # Process image
-        query_image = preprocess(pil_image).unsqueeze(0).to(device)
+        query_image = preprocess(image).unsqueeze(0).to(device)
         with torch.no_grad():
             query_embedding = model.encode_image(query_image).cpu().numpy().astype('float32')
-        
-        # Search in FAISS 
-        distances, indices = index.search(query_embedding, top_k)
 
-        product_count = defaultdict(int)
-        for i in range(top_k):
+        # Search in FAISS with a larger k to ensure we get enough unique products
+        search_k = min(top_k * 3, index.ntotal)  # Search more to ensure enough unique products
+        distances, indices = index.search(query_embedding, search_k)
+
+        # Collect unique products while maintaining order
+        unique_products = OrderedDict()
+
+        for i in range(len(indices[0])):
             idx = indices[0][i]
-            distance = distances[0][i]
+            distance = float(distances[0][i])
+
             if idx < len(product_names):
                 product = product_names[idx]
-                # if product in weighted_distances:
-                #     weighted_distances[product] += distance
-                # else:
-                #     weighted_distances[product] = distance
-                product_count[product] += 1
-                print(f"{product}: {distance}")
-        
-        print(product_count)
-        best_product = max(product_count, key=product_count.get)
+                if product not in unique_products:
+                    unique_products[product] = distance
+                    if len(unique_products) == top_k:
+                        break
+
+        # Convert to list of predictions
+        predictions = [ product for product, _ in unique_products.items()]
 
         result = {
-            'product_name': best_product
+            'best_match': predictions[0],  # First product has smallest distance
+            'predictions': predictions
         }
-        
+
         return result
+
     except Exception as e:
         print(f"Failed to query image: {e}")
-        return []
+        return None
