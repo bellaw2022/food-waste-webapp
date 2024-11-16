@@ -81,6 +81,7 @@
 .ingredient {
   display: grid;
   grid-template-columns: 80px 1.2fr 2fr 1fr;
+  align-items: center;
 }
 
 .ingredients-section {
