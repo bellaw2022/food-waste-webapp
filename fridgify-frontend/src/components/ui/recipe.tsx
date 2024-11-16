@@ -96,7 +96,7 @@ const Recipe: React.FC<CombinedProps> = ({
         ...ingredient,
         amount:
           typeof parsedAmount === "number"
-            ? (parsedAmount * multiplier).toString()
+            ? (parsedAmount * multiplier).toFixed(2).toString()
             : parsedAmount.toString(),
       };
     });
