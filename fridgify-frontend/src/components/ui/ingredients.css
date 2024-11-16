@@ -1,0 +1,40 @@
+.ingredients {
+  display: flex;
+  flex-wrap: wrap;
+  max-width: 100%;
+}
+
+.inv-title {
+  color: #333;
+  margin: 5px;
+  margin-bottom: 5px;
+  font-weight: bold;
+  margin-top: 10px;
+}
+
+.ingredient-button {
+  background-color: #d9d9d9;
+  color: #333;
+  padding: 8px 12px;
+  margin: 4px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  flex-shrink: 0;
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.ingredient-button.selected {
+  background-color: #5b9a5b;
+  color: white;
+}
+.search-bar {
+  width: 100%;
+  padding: 8px;
+  margin-top: 12px;
+  margin-bottom: 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 16px;
+}
