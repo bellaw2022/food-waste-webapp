@@ -6,17 +6,28 @@ import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { EditingCartItem, UnitAbbreviations, useEditingCart } from "@/store";
 import { ChevronLeftIcon, ChevronRightIcon, ClockIcon, PencilIcon, TrashIcon, UtensilsIcon } from "lucide-react";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { NumberInput } from "@/components/shared";
 
 export const InventoryPage = () => {
     const { isInventoryLoading, inventory } = useInventory();
     const { editInventory, isUpdating } = useEditInventory();
     const { isEditing, toggleEditing, addItem, removeItem, updateItem, setItems, cartItems } = useEditingCart();
+    
+    const [tempQuery, setTempQuery] = useState("");
     const [searchQuery, setSearchQuery] = useState("");
 
-    const expiringItems = Object.entries(inventory ?? {}).filter(([_, item]) => item.expirationDays < 7);
-    const freshItems = Object.entries(inventory ?? {}).filter(([_, item]) => item.expirationDays >= 7);
+    const filteredItems = useMemo(() => 
+        Object.values(inventory ?? {}).filter((item) => 
+            searchQuery === "" || item.name.toLowerCase().startsWith(searchQuery.toLowerCase())),
+    [searchQuery, inventory]);
+
+    const expiringItems = useMemo(() => 
+        filteredItems.filter((item) => item.expirationDays < 7)
+    , [filteredItems]);
+    const freshItems = useMemo(() => 
+        filteredItems.filter((item) => item.expirationDays >= 7)
+    , [filteredItems]);
 
     const onToggleSelect = useCallback((itemId: string) => {
         if (!inventory) return;
@@ -112,30 +123,33 @@ export const InventoryPage = () => {
             </div>
             <div className="mt-4 flex flex-row items-center justify-between gap-4">
                 <Input placeholder="Enter Item Name" type="search"
-                    value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}
+                    value={tempQuery} onChange={(e) => setTempQuery(e.target.value)}
+                    onKeyDown={(e) => {
+                        if (e.key === 'Enter') setSearchQuery(tempQuery);
+                    }}
                 />
-                <Button variant="default">
+                <Button variant="default" onClick={() => setSearchQuery(tempQuery)}>
                     Filter
                 </Button>
             </div>
             {inventory ?
                 <div className="mt-8 flex flex-col items-start gap-4">
                     <h2 className="text-2xl font-bold">Expiring Soon:</h2>
-                    {expiringItems.map(([itemId, item]) => 
-                        <InventoryCard key={itemId}
+                    {expiringItems.map((item) => 
+                        <InventoryCard key={item.cartItemId}
                             isEditing={isEditing}
-                            onToggle={() => onToggleSelect(itemId)}
-                            isSelected={itemId in cartItems} 
+                            onToggle={() => onToggleSelect(item.cartItemId)}
+                            isSelected={item.cartItemId in cartItems} 
                             item={item} expiringSoon={true} 
                         />
                     )}
                     <h2 className="text-2xl font-bold">Still Fresh:</h2>
-                    {freshItems.map(([itemId, item]) => 
-                        <InventoryCard key={itemId}
+                    {freshItems.map((item) => 
+                        <InventoryCard key={item.cartItemId}
                             isEditing={isEditing}
-                            onToggle={() => onToggleSelect(itemId)}
-                            isSelected={itemId in cartItems} 
-                            item={item} expiringSoon={false} 
+                            onToggle={() => onToggleSelect(item.cartItemId)}
+                            isSelected={item.cartItemId in cartItems} 
+                            item={item} expiringSoon={true} 
                         />
                     )}
                 </div>

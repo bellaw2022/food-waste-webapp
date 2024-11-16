@@ -1,12 +1,15 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { API_URL } from "@/api/constants";
 import { CartItem } from "@/store";
 import { EditingCartItem } from "@/store/editing-cart";
 import { toast } from "sonner";
+import { useToast } from "@/hooks/use-toast";
 
 const MILLISECONDS_IN_DAY = 24 * 60 * 60 * 1000;
 
 export const useAddInventory = () => {
+    const { toast } = useToast();
+
     const mutation = useMutation({
         mutationFn: async (cart: Record<string, CartItem>) => {
             const userIdString = localStorage.getItem('user_id');
@@ -34,19 +37,21 @@ export const useAddInventory = () => {
 
             if (!res.ok) throw new Error("Error communicating with backend to add inventory!");
             const resJson = await res.json();
-            console.log(resJson);
             if (resJson.status !== 200) throw new Error("Error response from backend!");
         },
         onSuccess: () => {
             // toast success
-            toast("Successfully added items!", {
-                description: "Your items have been saved to your inventory."
+            toast({
+                title: "Successfully added items!",
+                description: "Your items have been saved to your inventory.",
             });
         },
         onError: () => {
             // toast error
-            toast("Error adding items :(", {
-                description: "Please try again."
+            toast({
+                variant: "destructive",
+                title: "Error adding items :(",
+                description: "Please try again.",
             });
         }
     })
@@ -60,6 +65,9 @@ export const useAddInventory = () => {
 }
 
 export const useEditInventory = () => {
+    const queryClient = useQueryClient();
+    const { toast } = useToast();
+
     const mutation = useMutation({
         mutationFn: async (cart: Record<string, EditingCartItem>) => {
             const userIdString = localStorage.getItem('user_id');
@@ -71,8 +79,6 @@ export const useEditInventory = () => {
                 formattedInput[item.cartItemId] = item.quantity;
             });
 
-            console.log(formattedInput);
-
             const res = await fetch(`${API_URL}/user/${userId}/produce`, {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
@@ -81,18 +87,22 @@ export const useEditInventory = () => {
 
             if (!res.ok) throw new Error("Error communicating with backend to edit inventory!");
             const resJson = await res.json();
-            console.log(resJson);
             if (resJson.status !== 200) throw new Error("Error response from backend!");
         },
         onSuccess: () => {
             // toast success
-            toast("Successfully edited inventory!", {
-                description: "Your inventory and statistics have now been updated.",
+            toast({
+                title: "Successfully edited inventory!",
+                description: "Your inventory and statistics have been updated.",
             });
+
+            queryClient.invalidateQueries({ queryKey: ['inventory'] });
         },
         onError: () => {
             // toast error
-            toast("Error editing inventory :(", {
+            toast({
+                variant: "destructive",
+                title: "Error editing inventory :(",
                 description: "Please try again.",
             });
         }

@@ -3,7 +3,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { HomePage, BeginScanningPage, FinishScanningPage, InventoryPage, RecipePage, ProfilePage} from '@/pages';
 import { useOAuth } from "@/hooks";
 import { Navbar } from '@/components/shared';
-import { Toaster } from '@/components/ui/sonner';
+import { Toaster } from '@/components/ui/toaster';
 import APIClient from "@/api";
 
 function App() {

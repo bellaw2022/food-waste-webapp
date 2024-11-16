@@ -22,6 +22,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from "@/components/ui/checkbox"
 import { toast } from "sonner"
 import { useProduceCatalog } from "@/api"
+import { useToast } from "@/hooks/use-toast"
   
 export const ManualInputModal = () => {
     const { produceCatalog } = useProduceCatalog();
@@ -35,13 +36,16 @@ export const ManualInputModal = () => {
         setUpdatedItems(cartItems); // Reset to cartItems every time modal is opened/closed
     }, [isModalOpen, cartItems]);
 
+    const { toast } = useToast();
+
     const onSubmit = useCallback(() => {
         setItems(updatedItems);
-        toast("Scanning cart updated!", {
+        toast({
+            title: "Scanning cart updated!",
             description: "You can click Finish to set quantities.",
         });
         closeModal();
-    }, [setItems, updatedItems, closeModal]);
+    }, [setItems, updatedItems, toast, closeModal]);
 
     if (!isModalOpen) return null;
     if (!produceCatalog) return null;
