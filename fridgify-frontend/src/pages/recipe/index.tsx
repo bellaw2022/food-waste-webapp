@@ -102,6 +102,8 @@ export const RecipePage: React.FC = () => {
 
   const [searchOption, setSearchOption] = useState<number>(1);
 
+  const [isAI, setIsAI] = useState<boolean>(false);
+
   const handleNoRecipe = () => {
     setShowNoRecipesModal(false);
     setBasePage(true);
@@ -172,6 +174,7 @@ export const RecipePage: React.FC = () => {
         ingredients: [],
         instructions: [],
       });
+      setIsAI(false);
       console.log("zero everything");
     }
   }, [basePage]);
@@ -256,6 +259,7 @@ export const RecipePage: React.FC = () => {
       setRecipePage(true);
       setBasePage(false);
       setListPage(false);
+      setIsAI(true);
     }
   };
 
@@ -334,6 +338,7 @@ export const RecipePage: React.FC = () => {
           setBasePage={setBasePage}
           setListPage={setListPage}
           setRecipePage={setRecipePage}
+          isAI={isAI}
         ></Recipe>
       )}
     </div>
