@@ -2150,6 +2150,13 @@ def get_recipe_info():
         # Parse and return the data from the external API
         #external_data = response.json()
         external_data = response
+        steps = []
+
+        if "analyzedInstructions" in external_data and len(external_data["analyzedInstructions"]) > 0:
+            steps = [step["step"] for step in external_data["analyzedInstructions"][0]["steps"]]
+
+        print("steps")
+        print(steps)
 
          # title, image, servings, cookingMinutes, preparationMinutes, extendedIngredients.name, extendedIngredients.measures.us.amount, extendedIngredients.measures.us.unitLong
         response_data = {
@@ -2161,7 +2168,12 @@ def get_recipe_info():
                 {"name": ingredient["name"], "unit": ingredient["measures"]["us"]["unitLong"], "amount": ingredient["measures"]["us"]["amount"]}
                 for ingredient in external_data["extendedIngredients"]
             ],
-            "sourceURL" : external_data["sourceUrl"]}
+            "sourceURL" : external_data["sourceUrl"],
+
+            # DO THIS NEXT!! CHANGE INSTRUCTIONS INTO LIST PARSED FROM \N 
+            "instructions" : steps
+        }
+        
             
         
         return jsonify(response_data)

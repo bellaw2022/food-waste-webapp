@@ -203,7 +203,7 @@ const Recipe: React.FC<CombinedProps> = ({
         </div>
         <div className="instructions">
           <div className="instructions-title"> Instructions</div>
-          {recipe.instructions == null ? (
+          {recipe.instructions == null || recipe.instructions.length < 1 ? (
             <a
               href={recipe.sourceURL}
               target="_blank"
