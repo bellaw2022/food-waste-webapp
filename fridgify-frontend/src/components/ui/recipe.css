@@ -1,0 +1,126 @@
+.recipes-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  column-gap: 16px;
+  row-gap: 30px;
+  padding: 16px;
+  padding-top: 0px;
+}
+
+.recipes-card {
+  background-color: #ededed;
+  border: 1px solid #adadad;
+  border-radius: 8px;
+  /*padding: 0px 10px;*/
+  /*text-align: center;*/
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+.recipes-card:hover {
+  transform: scale(1.02);
+}
+
+.recipes-text,
+.recipe-text {
+  display: grid;
+  grid-template-columns: 1fr 25px 25px;
+  align-items: center;
+  padding: 5px 5px;
+  border-top: 1px solid #adadad;
+}
+
+.recipe-text {
+  border-top: none;
+}
+
+.recipes-image {
+  width: 100%;
+  height: auto;
+  border-radius: 4px;
+}
+
+.recipes-title {
+  font-size: 1em;
+}
+
+.recipes-missed-count,
+.recipes-used-count,
+.recipe-missed-count,
+.recipe-used-count {
+  font-size: 0.9em;
+  padding: 0px 5px;
+}
+
+.recipe {
+  padding: 0px 20px;
+  border: 2px solid #adadad;
+  background-color: #ededed;
+  margin-bottom: 40px;
+  border-radius: 10px;
+}
+
+.recipe-title {
+  font-size: 1.3em;
+  font-weight: bold;
+}
+
+.recipe-image {
+  max-width: 300px;
+  height: auto;
+  border-radius: 4px;
+}
+
+.recipe-subtract-button {
+  border: 2px solid #adadad;
+  background-color: #ededed;
+  border-radius: 5px;
+  padding: 0px 10px;
+  height: 70%;
+}
+
+.ingredient {
+  display: grid;
+  grid-template-columns: 80px 1.2fr 2fr 1fr;
+  align-items: center;
+}
+
+.ingredients-section {
+  padding: 20px 0px;
+}
+.serving-section {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  column-gap: 20px;
+  padding: 10px 0px;
+}
+.instructions-title,
+.ingredients-title {
+  font-weight: bold;
+  font-size: 1em;
+  padding-bottom: 5px;
+}
+
+.instructions {
+  padding-top: 10px;
+  padding-bottom: 20px;
+}
+.instructions-text {
+  text-decoration: underline;
+}
+
+.instructions-step {
+  background-color: white;
+  border-radius: 5px;
+  margin: 10px 0px;
+  padding: 5px 2px;
+}
+
+.recipe-top {
+  display: grid;
+  grid-template-columns: 1fr 200px;
+}
+
+.recipe-page {
+}
