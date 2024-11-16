@@ -2,6 +2,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { API_URL } from "@/api/constants";
 import { CartItem } from "@/store";
 import { EditingCartItem } from "@/store/editing-cart";
+import { toast } from "sonner";
 
 const MILLISECONDS_IN_DAY = 24 * 60 * 60 * 1000;
 
@@ -31,21 +32,74 @@ export const useAddInventory = () => {
                 body: JSON.stringify(formattedInputs),
             });
 
-            if (!res.ok) throw new Error("Error communicating with backend to update inventory!");
+            if (!res.ok) throw new Error("Error communicating with backend to add inventory!");
             const resJson = await res.json();
             console.log(resJson);
             if (resJson.status !== 200) throw new Error("Error response from backend!");
         },
         onSuccess: () => {
             // toast success
+            toast("Successfully added items!", {
+                description: "Your items have been saved to your inventory."
+            });
         },
         onError: () => {
             // toast error
+            toast("Error adding items :(", {
+                description: "Please try again."
+            });
         }
     })
 
     return {
-        updateInventory: async (cart: Record<string, CartItem>) => {
+        addInventory: async (cart: Record<string, CartItem>) => {
+            await mutation.mutateAsync(cart);
+        },
+        isUpdating: mutation.isPending,
+    }
+}
+
+export const useEditInventory = () => {
+    const mutation = useMutation({
+        mutationFn: async (cart: Record<string, EditingCartItem>) => {
+            const userIdString = localStorage.getItem('user_id');
+            if (!userIdString) throw new Error("Could not fetch user_id from local_storage");
+            const userId = parseInt(userIdString);
+
+            const formattedInput: Record<string, number> = {};
+            Object.values(cart).forEach((item) => {
+                formattedInput[item.cartItemId] = item.quantity;
+            });
+
+            console.log(formattedInput);
+
+            const res = await fetch(`${API_URL}/user/${userId}/produce`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(formattedInput),
+            });
+
+            if (!res.ok) throw new Error("Error communicating with backend to edit inventory!");
+            const resJson = await res.json();
+            console.log(resJson);
+            if (resJson.status !== 200) throw new Error("Error response from backend!");
+        },
+        onSuccess: () => {
+            // toast success
+            toast("Successfully edited inventory!", {
+                description: "Your inventory and statistics have now been updated.",
+            });
+        },
+        onError: () => {
+            // toast error
+            toast("Error editing inventory :(", {
+                description: "Please try again.",
+            });
+        }
+    })
+
+    return {
+        editInventory: async (cart: Record<string, EditingCartItem>) => {
             await mutation.mutateAsync(cart);
         },
         isUpdating: mutation.isPending,

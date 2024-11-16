@@ -10,17 +10,17 @@ import { Link, useNavigate } from "react-router-dom";
 
 export const FinishScanningPage = () => {
     const { cartItems, removeItem, updateItem, setItems } = useScanningCart();
-    const { updateInventory, isUpdating } = useAddInventory();
+    const { addInventory, isUpdating } = useAddInventory();
     const navigate = useNavigate();
 
     const onFinish = useCallback(async () => {
         if (isUpdating) return;
 
-        await updateInventory(cartItems).then(() => {
+        await addInventory(cartItems).then(() => {
             setItems({}); // Clear local storage
             navigate("/inventory");
         });
-    }, [isUpdating, updateInventory, cartItems, setItems, navigate]);
+    }, [isUpdating, addInventory, cartItems, setItems, navigate]);
 
     return (
         <div className="mx-10 my-10">
@@ -55,6 +55,7 @@ export const FinishScanningPage = () => {
                                 <div className="flex flex-row items-center justify-center">
                                     <NumberInput
                                         value={item.quantity}
+                                        minVal={1}
                                         onIncrement={() => updateItem(name, { quantity: item.quantity+1 })}
                                         onDecrement={() => updateItem(name, { quantity: Math.max(1, item.quantity-1) })}
                                         onSetValue={(newQuantity: number) => updateItem(name, { quantity: newQuantity })}
@@ -79,6 +80,7 @@ export const FinishScanningPage = () => {
                                 Expires in:
                                 <NumberInput
                                     value={item.expirationDays}
+                                    minVal={1}
                                     onIncrement={() => updateItem(name, { expirationDays: item.expirationDays+1 })}
                                     onDecrement={() => updateItem(name, { expirationDays: Math.max(1, item.expirationDays-1) })}
                                     onSetValue={(newExpirationDays: number) => updateItem(name, { expirationDays: newExpirationDays })}

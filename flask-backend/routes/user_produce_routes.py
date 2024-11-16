@@ -21,6 +21,7 @@ def get_user_inventory(user_id):
         result = [{
             "userproduce_id": user_produce.userproduce_id,
             "produce_name": produce.produce_name,
+            "category": produce.category,
             "quantity": user_produce.quantity,
             "unit": produce.unit,
             "purchase_date": user_produce.purchase_date.strftime('%Y-%m-%d'),

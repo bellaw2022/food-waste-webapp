@@ -1,18 +1,18 @@
-import { useInventory } from "@/api";
+import { useEditInventory, useInventory } from "@/api";
 import { Alert } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { EditingCartItem, UnitAbbreviations, useEditingCart } from "@/store";
-import { ChevronLeftIcon, ClockIcon, PencilIcon } from "lucide-react";
-import { useCallback, useState } from "react";
-import { EditingCartSheet } from "./sheet";
-import { Sheet, SheetTrigger } from "@/components/ui/sheet";
+import { ChevronLeftIcon, ChevronRightIcon, ClockIcon, PencilIcon, TrashIcon, UtensilsIcon } from "lucide-react";
+import { useCallback, useEffect, useState } from "react";
+import { NumberInput } from "@/components/shared";
 
 export const InventoryPage = () => {
     const { isInventoryLoading, inventory } = useInventory();
-    const { isEditing, toggleEditing, addItem, removeItem, cartItems } = useEditingCart();
+    const { editInventory, isUpdating } = useEditInventory();
+    const { isEditing, toggleEditing, addItem, removeItem, updateItem, setItems, cartItems } = useEditingCart();
     const [searchQuery, setSearchQuery] = useState("");
 
     const expiringItems = Object.entries(inventory ?? {}).filter(([_, item]) => item.expirationDays < 7);
@@ -24,66 +24,124 @@ export const InventoryPage = () => {
         if (itemId in cartItems) removeItem(itemId);
         else addItem(itemId, inventory[itemId]);
     }, [inventory, cartItems, addItem, removeItem]);
+    
+    const [isSheetOpen, setSheetOpen] = useState(false);
+    useEffect(() => {
+        if (!isEditing) setSheetOpen(false);
+    }, [isEditing, setSheetOpen]);
+
+    const clearCart = useCallback(() => {
+        setItems({});
+        setSheetOpen(false);
+    }, [setItems, setSheetOpen]);
+    
+    const onTrash = useCallback(() => {
+        if (isUpdating) return;
+        editInventory(cartItems);
+        clearCart();
+    }, [isUpdating, editInventory, cartItems, clearCart]);
+
+    const onConsume = useCallback(() => {
+        if (isUpdating) return;
+        editInventory(cartItems);
+        clearCart();
+    }, [isUpdating, editInventory, cartItems, clearCart]);
 
     return (
-        <Sheet>
-            <div className="mx-4 mb-10">
-                {isEditing && 
-                    <SheetTrigger asChild>
-                        <Button
-                            variant="outline" 
-                            className="fixed right-0 top-[13em] 
-                            rounded-r-none border-2 border-r-0 border-black px-4 py-6
-                            bg-[white]"
-                        >
-                            <ChevronLeftIcon />
+        <div className="mx-4 mb-10">
+            {isEditing && isSheetOpen &&
+                <Card
+                    className="fixed right-0 top-[25vh]
+                    rounded-r-none border-2 border-r-0 border-black
+                    w-[300px] h-[380px] bg-[white]
+                    flex flex-col"
+                >
+                    <CardHeader>
+                        <CardTitle>Editing Inventory List</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        {Object.entries(cartItems).map(([itemId, item]) => (
+                            <div key={itemId} className="flex flex-row items-center justify-between">
+                                <div className="text-md">{item.name.charAt(0).toUpperCase() + item.name.slice(1)}</div>
+                                <div className="flex flex-row items-center justify-between gap-2">
+                                    <NumberInput
+                                        value={item.quantity}
+                                        minVal={0} maxVal={inventory?.[itemId].quantity}
+                                        onIncrement={() => updateItem(itemId, { quantity: item.quantity+1 })}
+                                        onDecrement={() => updateItem(itemId, { quantity: Math.max(0, item.quantity-1) })}
+                                        onSetValue={(newQuantity: number) => updateItem(itemId, { quantity: newQuantity })}
+                                    />
+                                    <div className="w-[2em]">{UnitAbbreviations?.[item.unit]}</div>
+                                </div>
+                            </div>
+                        ))}
+                    </CardContent>
+                    <CardFooter className="mt-auto mx-auto gap-2">
+                        <Button variant="outline" className="border-[black]" onClick={clearCart}>
+                            Cancel
                         </Button>
-                    </SheetTrigger>}
-                <EditingCartSheet />
-                <div className="flex flex-row items-center justify-between">
-                    <h1 className="text-3xl font-bold">Inventory</h1>
-                    <div className="flex flex-row items-center justify-between gap-2 cursor-pointer"
-                        onClick={toggleEditing}
-                    >
-                        <Button className="p-2 h-fit w-fit border-[green]" variant="ghost">
-                            <PencilIcon size={24} color="green" />
+                        <Button variant="outline" className="border-[red] bg-[red]/30 hover:bg-[red]/50" onClick={onTrash}>
+                            <TrashIcon />
                         </Button>
-                        {isEditing && <div className="font-bold">Editing</div>}
-                    </div>
-                </div>
-                <div className="mt-4 flex flex-row items-center justify-between gap-4">
-                    <Input placeholder="Enter Item Name" type="search"
-                        value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}
-                    />
-                    <Button variant="default">
-                        Filter
+                        <Button variant="outline" className="border-[green] bg-[green]/30 hover:bg-[green]/50" onClick={onConsume}>
+                            <UtensilsIcon />
+                        </Button>
+                    </CardFooter>
+                </Card>}
+            {isEditing &&
+                <Button
+                    variant="outline" 
+                    className={cn(isSheetOpen ? "rounded-none" : "", 
+                        "fixed right-0 top-[25vh] \
+                        rounded-r-none border-2 border-r-0 border-black px-4 py-6 \
+                        bg-[#f3f3f3]")}
+                    onClick={() => setSheetOpen((isOpen) => !isOpen)}
+                >
+                    {isSheetOpen ? <ChevronRightIcon /> : <ChevronLeftIcon />}
+                </Button>}
+            <div className="flex flex-row items-center justify-between">
+                <h1 className="text-3xl font-bold">Inventory</h1>
+                <div className="flex flex-row items-center justify-between gap-2 cursor-pointer"
+                    onClick={toggleEditing}
+                >
+                    <Button className="p-2 h-fit w-fit border-[green]" variant="ghost">
+                        <PencilIcon size={24} color="green" />
                     </Button>
+                    {isEditing && <div className="font-bold">Editing</div>}
                 </div>
-                {inventory ?
-                    <div className="mt-8 flex flex-col items-start gap-4">
-                        <h2 className="text-2xl font-bold">Expiring Soon:</h2>
-                        {expiringItems.map(([itemId, item]) => 
-                            <InventoryCard key={itemId}
-                                isEditing={isEditing}
-                                onToggle={() => onToggleSelect(itemId)}
-                                isSelected={itemId in cartItems} 
-                                item={item} expiringSoon={true} 
-                            />
-                        )}
-                        <h2 className="text-2xl font-bold">Still Fresh:</h2>
-                        {freshItems.map(([itemId, item]) => 
-                            <InventoryCard key={itemId}
-                                isEditing={isEditing}
-                                onToggle={() => onToggleSelect(itemId)}
-                                isSelected={itemId in cartItems} 
-                                item={item} expiringSoon={false} 
-                            />
-                        )}
-                    </div>
-                    : isInventoryLoading ? <Alert>Loading Inventory...</Alert>
-                        : <Alert variant="destructive">Error loading inventory</Alert>}
             </div>
-        </Sheet>
+            <div className="mt-4 flex flex-row items-center justify-between gap-4">
+                <Input placeholder="Enter Item Name" type="search"
+                    value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}
+                />
+                <Button variant="default">
+                    Filter
+                </Button>
+            </div>
+            {inventory ?
+                <div className="mt-8 flex flex-col items-start gap-4">
+                    <h2 className="text-2xl font-bold">Expiring Soon:</h2>
+                    {expiringItems.map(([itemId, item]) => 
+                        <InventoryCard key={itemId}
+                            isEditing={isEditing}
+                            onToggle={() => onToggleSelect(itemId)}
+                            isSelected={itemId in cartItems} 
+                            item={item} expiringSoon={true} 
+                        />
+                    )}
+                    <h2 className="text-2xl font-bold">Still Fresh:</h2>
+                    {freshItems.map(([itemId, item]) => 
+                        <InventoryCard key={itemId}
+                            isEditing={isEditing}
+                            onToggle={() => onToggleSelect(itemId)}
+                            isSelected={itemId in cartItems} 
+                            item={item} expiringSoon={false} 
+                        />
+                    )}
+                </div>
+                : isInventoryLoading ? <Alert>Loading Inventory...</Alert>
+                    : <Alert variant="destructive">Error loading inventory</Alert>}
+        </div>
     );
 }
 
