@@ -2153,10 +2153,7 @@ def get_recipe_info():
         steps = []
 
         if "analyzedInstructions" in external_data and len(external_data["analyzedInstructions"]) > 0:
-            steps = [step["step"] for step in external_data["analyzedInstructions"][0]["steps"]]
-
-        print("steps")
-        print(steps)
+            steps = [f"Step {step['number']}. {step['step']}" for step in external_data["analyzedInstructions"][0]["steps"]]
 
          # title, image, servings, cookingMinutes, preparationMinutes, extendedIngredients.name, extendedIngredients.measures.us.amount, extendedIngredients.measures.us.unitLong
         response_data = {
