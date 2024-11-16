@@ -51,7 +51,7 @@ const Recipe: React.FC<CombinedProps> = ({
   const [removeableIngredients, setRemoveableIngredients] = useState<
     {
       name: string;
-      amount: number;
+      amount: string;
       unit: string;
       maxAmount: number;
     }[]
@@ -76,7 +76,7 @@ const Recipe: React.FC<CombinedProps> = ({
       });
 
       const data = await response.data;
-      console.log("initial ingredients: ", data);
+
       setRemoveableIngredients(data);
     } catch (error) {
       console.error("Error fetching ingredients:", error);

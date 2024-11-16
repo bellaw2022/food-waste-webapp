@@ -4,7 +4,7 @@ import { SlClose } from "react-icons/sl";
 
 interface Ingredient {
   name: string;
-  amount: number;
+  amount: string;
   unit: string;
   maxAmount: number;
 }
@@ -23,16 +23,23 @@ const IngredientItem: React.FC<IngredientProps> = ({
   deleteIngredient,
 }) => {
   // Initialize amount state with the default value (1 if undefined)
-  const [amount, setAmount] = useState<number>(ingredient.amount || 1);
+  const [amount, setAmount] = useState<string>(ingredient.amount || "1");
 
   // Handle input change for amount
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newAmount = parseFloat(e.target.value);
-    if (!isNaN(newAmount) && newAmount >= 0) {
-      setAmount(newAmount);
+    if (e.target.value === "") {
+      // Allow the input to be empty
+      setAmount(""); // Or setAmount("") if you want to show an empty field
+      return;
     }
-    if (newAmount > ingredient.maxAmount) {
-      setAmount(ingredient.maxAmount);
+    const newAmount = parseFloat(e.target.value);
+
+    if (!isNaN(newAmount) && newAmount >= 0) {
+      setAmount(
+        newAmount > ingredient.maxAmount
+          ? ingredient.maxAmount.toString()
+          : newAmount.toString()
+      );
     }
   };
 
