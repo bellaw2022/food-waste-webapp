@@ -25,6 +25,7 @@ interface BackendData {
 interface Ingredient {
   name: string;
   days: number;
+  shelfPercentage: number;
 }
 
 interface Recipe {
@@ -188,13 +189,19 @@ export const RecipePage: React.FC = () => {
       console.log(responseData);
       const fetchedIngredients: Ingredient[] = responseData.data.map((item) => {
         const expirationDate = new Date(item.expiration_date);
+        const purchaseDate = new Date(item.purchase_date);
         const today = new Date();
         const daysUntilExpiration = Math.ceil(
           (expirationDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)
         );
+        const expirationRatio =
+          (today.getTime() - purchaseDate.getTime()) /
+          (expirationDate.getTime() - purchaseDate.getTime());
+
         return {
           name: item.produce_name,
           days: daysUntilExpiration,
+          shelfPercentage: expirationRatio,
         };
       });
       setIngredients(fetchedIngredients);
