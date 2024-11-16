@@ -6,6 +6,7 @@ interface Ingredient {
   name: string;
   amount: number;
   unit: string;
+  maxAmount: number;
 }
 
 interface IngredientProps {
@@ -29,6 +30,9 @@ const IngredientItem: React.FC<IngredientProps> = ({
     const newAmount = parseFloat(e.target.value);
     if (!isNaN(newAmount) && newAmount >= 0) {
       setAmount(newAmount);
+    }
+    if (newAmount > ingredient.maxAmount) {
+      setAmount(ingredient.maxAmount);
     }
   };
 

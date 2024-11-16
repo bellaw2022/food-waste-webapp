@@ -7,56 +7,6 @@ from difflib import get_close_matches
 
 recipes_routes = Blueprint('recipes_routes', __name__)
 
-'''
-@recipes_routes.route('/api/recipes', methods=['POST'])
-def generate_recipes():
-    ingredients = request.json 
-    result = [{
-        "title": "example recipe",
-        "number": 0,
-        "pictureUrl": "https://github.com/yuqian-cao-19/Cloud_Project3/raw/main/pexels-ella-olsson-572949-1640777.jpg",
-        "ingredients": ["carrots", "onions", "beef", "bread", "lettuce", "pickles"],
-        "instructions": ["Cook beef patty", "sautee onion and carrots", "assemble burger with bread, carrots, onions, beef, lettuce, and pickles"]
-    },
-    {
-        "title": "example recipe 2",
-        "number": 1,
-        "pictureUrl": "https://github.com/yuqian-cao-19/Cloud_Project3/raw/main/pexels-ella-olsson-572949-1640777.jpg",
-        "ingredients": ["carrots", "onions", "beef", "bread", "lettuce", "pickles"],
-        "instructions": ["Cook beef patty", "sautee onion and carrots", "assemble burger with bread, carrots, onions, beef, lettuce, and pickles"]
-    },
-    {
-        "title": "example recipe 3",
-        "number": 2,
-        "pictureUrl": "https://github.com/yuqian-cao-19/Cloud_Project3/raw/main/pexels-ella-olsson-572949-1640777.jpg",
-        "ingredients": ["carrots", "onions", "beef", "bread", "lettuce", "pickles"],
-        "instructions": ["Cook beef patty", "sautee onion and carrots", "assemble burger with bread, carrots, onions, beef, lettuce, and pickles"]
-    },
-    {
-        "title": "example recipe 4",
-        "number": 3,
-        "pictureUrl": "https://github.com/yuqian-cao-19/Cloud_Project3/raw/main/pexels-ella-olsson-572949-1640777.jpg",
-        "ingredients": ["carrots", "onions", "beef", "bread", "lettuce", "pickles"],
-        "instructions": ["Cook beef patty", "sautee onion and carrots", "assemble burger with bread, carrots, onions, beef, lettuce, and pickles"]
-    },
-    {
-        "title": "example recipe 5",
-        "number": 4,
-        "pictureUrl": "https://github.com/yuqian-cao-19/Cloud_Project3/raw/main/pexels-ella-olsson-572949-1640777.jpg",
-        "ingredients": ["carrots", "onions", "beef", "bread", "lettuce", "pickles"],
-        "instructions": ["Cook beef patty", "sautee onion and carrots", "assemble burger with bread, carrots, onions, beef, lettuce, and pickles"]
-    },
-    {
-        "title": "example recipe 6",
-        "number": 4,
-        "pictureUrl": "https://github.com/yuqian-cao-19/Cloud_Project3/raw/main/pexels-ella-olsson-572949-1640777.jpg",
-        "ingredients": ["carrots", "onions", "beef", "bread", "lettuce", "pickles"],
-        "instructions": ["Cook beef patty", "sautee onion and carrots", "assemble burger with bread, carrots, onions, beef, lettuce, and pickles"]
-    }]
-    '''
-    
-    
-
 # minimize ingredients we don't have - no selection just generate recipe
 # maximize ingredients we chose - typical
 # sort by max ingredients used
@@ -2291,18 +2241,28 @@ def get_ingredient_units():
     
     # Extract 'ingredients' array from the JSON payload
     ingredients = data.get("ingredients", [])
+    user_id = data.get("user_id")
     
     try:
         produce_data = fetch_produce_info(ingredients)
+        inventory_data = json.loads(get_user_inventory(user_id).data.decode("utf-8"))
+        user_inventory = inventory_data.get("data", [])
 
         result = []
         for key, values in produce_data.items():
             item = {
                 "name" : key,
                 "amount" : 1,
-                "unit": values.get("unit", "")
+                "unit": values.get("unit", ""),
+                "maxAmount" : 0
             }
+            for inventory_item in user_inventory:
+                if inventory_item.get("produce_name", "").lower() == key.lower():
+                    item["maxAmount"] = inventory_item.get("quantity", 0)
+
             result.append(item)
+        
+       
        
         return jsonify(result)
 
