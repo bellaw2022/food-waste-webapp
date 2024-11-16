@@ -9,8 +9,12 @@ import { ManualInputModal } from "./modal";
 import { cn } from "@/lib/utils";
 import { LoadingSpinner } from "@/components/shared/spinner";
 import { Alert } from "@/components/ui/alert";
+import { useProduceCatalog } from "@/api";
 
 export const BeginScanningPage = () => {
+    const { isCatalogLoading, isCatalogError, produceCatalog } = useProduceCatalog();
+    console.log(produceCatalog);
+
     const webcamRef = useRef<Webcam>(null);
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const fullImageRef = useRef<HTMLImageElement>(null);
@@ -89,7 +93,7 @@ export const BeginScanningPage = () => {
                         const blob = await (await fetch(croppedData)).blob();
                         formData.append('image', blob, 'scan.jpg');
 
-                        const res = await fetch("http://localhost:8000/scan", {
+                        const res = await fetch("http://localhost:10000/api/scan", {
                             method: "POST",
                             body: formData
                         });
@@ -116,11 +120,12 @@ export const BeginScanningPage = () => {
 
     const confirmGuess = useCallback(() => {
         if (guess === "") return;
+        if (!produceCatalog) return;
 
         // add to store then clear
-        addItem(guess);
+        addItem(guess, produceCatalog[guess]);
         clearPicture();
-    }, [addItem, guess, clearPicture]);
+    }, [addItem, guess, clearPicture, produceCatalog]);
 
     return (
         <div className="relative w-full h-[100vh] overflow-hidden">
@@ -145,8 +150,10 @@ export const BeginScanningPage = () => {
             <div className="absolute top-[calc(36vh-170px)] left-[calc(50vw-170px)] w-[340px] h-[340px] z-100
                 overflow-hidden p-0 flex items-center justify-center"
             >
+                {isCatalogLoading && <Alert className="w-fit" variant="default">Loading Catalog...</Alert>}
+                {isCatalogError && <Alert className="w-fit bg-white" variant="destructive">Error Loading Catalog</Alert>}
                 {isLoadingGuess && <LoadingSpinner size={72} color="lightblue" />}
-                {guess !== "" && <Alert className="w-fit" variant="default">{guess}</Alert>}
+                {guess !== "" && <Alert className="w-fit" variant="default">{guess.charAt(0).toUpperCase() + guess.slice(1).toLowerCase()}</Alert>}
             </div>
             <div className="w-full h-full absolute top-0 left-0 z-10">
                 <Overlay takePicture={takePicture} clearPicture={clearPicture} isLoadingGuess={isLoadingGuess} 
@@ -175,6 +182,7 @@ const Overlay = ({ takePicture, clearPicture, confirmGuess, isLoadingGuess, isGu
      }
 ) => {
     const { openModal } = useScanningCart();
+    const { isCatalogLoading, isCatalogError } = useProduceCatalog();
 
     return (
         <div className="p-4 h-full flex flex-col items-center h-screen overflow-hidden">
@@ -189,10 +197,11 @@ const Overlay = ({ takePicture, clearPicture, confirmGuess, isLoadingGuess, isGu
             </div>
             <div className="mt-[410px] flex flex-col items-center justify-center gap-10">
                 {!isLoadingGuess && !isGuessReady ?
-                    <div className="w-fit h-fit rounded-full bg-white">
+                    <div className={cn("w-fit h-fit rounded-full", isCatalogLoading || isCatalogError ? "bg-[gray]": "bg-white")}>
                         <Button variant="outline" 
                             className="rounded-full w-16 h-16 border-[orange] bg-[orange]/30 hover:bg-[orange]/50"
                             onClick={takePicture}
+                            disabled={isCatalogLoading || isCatalogError}
                         >
                             <CameraIcon color="orange" />
                         </Button>
@@ -217,11 +226,11 @@ const Overlay = ({ takePicture, clearPicture, confirmGuess, isLoadingGuess, isGu
                             </Button>
                         </div>
                     </div>}
-                <div className={cn("w-fit h-fit rounded-full", isLoadingGuess || isGuessReady ? "bg-[gray]" : "bg-white")}>
+                <div className={cn("w-fit h-fit rounded-full", isLoadingGuess || isGuessReady || isCatalogLoading || isCatalogError ? "bg-[gray]" : "bg-white")}>
                     <Button variant="outline" 
                         className="rounded-full w-16 h-16 border-[gray] bg-[gray]/30 hover:bg-[gray]/50"
                         onClick={openModal}
-                        disabled={isLoadingGuess || isGuessReady}
+                        disabled={isLoadingGuess || isGuessReady || isCatalogLoading || isCatalogError}
                     >
                         <BookOpenIcon />
                     </Button>
