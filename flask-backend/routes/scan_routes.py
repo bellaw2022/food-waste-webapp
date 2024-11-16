@@ -22,7 +22,7 @@ def scan():
         img_bytes = file.read()
         pil_image = Image.open(io.BytesIO(img_bytes)).convert("RGB")
 
-        results = query_product.query_product(pil_image, top_k=6)
+        results = query_product.query_product(pil_image)
 
         return jsonify({
             "status": 200,
