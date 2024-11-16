@@ -33,6 +33,9 @@ const RecipeList: React.FC<CombinedProps> = ({
   setListPage,
   setRecipePage,
 }) => {
+  const sortedRecipes = recipes.sort(
+    (a, b) => a.missedIngredientCount - b.missedIngredientCount
+  );
   return (
     <>
       <BackButton
@@ -42,7 +45,7 @@ const RecipeList: React.FC<CombinedProps> = ({
         backToBase={false}
       ></BackButton>
       <div className="recipes-list">
-        {recipes.map((recipe, index) => (
+        {sortedRecipes.map((recipe, index) => (
           <div
             key={index}
             className="recipes-card"
