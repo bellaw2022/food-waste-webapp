@@ -27,6 +27,7 @@ interface Props {
   setBasePage: React.Dispatch<React.SetStateAction<boolean>>;
   setListPage: React.Dispatch<React.SetStateAction<boolean>>;
   setRecipePage: React.Dispatch<React.SetStateAction<boolean>>;
+  isAI: boolean;
 }
 
 type CombinedProps = { recipe: CompleteRecipe } & Props;
@@ -36,6 +37,7 @@ const Recipe: React.FC<CombinedProps> = ({
   setBasePage,
   setListPage,
   setRecipePage,
+  isAI,
 }) => {
   console.log("recipe: ", recipe);
   const [servings, setServings] = useState<number>(recipe.servings);
@@ -132,7 +134,7 @@ const Recipe: React.FC<CombinedProps> = ({
   return (
     <div className="recipe-page">
       <div className="recipe-top">
-        {recipe.instructions != null ? (
+        {isAI ? (
           <BackButton
             setToFalsePage={[setRecipePage, setBasePage]}
             setToTruePage={[setListPage]}

@@ -2167,7 +2167,6 @@ def get_recipe_info():
             ],
             "sourceURL" : external_data["sourceUrl"],
 
-            # DO THIS NEXT!! CHANGE INSTRUCTIONS INTO LIST PARSED FROM \N 
             "instructions" : steps
         }
         
