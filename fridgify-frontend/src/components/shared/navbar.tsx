@@ -1,7 +1,8 @@
-import { PlusCircleIcon, Share2Icon } from "lucide-react";
+import { Share2Icon } from "lucide-react";
 import { Button } from "../ui/button";
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
+import logo from "@/logo.png";
 
 const buttonRoutes = [
     { name: "Inventory", path: "/inventory" },
@@ -16,9 +17,9 @@ export const Navbar = () => {
 
     return (
         <div className="m-3 flex flex-row items-center justify-between">
-            <Link to="/scan">
-                <Button className="p-2 h-fit w-fit rounded-full bg-[green]" variant="outline">
-                    <PlusCircleIcon size={32} color="white" />
+            <Link to="/">
+                <Button className="p-0 h-fit w-fit" variant="ghost">
+                    <img src={logo} width={50} />
                 </Button>
             </Link>
             <div className="flex flex-row items-center justify-center gap-1">

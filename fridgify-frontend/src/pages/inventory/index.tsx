@@ -5,9 +5,10 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { EditingCartItem, UnitAbbreviations, useEditingCart } from "@/store";
-import { ChevronLeftIcon, ChevronRightIcon, ClockIcon, PencilIcon, TrashIcon, UtensilsIcon } from "lucide-react";
+import { ChevronLeftIcon, ChevronRightIcon, ClockIcon, PencilIcon, PlusCircleIcon, TrashIcon, UtensilsIcon } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { NumberInput } from "@/components/shared";
+import { Link } from "react-router-dom";
 
 export const InventoryPage = () => {
     const { isInventoryLoading, inventory } = useInventory();
@@ -111,7 +112,14 @@ export const InventoryPage = () => {
                     {isSheetOpen ? <ChevronRightIcon /> : <ChevronLeftIcon />}
                 </Button>}
             <div className="flex flex-row items-center justify-between">
-                <h1 className="text-3xl font-bold">Inventory</h1>
+                <h1 className="text-3xl font-bold">
+                    Inventory
+                    <Link to="/scan">
+                        <Button className="ml-2 p-2 h-fit w-fit rounded-full bg-[green]" variant="outline">
+                            <PlusCircleIcon size={18} color="white" />
+                        </Button>
+                    </Link>
+                </h1>
                 <div className="flex flex-row items-center justify-between gap-2 cursor-pointer"
                     onClick={toggleEditing}
                 >
