@@ -81,7 +81,7 @@ export function WasteSavingChart({ setGif }: { setGif: (src: string) => void }) 
                 gifWidth: 350,
                 gifHeight: 300,
                 numWorkers: 5,
-                frameDuration: 0.01,
+                frameDuration: 0.05,
                 sampleInterval: 10,
               };
           
