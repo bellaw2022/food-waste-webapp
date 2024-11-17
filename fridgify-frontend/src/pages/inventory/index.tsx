@@ -193,11 +193,12 @@ const TrashConsumeButton = ({ isTrash, setIsTrash }:
     { isTrash: boolean, setIsTrash: (val: boolean) => void }) => {
     return (
         <div className="w-full flex flex-row items-center justify-center gap-0">
-            <Button className={
-                cn("w-full p-2 gap-2 rounded-r-none hover:bg-[red]/30 hover:text-[red]",
-                    isTrash ? "border-2 text-[red] border-[red] bg-[red]/30"
-                        : "text-[red]/50 border-[red]/50 bg-[red]/10")
-            }
+            <Button 
+                className={
+                    cn("w-full p-2 gap-2 rounded-r-none hover:bg-[red]/30 hover:text-[red]",
+                        isTrash ? "border-2 text-[red] border-[red] bg-[red]/30"
+                            : "text-[red]/50 border-[red]/50 bg-[red]/10"
+                    )}
                 onClick={() => setIsTrash(true)}
                 variant="outline"
             >

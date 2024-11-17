@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { BookOpenIcon, CameraIcon, CheckIcon, RecycleIcon, XIcon } from "lucide-react";
+import { BookOpenIcon, CameraIcon, CheckIcon, EllipsisIcon, RecycleIcon, RefreshCwIcon, XIcon } from "lucide-react";
 import { useCallback, useMemo, useRef, useState } from "react";
 import { useWindowDimensions } from "@/hooks";
 import Webcam from "react-webcam";
@@ -31,11 +31,14 @@ export const BeginScanningPage = () => {
 
     const [guessIndex, setGuessIndex] = useState(0);
     const [allGuesses, setAllGuesses] = useState<string[]>([]);
+
+    const [isShowingMore, setShowingMore] = useState(false);
     
     const clearPicture = useCallback(() => {
         setLoadingGuess(false); setPictureTaken(false); 
         setGuessIndex(0); setAllGuesses([]);
-    }, [setLoadingGuess, setPictureTaken, setGuessIndex, setAllGuesses]);
+        setShowingMore(false);
+    }, [setLoadingGuess, setPictureTaken, setGuessIndex, setAllGuesses, setShowingMore]);
 
     const { toast } = useToast();
 
@@ -155,19 +158,39 @@ export const BeginScanningPage = () => {
                 <canvas className="hidden" ref={canvasRef} />
             </div>
             <div className="absolute top-[calc(36vh-170px)] left-[calc(50vw-170px)] w-[340px] h-[340px] z-100
-                overflow-hidden p-0 flex items-center justify-center"
+                overflow-hidden p-0 flex flex-col items-center justify-center gap-2"
             >
                 {isCatalogLoading && <Alert className="w-fit" variant="default">Loading Catalog...</Alert>}
                 {isCatalogError && <Alert className="w-fit bg-white" variant="destructive">Error Loading Catalog</Alert>}
                 {isLoadingGuess && <LoadingSpinner size={72} color="lightblue" />}
-                {allGuesses.length > 0 ? <Alert className="w-fit" variant="default">
-                    {allGuesses[guessIndex].charAt(0).toUpperCase() + allGuesses[guessIndex].slice(1).toLowerCase()}
-                </Alert> : ""}
+                {allGuesses.length > 0 ? 
+                    isShowingMore ? (
+                        allGuesses.map((guess, idx) => (
+                            <Button 
+                                key={`${guess}-${idx}`}
+                                className={
+                                    cn("w-fit cursor-pointer z-[100] hover:bg-[lightgreen]/50", 
+                                        idx === guessIndex ? "border-[green] bg-[lightgreen] border-2" : ""
+                                    )
+                                }
+                                variant="outline"
+                                onClick={() => setGuessIndex(idx)}
+                            >
+                                {guess.charAt(0).toUpperCase() + guess.slice(1).toLowerCase()}
+                            </Button>
+                        ))
+                    ) 
+                    : 
+                    <Alert className="w-fit" variant="default">
+                        {allGuesses[guessIndex].charAt(0).toUpperCase() + allGuesses[guessIndex].slice(1).toLowerCase()}
+                    </Alert> 
+                : ""}
             </div>
             <div className="w-full h-full absolute top-0 left-0 z-10">
                 <Overlay takePicture={takePicture} clearPicture={clearPicture} isLoadingGuess={isLoadingGuess} 
                     confirmGuess={confirmGuess} isGuessReady={allGuesses.length > 0}
-                />                
+                    isShowingMore={isShowingMore} showMore={() => setShowingMore(true)}
+                />
             </div>
             <div className="w-full h-[100vh] absolute top-0 left-0 z-5">
                 <svg width="100%" height="100%">
@@ -184,10 +207,10 @@ export const BeginScanningPage = () => {
     )
 }
 
-const Overlay = ({ takePicture, clearPicture, confirmGuess, isLoadingGuess, isGuessReady }: 
+const Overlay = ({ takePicture, clearPicture, showMore, confirmGuess, isLoadingGuess, isGuessReady, isShowingMore }: 
     { 
-        takePicture: () => void, clearPicture: () => void, 
-        confirmGuess: () => void, isLoadingGuess: boolean, isGuessReady: boolean 
+        takePicture: () => void, clearPicture: () => void, showMore: () => void,
+        confirmGuess: () => void, isLoadingGuess: boolean, isGuessReady: boolean, isShowingMore: boolean,
      }
 ) => {
     const { openModal } = useScanningCart();
@@ -222,15 +245,16 @@ const Overlay = ({ takePicture, clearPicture, confirmGuess, isLoadingGuess, isGu
                                 className="rounded-full w-16 h-16 border-[red] bg-[red]/30 hover:bg-[red]/50"
                                 onClick={clearPicture}
                             >
-                                <XIcon color="red" />
+                                <RefreshCwIcon color="red" />
                             </Button>
                         </div>
-                        <div className={cn("w-fit h-fit rounded-full", !isGuessReady ? "bg-[gray]": "bg-white")}>
+                        <div className={cn("w-fit h-fit rounded-full", !isGuessReady || isShowingMore ? "bg-[gray]": "bg-white")}>
                             <Button variant="outline" 
                                 className="rounded-full w-16 h-16 border-[lightgray] bg-[lightgray]/30 hover:bg-[lightgray]/50"
-                                disabled={!isGuessReady}
+                                disabled={!isGuessReady || isShowingMore}
+                                onClick={showMore}
                             >
-                                <RecycleIcon color="black" />
+                                <EllipsisIcon color="black" />
                             </Button>
                         </div>
                         <div className={cn("w-fit h-fit rounded-full", !isGuessReady ? "bg-[gray]": "bg-white")}>
