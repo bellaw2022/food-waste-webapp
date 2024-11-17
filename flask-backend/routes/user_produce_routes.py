@@ -153,3 +153,39 @@ def update_user_produce(user_id):
             "status": 202,
             "error": error_message
         })
+
+@user_produce_routes.route('/api/user/<int:user_id>/produce/trash', methods=['PUT'])
+def trash_user_produce(user_id):
+    try:
+        data = request.get_json()  # Expect a dictionary of userproduce_id to trash request
+
+        for userproduce_id in data.keys():
+            # Convert userproduce_id to integer
+            userproduce_id = int(userproduce_id)
+
+            # Fetch the UserAndProduce record and verify ownership
+            user_produce = UserAndProduce.query.filter_by(
+                userproduce_id=userproduce_id,
+                user_id=user_id
+            ).first()
+
+            if not user_produce:
+                raise ValueError(
+                    f"UserAndProduce record {userproduce_id} not found or doesn't belong to user {user_id}")
+
+            # Reset quantity to 0 to indicate it has been trashed
+            user_produce.quantity = 0
+
+        # Commit changes to the database
+        db.session.commit()
+        return jsonify({
+            "status": 200,
+            "data": "Successfully trashed the specified produces"
+        })
+    except Exception as e:
+        db.session.rollback()
+        # Return a detailed error message if an exception occurs
+        return jsonify({
+            "status": 202,
+            "error": str(e)
+        })
