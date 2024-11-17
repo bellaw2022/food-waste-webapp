@@ -194,7 +194,7 @@ const Overlay = ({ takePicture, clearPicture, confirmGuess, isLoadingGuess, isGu
     const { isCatalogLoading, isCatalogError } = useProduceCatalog();
 
     return (
-        <div className="p-4 h-full flex flex-col items-center h-screen overflow-hidden">
+        <div className="p-4 h-full flex flex-col items-center h-screen overflow-hidden relative">
             <ManualInputModal />
             <div className="flex flex-row items-center justify-between w-full">
                 <Link to="/inventory">
@@ -204,7 +204,7 @@ const Overlay = ({ takePicture, clearPicture, confirmGuess, isLoadingGuess, isGu
                     <Button>Finish</Button>
                 </Link>
             </div>
-            <div className="mt-[410px] flex flex-col items-center justify-center gap-10">
+            <div className="absolute top-[calc(36vh+190px)] flex flex-col items-center justify-center gap-6">
                 {!isLoadingGuess && !isGuessReady ?
                     <div className={cn("w-fit h-fit rounded-full", isCatalogLoading || isCatalogError ? "bg-[gray]": "bg-white")}>
                         <Button variant="outline" 
