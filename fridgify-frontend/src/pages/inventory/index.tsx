@@ -1,5 +1,4 @@
 import { useEditInventory, useInventory } from "@/api";
-import { Alert } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -114,14 +113,14 @@ export const InventoryPage = () => {
             <div className="flex flex-row items-center justify-between">
                 <h1 className="text-3xl font-bold">
                     Inventory
-                    <Link to="/scan">
+                    <Link to="/scan" onClick={() => { toggleEditing(false); clearCart(); }}>
                         <Button className="ml-2 p-2 h-fit w-fit rounded-full bg-[green]" variant="outline">
                             <PlusCircleIcon size={18} color="white" />
                         </Button>
                     </Link>
                 </h1>
                 <div className="flex flex-row items-center justify-between gap-2 cursor-pointer"
-                    onClick={toggleEditing}
+                    onClick={() => toggleEditing()}
                 >
                     <Button className="p-2 h-fit w-fit border-[green]" variant="ghost">
                         <PencilIcon size={24} color="green" />
@@ -161,8 +160,11 @@ export const InventoryPage = () => {
                         />
                     )}
                 </div>
-                : isInventoryLoading ? <Alert>Loading Inventory...</Alert>
-                    : <Alert variant="destructive">Error loading inventory</Alert>}
+                : 
+                <div className="p-2">
+                    {isInventoryLoading ? "Loading Inventory..." : "Error loading inventory"}
+                </div>
+            }
         </div>
     );
 }

@@ -12,7 +12,7 @@ export interface EditingCartItem {
 
 interface EditingCartState {
     isEditing: boolean;
-    toggleEditing: () => void;
+    toggleEditing: (val?: boolean) => void;
 
     // Cart State
     cartItems: Record<string, EditingCartItem>; // cartItemId - item
@@ -27,7 +27,7 @@ export const useEditingCart = create<EditingCartState>()(
     persist(
         (set) => ({
             isEditing: false,
-            toggleEditing: () => set((state) => ({ isEditing: !state.isEditing })),
+            toggleEditing: (val?: boolean) => set((state) => ({ isEditing: val !== undefined ? val : !state.isEditing })),
             cartItems: {},
             setItems: (items: { [name: string]: EditingCartItem }) => set(() => ({ cartItems: items })),
             addItem: (cartItemId: string, item: EditingCartItem) => set((state) => {
