@@ -2,7 +2,10 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectItem, SelectContent, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
-import { ChartBarIcon } from "lucide-react";
+import { WasteSavingChart } from "./waste-saving-chart";
+import { Button } from "@/components/ui/button";
+import { useCallback, useState } from "react";
+import { InstagramLogoIcon } from "@radix-ui/react-icons";
 
 export const ProfilePage = () => {
     return (
@@ -129,17 +132,27 @@ const FoodSection = () => {
 }
 
 const ProgressSection = () => {
+    const [gif, setGif] = useState("");
+
+    const shareGif = useCallback(() => {
+        console.log(gif);
+    }, [gif]);
+
     return (
         <>
             <TableRow className="h-10 bg-white">
                 <TableCell className="text-large font-bold">Progress Tracking</TableCell>
-            </TableRow>
-            <TableRow className="h-10">
-                <TableCell className="font-medium">
-                    <div className="ml-2">1</div>
+                <TableCell className="text-large font-bold">
+                    <Button disabled={gif === ""} onClick={shareGif}
+                        className="w-full gap-2"
+                    >
+                        Share! <InstagramLogoIcon />
+                    </Button>
                 </TableCell>
-                <TableCell className="text-right">
-                    <ChartBarIcon />
+            </TableRow>
+            <TableRow>
+                <TableCell className="w-full" colSpan={2}>
+                    <WasteSavingChart setGif={(src: string) => setGif(src)} />
                 </TableCell>
             </TableRow>
         </>
