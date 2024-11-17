@@ -2,8 +2,11 @@ import { useQuery } from "@tanstack/react-query";
 import { API_URL } from "@/api/constants";
 import { CatalogItem } from "@/store";
 
+
+
 export const useProduceCatalog = () => {
     const query = useQuery({
+        refetchOnWindowFocus: false,
         queryKey: ["produce-catalog"],
         queryFn: async () => {
             const response1 = await fetch(`${API_URL}/all_produces`);
@@ -12,10 +15,17 @@ export const useProduceCatalog = () => {
             }
 
             const data1 = await response1.json();
-            const names = data1?.data;
-            if (!names) {
+            const nameAndCategory = data1?.data;
+            if (!nameAndCategory) {
                 throw new Error("Could not get names from backend response!");
             }
+
+            const result: Record<string, Record<string, string | number>> = {};
+            Object.entries(nameAndCategory as Record<string, string[]>).forEach(([category, names]) => {
+                names.forEach((name) => {
+                    result[name] = { category };
+                });
+            })
             
             const response2 = await fetch(`${API_URL}/produce`, {
                 method: "POST",
@@ -23,7 +33,7 @@ export const useProduceCatalog = () => {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
-                    produces: names,
+                    produces: Object.keys(result),
                 }),
             });
             if (response2.status !== 200) {
@@ -32,17 +42,16 @@ export const useProduceCatalog = () => {
 
             const data2 = await response2.json();
 
-            const result = data2.data;
             Object.keys(result).forEach((name) => {
                 result[name] = {
-                    category: result[name].category ?? undefined,
-                    unit: result[name].unit,
-                    expirationDays: result[name].common_expdate,
-                    productId: result[name].product_id,
+                    ...result[name],
+                    unit: data2.data[name].unit,
+                    expirationDays: data2.data[name].common_expdate,
+                    productId: data2.data[name].product_id,
                 }
             });
 
-            return result as Record<string, CatalogItem>;
+            return result as unknown as Record<string, CatalogItem>;
         }
     });
 

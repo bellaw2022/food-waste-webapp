@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { BookOpenIcon, CameraIcon, CheckIcon, XIcon } from "lucide-react";
+import { BookOpenIcon, CameraIcon, CheckIcon, RecycleIcon, XIcon } from "lucide-react";
 import { useCallback, useMemo, useRef, useState } from "react";
 import { useWindowDimensions } from "@/hooks";
 import Webcam from "react-webcam";
@@ -10,10 +10,10 @@ import { cn } from "@/lib/utils";
 import { LoadingSpinner } from "@/components/shared/spinner";
 import { Alert } from "@/components/ui/alert";
 import { useProduceCatalog } from "@/api";
+import { useToast } from "@/hooks/use-toast";
 
 export const BeginScanningPage = () => {
     const { isCatalogLoading, isCatalogError, produceCatalog } = useProduceCatalog();
-    console.log(produceCatalog);
 
     const webcamRef = useRef<Webcam>(null);
     const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -28,11 +28,16 @@ export const BeginScanningPage = () => {
 
     const [isLoadingGuess, setLoadingGuess] = useState(false);
     const [pictureTaken, setPictureTaken] = useState(false);
-    const [guess, setGuess] = useState("");
+
+    const [guessIndex, setGuessIndex] = useState(0);
+    const [allGuesses, setAllGuesses] = useState<string[]>([]);
     
     const clearPicture = useCallback(() => {
-        setLoadingGuess(false); setPictureTaken(false); setGuess("");
-    }, [setLoadingGuess, setPictureTaken, setGuess]);
+        setLoadingGuess(false); setPictureTaken(false); 
+        setGuessIndex(0); setAllGuesses([]);
+    }, [setLoadingGuess, setPictureTaken, setGuessIndex, setAllGuesses]);
+
+    const { toast } = useToast();
 
     const takePicture = useCallback(() => {
         if (isLoadingGuess || pictureTaken) return;
@@ -74,8 +79,6 @@ export const BeginScanningPage = () => {
                     canvasRef.current.width = 340;
                     canvasRef.current.height = 340;
 
-                    console.log(video.videoWidth, video.videoHeight);
-
                     ctx?.drawImage(
                         fullImageRef.current,
                         video.videoWidth/2-170, video.videoHeight*0.36-170, 340, 340, // region in the full image
@@ -103,29 +106,33 @@ export const BeginScanningPage = () => {
                         }
                         
                         const guessData = await res.json();
-                        console.log(guessData);
-                        setGuess(guessData?.results?.product_name || "");
+                        setAllGuesses(guessData?.results?.predictions);
                         setLoadingGuess(false);
                     } catch (error) {
                         console.log("Failed to send result to backend:", error);
-                        alert("Error while sending result to backend!");
+                        toast({
+                            variant: "destructive",
+                            title: "Error scanning item :(",
+                            description: "Please try again.",
+                        });
                         clearPicture();
                     }
                 }
             }
         }
-    }, [isLoadingGuess, pictureTaken, setLoadingGuess, setPictureTaken, setGuess, clearPicture]);
+    }, [isLoadingGuess, pictureTaken, setLoadingGuess, setPictureTaken, setAllGuesses, toast, clearPicture]);
 
     const { addItem } = useScanningCart();
 
     const confirmGuess = useCallback(() => {
-        if (guess === "") return;
+        if (!allGuesses.length) return;
         if (!produceCatalog) return;
 
         // add to store then clear
-        addItem(guess, produceCatalog[guess]);
+        const itemName = allGuesses[guessIndex];
+        addItem(itemName, produceCatalog[itemName]);
         clearPicture();
-    }, [addItem, guess, clearPicture, produceCatalog]);
+    }, [addItem, guessIndex, allGuesses, clearPicture, produceCatalog]);
 
     return (
         <div className="relative w-full h-[100vh] overflow-hidden">
@@ -153,11 +160,13 @@ export const BeginScanningPage = () => {
                 {isCatalogLoading && <Alert className="w-fit" variant="default">Loading Catalog...</Alert>}
                 {isCatalogError && <Alert className="w-fit bg-white" variant="destructive">Error Loading Catalog</Alert>}
                 {isLoadingGuess && <LoadingSpinner size={72} color="lightblue" />}
-                {guess !== "" && <Alert className="w-fit" variant="default">{guess.charAt(0).toUpperCase() + guess.slice(1).toLowerCase()}</Alert>}
+                {allGuesses.length > 0 ? <Alert className="w-fit" variant="default">
+                    {allGuesses[guessIndex].charAt(0).toUpperCase() + allGuesses[guessIndex].slice(1).toLowerCase()}
+                </Alert> : ""}
             </div>
             <div className="w-full h-full absolute top-0 left-0 z-10">
                 <Overlay takePicture={takePicture} clearPicture={clearPicture} isLoadingGuess={isLoadingGuess} 
-                    confirmGuess={confirmGuess} isGuessReady={guess !== ""}
+                    confirmGuess={confirmGuess} isGuessReady={allGuesses.length > 0}
                 />                
             </div>
             <div className="w-full h-[100vh] absolute top-0 left-0 z-5">
@@ -185,7 +194,7 @@ const Overlay = ({ takePicture, clearPicture, confirmGuess, isLoadingGuess, isGu
     const { isCatalogLoading, isCatalogError } = useProduceCatalog();
 
     return (
-        <div className="p-4 h-full flex flex-col items-center h-screen overflow-hidden">
+        <div className="p-4 h-full flex flex-col items-center h-screen overflow-hidden relative">
             <ManualInputModal />
             <div className="flex flex-row items-center justify-between w-full">
                 <Link to="/inventory">
@@ -195,7 +204,7 @@ const Overlay = ({ takePicture, clearPicture, confirmGuess, isLoadingGuess, isGu
                     <Button>Finish</Button>
                 </Link>
             </div>
-            <div className="mt-[410px] flex flex-col items-center justify-center gap-10">
+            <div className="absolute top-[calc(36vh+190px)] flex flex-col items-center justify-center gap-6">
                 {!isLoadingGuess && !isGuessReady ?
                     <div className={cn("w-fit h-fit rounded-full", isCatalogLoading || isCatalogError ? "bg-[gray]": "bg-white")}>
                         <Button variant="outline" 
@@ -214,6 +223,14 @@ const Overlay = ({ takePicture, clearPicture, confirmGuess, isLoadingGuess, isGu
                                 onClick={clearPicture}
                             >
                                 <XIcon color="red" />
+                            </Button>
+                        </div>
+                        <div className={cn("w-fit h-fit rounded-full", !isGuessReady ? "bg-[gray]": "bg-white")}>
+                            <Button variant="outline" 
+                                className="rounded-full w-16 h-16 border-[lightgray] bg-[lightgray]/30 hover:bg-[lightgray]/50"
+                                disabled={!isGuessReady}
+                            >
+                                <RecycleIcon color="black" />
                             </Button>
                         </div>
                         <div className={cn("w-fit h-fit rounded-full", !isGuessReady ? "bg-[gray]": "bg-white")}>

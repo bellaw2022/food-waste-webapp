@@ -1,23 +1,18 @@
 import { create } from 'zustand'
 import { devtools, persist } from 'zustand/middleware';
 import type {} from '@redux-devtools/extension'; // required for devtools typing
-
-export enum UnitTypes {
-    EACH = "Each",
-    GRAMS = "Gram",
-}
+import { UnitTypes } from '@/store/types';
 
 export interface CatalogItem {
     productId: string;
-    category?: string;
+    category: string;
     expirationDays: number;
-    unit: string;
+    unit: UnitTypes;
 }
 
 export interface CartItem {
     quantity: number;
-    // unit: UnitTypes,
-    unit: string;
+    unit: UnitTypes;
     expirationDays: number;
 };
 
@@ -38,9 +33,7 @@ interface ScanningCartState {
     closeModal: () => void;
 
     // Cart State
-    cartItems: {
-        [name: string]: CartItem;
-    },
+    cartItems: Record<string, CartItem>;
     setItems: (items: { [name: string]: CartItem }) => void;
     addItem: (name: string, itemInfo: CatalogItem) => void;
     removeItem: (name: string) => void;

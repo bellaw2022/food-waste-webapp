@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { makeDefaultItem, useScanningCart } from "@/store/scanning-cart"
+import { makeDefaultItem, useScanningCart } from "@/store"
 import { XIcon } from "lucide-react"
 import { useCallback, useEffect, useState } from "react"
 
@@ -20,8 +20,8 @@ import {
   } from "@/components/ui/table"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Checkbox } from "@/components/ui/checkbox"
-import { toast } from "sonner"
 import { useProduceCatalog } from "@/api"
+import { useToast } from "@/hooks/use-toast"
   
 export const ManualInputModal = () => {
     const { produceCatalog } = useProduceCatalog();
@@ -35,13 +35,16 @@ export const ManualInputModal = () => {
         setUpdatedItems(cartItems); // Reset to cartItems every time modal is opened/closed
     }, [isModalOpen, cartItems]);
 
+    const { toast } = useToast();
+
     const onSubmit = useCallback(() => {
         setItems(updatedItems);
-        toast("Scanning cart updated!", {
+        toast({
+            title: "Scanning cart updated!",
             description: "You can click Finish to set quantities.",
         });
         closeModal();
-    }, [setItems, updatedItems, closeModal]);
+    }, [setItems, updatedItems, toast, closeModal]);
 
     if (!isModalOpen) return null;
     if (!produceCatalog) return null;
@@ -74,10 +77,10 @@ export const ManualInputModal = () => {
                             </SelectTrigger>
                             <SelectContent position="popper">
                                 <SelectItem value="All">All Foods</SelectItem>
-                                <SelectItem value="Fruit">Fruit</SelectItem>
-                                <SelectItem value="Eggs & Dairy">Eggs & Dairy</SelectItem>
-                                <SelectItem value="Meat">Meat</SelectItem>
+                                <SelectItem value="Fruits">Fruits</SelectItem>
+                                <SelectItem value="Egg & Dairy">Egg & Dairy</SelectItem>
                                 <SelectItem value="Vegetables">Vegetables</SelectItem>
+                                <SelectItem value="Other">Other</SelectItem>
                             </SelectContent>
                         </Select>
                     </div>
@@ -86,7 +89,7 @@ export const ManualInputModal = () => {
                             <TableBody>
                                 {Object.entries(produceCatalog).map(([name, item]) => {
                                     if (
-                                        (item.category === categoryQuery || categoryQuery=== "All") &&
+                                        (item.category.toUpperCase() === categoryQuery.toUpperCase() || categoryQuery=== "All") &&
                                         (searchQuery === "" || name.toUpperCase().includes(searchQuery.toUpperCase()))
                                     ) {
                                         return (

@@ -1,20 +1,26 @@
+import { useAddInventory } from "@/api";
 import { NumberInput } from "@/components/shared";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { UnitTypes, useScanningCart } from "@/store/scanning-cart";
+import { UnitTypes, useScanningCart } from "@/store";
 import { CheckCircleIcon, PlusCircleIcon, XIcon } from "lucide-react";
 import { useCallback } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 export const FinishScanningPage = () => {
     const { cartItems, removeItem, updateItem, setItems } = useScanningCart();
+    const { addInventory, isUpdating } = useAddInventory();
     const navigate = useNavigate();
 
-    const onFinish = useCallback(() => {
-        setItems({}); // Clear local storage
-        navigate("/inventory")
-    }, [setItems, navigate]);
+    const onFinish = useCallback(async () => {
+        if (isUpdating) return;
+
+        await addInventory(cartItems).then(() => {
+            setItems({}); // Clear local storage
+            navigate("/inventory");
+        });
+    }, [isUpdating, addInventory, cartItems, setItems, navigate]);
 
     return (
         <div className="mx-10 my-10">
@@ -49,6 +55,7 @@ export const FinishScanningPage = () => {
                                 <div className="flex flex-row items-center justify-center">
                                     <NumberInput
                                         value={item.quantity}
+                                        minVal={1}
                                         onIncrement={() => updateItem(name, { quantity: item.quantity+1 })}
                                         onDecrement={() => updateItem(name, { quantity: Math.max(1, item.quantity-1) })}
                                         onSetValue={(newQuantity: number) => updateItem(name, { quantity: newQuantity })}
@@ -73,6 +80,7 @@ export const FinishScanningPage = () => {
                                 Expires in:
                                 <NumberInput
                                     value={item.expirationDays}
+                                    minVal={1}
                                     onIncrement={() => updateItem(name, { expirationDays: item.expirationDays+1 })}
                                     onDecrement={() => updateItem(name, { expirationDays: Math.max(1, item.expirationDays-1) })}
                                     onSetValue={(newExpirationDays: number) => updateItem(name, { expirationDays: newExpirationDays })}
