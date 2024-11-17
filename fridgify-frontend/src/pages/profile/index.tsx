@@ -134,8 +134,46 @@ const FoodSection = () => {
 const ProgressSection = () => {
     const [gif, setGif] = useState("");
 
-    const shareGif = useCallback(() => {
-        console.log(gif);
+    const shareGif = useCallback(async () => {
+        try {
+            console.log("Share button clicked");
+
+            if (!navigator.canShare) {
+                console.log("Share API is not supported in this browser.");
+                return;
+            }
+
+            const response = await fetch(gif);
+            console.log("Image fetch response:", response);
+
+            const blobImageAsset = await response.blob();
+            console.log("Image fetched and converted to blob");
+
+            //create a file from the blob
+            const filesArray = [
+                new File([blobImageAsset], "shared-image.gif", {
+                    type: "image/gif",
+                    lastModified: new Date().getTime(),
+                }),
+            ];
+
+            const shareData = {
+                title: "Waste Saving Progress",
+                text: "Check out my waste saving progress!",
+                files: filesArray,
+            };
+
+            // Check if sharing is possible
+            if (navigator.canShare(shareData)) {
+                console.log("Attempting to share the image...");
+                await navigator.share(shareData);
+                console.log("Image shared successfully!");
+            } else {
+                console.log("Sharing not supported for this file type.");
+            }
+        } catch (error) {
+            console.error("Error sharing image:", error);
+        }
     }, [gif]);
 
     return (
