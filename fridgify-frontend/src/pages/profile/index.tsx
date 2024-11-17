@@ -2,7 +2,10 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectItem, SelectContent, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
-import { ChartBarIcon } from "lucide-react";
+import { WasteSavingChart } from "./waste-saving-chart";
+import { Button } from "@/components/ui/button";
+import { useCallback, useState } from "react";
+import { InstagramLogoIcon } from "@radix-ui/react-icons";
 
 export const ProfilePage = () => {
     return (
@@ -129,17 +132,65 @@ const FoodSection = () => {
 }
 
 const ProgressSection = () => {
+    const [gif, setGif] = useState("");
+
+    const shareGif = useCallback(async () => {
+        try {
+            console.log("Share button clicked");
+
+            if (!navigator.canShare) {
+                console.log("Share API is not supported in this browser.");
+                return;
+            }
+
+            const response = await fetch(gif);
+            console.log("Image fetch response:", response);
+
+            const blobImageAsset = await response.blob();
+            console.log("Image fetched and converted to blob");
+
+            //create a file from the blob
+            const filesArray = [
+                new File([blobImageAsset], "shared-image.gif", {
+                    type: "image/gif",
+                    lastModified: new Date().getTime(),
+                }),
+            ];
+
+            const shareData = {
+                title: "Waste Saving Progress",
+                text: "Check out my waste saving progress!",
+                files: filesArray,
+            };
+
+            // Check if sharing is possible
+            if (navigator.canShare(shareData)) {
+                console.log("Attempting to share the image...");
+                await navigator.share(shareData);
+                console.log("Image shared successfully!");
+            } else {
+                console.log("Sharing not supported for this file type.");
+            }
+        } catch (error) {
+            console.error("Error sharing image:", error);
+        }
+    }, [gif]);
+
     return (
         <>
             <TableRow className="h-10 bg-white">
                 <TableCell className="text-large font-bold">Progress Tracking</TableCell>
-            </TableRow>
-            <TableRow className="h-10">
-                <TableCell className="font-medium">
-                    <div className="ml-2">1</div>
+                <TableCell className="text-large font-bold">
+                    <Button disabled={gif === ""} onClick={shareGif}
+                        className="w-full gap-2"
+                    >
+                        Share! <InstagramLogoIcon />
+                    </Button>
                 </TableCell>
-                <TableCell className="text-right">
-                    <ChartBarIcon />
+            </TableRow>
+            <TableRow>
+                <TableCell className="w-full" colSpan={2}>
+                    <WasteSavingChart setGif={(src: string) => setGif(src)} />
                 </TableCell>
             </TableRow>
         </>
