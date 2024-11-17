@@ -22,7 +22,7 @@ export const NumberInput = ({ onDecrement, onIncrement, onSetValue, value, minVa
                 value={temp} type="number" onChange={(e) => {
                     const newVal = parseInt(e.target.value);
                     setTemp(newVal);
-                    if (!isNaN(newVal) && newVal >= minVal) onSetValue(newVal);
+                    if (!isNaN(newVal) && newVal >= minVal && (maxVal === undefined || newVal <= maxVal)) onSetValue(newVal);
                 }}
                 onBlur={reset}
             />

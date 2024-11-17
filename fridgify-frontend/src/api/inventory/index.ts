@@ -2,7 +2,6 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { API_URL } from "@/api/constants";
 import { CartItem } from "@/store";
 import { EditingCartItem } from "@/store/editing-cart";
-import { toast } from "sonner";
 import { useToast } from "@/hooks/use-toast";
 
 const MILLISECONDS_IN_DAY = 24 * 60 * 60 * 1000;
@@ -74,20 +73,39 @@ export const useEditInventory = () => {
             if (!userIdString) throw new Error("Could not fetch user_id from local_storage");
             const userId = parseInt(userIdString);
 
-            const formattedInput: Record<string, number> = {};
+            const trashedItems: Record<string, number> = {};
+            const consumedItems: Record<string, number> = {};
             Object.values(cart).forEach((item) => {
-                formattedInput[item.cartItemId] = item.quantity;
+                if (item.isTrash) {
+                    trashedItems[item.cartItemId] = item.quantity;
+                } else {
+                    consumedItems[item.cartItemId] = item.quantity;
+                }
             });
 
-            const res = await fetch(`${API_URL}/user/${userId}/produce`, {
-                method: "PUT",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(formattedInput),
-            });
+            if (Object.keys(trashedItems).length > 0) {
+                const res1 = await fetch(`${API_URL}/user/${userId}/produce`, {
+                    method: "PUT",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(trashedItems),
+                });
 
-            if (!res.ok) throw new Error("Error communicating with backend to edit inventory!");
-            const resJson = await res.json();
-            if (resJson.status !== 200) throw new Error("Error response from backend!");
+                if (!res1.ok) throw new Error("Error communicating with backend to edit inventory (trashing items)!");
+                const resJson1 = await res1.json();
+                if (resJson1.status !== 200) throw new Error("Error response from backend (trashing items)!");
+            }
+
+            if (Object.keys(consumedItems).length > 0) {
+                const res2 = await fetch(`${API_URL}/user/${userId}/produce`, {
+                    method: "PUT",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(consumedItems),
+                });
+
+                if (!res2.ok) throw new Error("Error communicating with backend to edit inventory (consuming items)!");
+                const resJson2 = await res2.json();
+                if (resJson2.status !== 200) throw new Error("Error response from backend (consuming items)!");
+            }
         },
         onSuccess: () => {
             // toast success
@@ -138,8 +156,9 @@ export const useInventory = () => {
                     quantity: item.quantity,
                     unit: item.unit,
                     expirationDays: Math.floor((Date.parse(item.expiration_date) - todayDate.getTime()) / MILLISECONDS_IN_DAY),
+                    isTrash: false,
                 }
-            })
+            });
 
             return inventory as Record<string, EditingCartItem>;
         }

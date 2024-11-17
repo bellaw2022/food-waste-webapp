@@ -8,18 +8,19 @@ export interface EditingCartItem {
     quantity: number;
     unit: UnitTypes;
     expirationDays: number;
+    isTrash: boolean;
 };
 
 interface EditingCartState {
     isEditing: boolean;
-    toggleEditing: () => void;
+    toggleEditing: (val?: boolean) => void;
 
     // Cart State
-    cartItems: Record<string, EditingCartItem>; // uuid - item
+    cartItems: Record<string, EditingCartItem>; // cartItemId - item
     setItems: (items: { [cartItemId: string]: EditingCartItem }) => void;
     addItem: (cartItemId: string, item: EditingCartItem) => void;
     removeItem: (cartItemId: string) => void;
-    updateItem: (cartItemId: string, updates: { quantity?: number, unit?: UnitTypes, expirationDays?: number }) => void;
+    updateItem: (cartItemId: string, updates: { quantity?: number, unit?: UnitTypes, expirationDays?: number, isTrash?: boolean }) => void;
 }
 
 export const useEditingCart = create<EditingCartState>()(
@@ -27,7 +28,7 @@ export const useEditingCart = create<EditingCartState>()(
     persist(
         (set) => ({
             isEditing: false,
-            toggleEditing: () => set((state) => ({ isEditing: !state.isEditing })),
+            toggleEditing: (val?: boolean) => set((state) => ({ isEditing: val !== undefined ? val : !state.isEditing })),
             cartItems: {},
             setItems: (items: { [name: string]: EditingCartItem }) => set(() => ({ cartItems: items })),
             addItem: (cartItemId: string, item: EditingCartItem) => set((state) => {
@@ -51,6 +52,7 @@ export const useEditingCart = create<EditingCartState>()(
                     quantity?: number,
                     unit?: UnitTypes,
                     expirationDays?: number,
+                    isTrash?: boolean,
                 }
             ) => set((state) => {
                 if (cartItemId in state.cartItems) {
@@ -63,6 +65,7 @@ export const useEditingCart = create<EditingCartState>()(
                                 quantity: updates.quantity ?? item.quantity,
                                 unit: updates.unit ?? item.unit,
                                 expirationDays: updates.expirationDays ?? item.expirationDays,
+                                isTrash: updates.isTrash ?? item.isTrash,
                             }
                         }
                     };
@@ -71,7 +74,7 @@ export const useEditingCart = create<EditingCartState>()(
             }),
         }),
             {
-                name: 'scanning-cart-storage',
+                name: 'editing-cart-storage',
             },
         ),
     ),
