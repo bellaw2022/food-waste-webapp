@@ -15,7 +15,7 @@ interface EditingCartState {
     toggleEditing: () => void;
 
     // Cart State
-    cartItems: Record<string, EditingCartItem>; // uuid - item
+    cartItems: Record<string, EditingCartItem>; // cartItemId - item
     setItems: (items: { [cartItemId: string]: EditingCartItem }) => void;
     addItem: (cartItemId: string, item: EditingCartItem) => void;
     removeItem: (cartItemId: string) => void;
@@ -71,7 +71,7 @@ export const useEditingCart = create<EditingCartState>()(
             }),
         }),
             {
-                name: 'scanning-cart-storage',
+                name: 'editing-cart-storage',
             },
         ),
     ),

@@ -58,7 +58,7 @@ export const InventoryPage = () => {
         editInventory(cartItems);
         clearCart();
     }, [isUpdating, editInventory, cartItems, clearCart]);
-
+    
     return (
         <div className="mx-4 mb-10">
             {isEditing && isSheetOpen &&
