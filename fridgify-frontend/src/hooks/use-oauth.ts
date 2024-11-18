@@ -1,18 +1,22 @@
 import { googleLogout, useGoogleLogin } from "@react-oauth/google";
 import axios from "axios";
-import { useEffect, useState, useContext, createContext } from "react";
+import { useEffect, useState } from "react";
 import { useAppContext } from "../AppContext";
 import { useQueryClient } from "@tanstack/react-query";
 
+interface User {
+    access_token: string;
+}
+
 export const useOAuth = () => {
-    const [user, setUser] = useState(null);
+    const [user, setUser] = useState<User | null>(null);
     const [profile, setProfile] = useState(null);
     const [userId, setUserId] = useState(null);
-    const { globalUserId, setGlobalUserId } = useAppContext();
+    const { setGlobalUserId } = useAppContext();
     const queryClient = useQueryClient();
 
     const login = useGoogleLogin({
-        onSuccess: (codeResponse) => {
+        onSuccess: (codeResponse: User) => {
             console.log('Login Success:', codeResponse);
             setUser(codeResponse);
             queryClient.invalidateQueries({
@@ -60,6 +64,7 @@ export const useOAuth = () => {
                     setGlobalUserId(backendLoginRes.data.user_id);
 
                     localStorage.setItem('user_id', backendLoginRes.data.user_id);
+                    window.location.href = "/inventory";
                 } else {
                     console.error('Backend login failed:', backendLoginRes.data.error);
                 }

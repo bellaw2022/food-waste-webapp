@@ -154,7 +154,7 @@ export const InventoryPage = () => {
                             isEditing={isEditing}
                             onToggle={() => onToggleSelect(item.cartItemId)}
                             isSelected={item.cartItemId in cartItems} 
-                            item={item} expiringSoon={true} 
+                            item={item} expiringSoon={false} 
                         />
                     )}
                 </div>

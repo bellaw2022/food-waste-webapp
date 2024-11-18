@@ -2,8 +2,7 @@ import { useAddInventory } from "@/api";
 import { NumberInput } from "@/components/shared";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { UnitTypes, useScanningCart } from "@/store";
+import { useScanningCart } from "@/store";
 import { CheckCircleIcon, PlusCircleIcon, XIcon } from "lucide-react";
 import { useCallback } from "react";
 import { Link, useNavigate } from "react-router-dom";
@@ -61,20 +60,9 @@ export const FinishScanningPage = () => {
                                         onSetValue={(newQuantity: number) => updateItem(name, { quantity: newQuantity })}
                                     />
                                 </div>
-                                <Select value={item.unit} onValueChange={(val) => {
-                                    if (Object.values(UnitTypes).includes(val as UnitTypes)) {
-                                        updateItem(name, { unit: val as UnitTypes });
-                                    }
-                                }}>
-                                    <SelectTrigger id="unit-selection" className="w-[120px]">
-                                        <SelectValue />
-                                    </SelectTrigger>
-                                    <SelectContent position="popper">
-                                        {Object.values(UnitTypes).map((unit) => (
-                                            <SelectItem key={unit} value={unit}>{unit.toLowerCase()}</SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
+                                <div id="unit-selection" className="w-[120px] p-1 text-center font-semibold">
+                                    {item.unit.toLowerCase()}
+                                </div>
                             </div>
                             <div className="flex flex-row items-center gap-2 text-xl">
                                 Expires in:

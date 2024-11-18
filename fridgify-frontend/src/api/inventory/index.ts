@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { API_URL } from "@/api/constants";
-import { CartItem } from "@/store";
+import { CartItem, UnitTypes } from "@/store";
 import { EditingCartItem } from "@/store/editing-cart";
 import { useToast } from "@/hooks/use-toast";
 
@@ -134,6 +134,14 @@ export const useEditInventory = () => {
     }
 }
 
+interface InventoryResponse {
+    userproduce_id: string,
+    produce_name: string,
+    quantity: number,
+    unit: UnitTypes,
+    expiration_date: string,
+}
+
 export const useInventory = () => {
     const query = useQuery({
         queryKey: ["inventory"],
@@ -149,7 +157,7 @@ export const useInventory = () => {
             const todayDate = new Date((new Date()).toISOString().split("T")[0]);
 
             const inventory: Record<string, EditingCartItem> = {};
-            res.data?.forEach((item) => {
+            res.data?.forEach((item: InventoryResponse) => {
                 inventory[item.userproduce_id] = {
                     cartItemId: item.userproduce_id,
                     name: item.produce_name,
