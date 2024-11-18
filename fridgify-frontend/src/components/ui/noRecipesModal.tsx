@@ -1,5 +1,5 @@
 import React from "react";
-import "./NoRecipesModal.css";
+import "./noRecipesModal.css";
 import { setBackend } from "@tensorflow/tfjs";
 
 interface NoRecipesModalProps {
