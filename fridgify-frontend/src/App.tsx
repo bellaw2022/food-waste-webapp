@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import { HomePage, BeginScanningPage, FinishScanningPage, InventoryPage, RecipePage, ProfilePage} from '@/pages';
 import { useOAuth } from "@/hooks";
 import { Navbar } from '@/components/shared';
@@ -6,6 +6,7 @@ import { Toaster } from '@/components/ui/toaster';
 
 function App() {
     const { profile, login, logOut } = useOAuth();
+
     return (
         <Router>
             <div className="m-0 p-0 relative">
