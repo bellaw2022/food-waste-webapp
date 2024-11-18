@@ -61,20 +61,9 @@ export const FinishScanningPage = () => {
                                         onSetValue={(newQuantity: number) => updateItem(name, { quantity: newQuantity })}
                                     />
                                 </div>
-                                <Select value={item.unit} onValueChange={(val) => {
-                                    if (Object.values(UnitTypes).includes(val as UnitTypes)) {
-                                        updateItem(name, { unit: val as UnitTypes });
-                                    }
-                                }}>
-                                    <SelectTrigger id="unit-selection" className="w-[120px]">
-                                        <SelectValue />
-                                    </SelectTrigger>
-                                    <SelectContent position="popper">
-                                        {Object.values(UnitTypes).map((unit) => (
-                                            <SelectItem key={unit} value={unit}>{unit.toLowerCase()}</SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
+                                <div id="unit-selection" className="w-[120px] p-1 text-center font-semibold">
+                                    {item.unit.toLowerCase()}
+                                </div>
                             </div>
                             <div className="flex flex-row items-center gap-2 text-xl">
                                 Expires in:

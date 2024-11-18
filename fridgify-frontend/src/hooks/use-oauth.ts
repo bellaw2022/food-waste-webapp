@@ -60,6 +60,7 @@ export const useOAuth = () => {
                     setGlobalUserId(backendLoginRes.data.user_id);
 
                     localStorage.setItem('user_id', backendLoginRes.data.user_id);
+                    window.location.href = "/inventory";
                 } else {
                     console.error('Backend login failed:', backendLoginRes.data.error);
                 }
