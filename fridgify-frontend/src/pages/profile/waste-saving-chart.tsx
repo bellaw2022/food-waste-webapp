@@ -46,7 +46,7 @@ const getImgURL = (base64ImageData: string) => {
 }
 
 export function WasteSavingChart({ setGif }: { setGif: (src: string) => void }) {
-    const { progress, isProgressLoading } = useWasteSavingProgress();
+    const { progress } = useWasteSavingProgress();
 
     const chartRef = useRef<HTMLDivElement>(null);
     const [prevScreenshot, takeScreenshot] = useScreenshot({ type: "image/png", quality: 1.0 });
@@ -78,7 +78,7 @@ export function WasteSavingChart({ setGif }: { setGif: (src: string) => void }) 
         if (imagesDone) {
             const options = {
                 images: images,
-                gifWidth: 350,
+                gifWidth: 320,
                 gifHeight: 300,
                 numWorkers: 5,
                 frameDuration: 0.05,
@@ -91,7 +91,7 @@ export function WasteSavingChart({ setGif }: { setGif: (src: string) => void }) 
                 }
               });
         }
-    }, [imagesDone, images]);
+    }, [imagesDone, images, setGif]);
 
     const totalCO2Saved = useMemo(() => {
         if (!progress) return 0;
@@ -101,11 +101,11 @@ export function WasteSavingChart({ setGif }: { setGif: (src: string) => void }) 
     if (!progress) return;
 
     return (
-        <Card ref={chartRef} className="w-[350px] h-[300px] mx-auto">
+        <Card ref={chartRef} className="w-[320px] h-[300px] mx-auto">
             <CardHeader>
                 <CardTitle>Waste Saved in CO2</CardTitle>
                 <CardDescription>
-                    I've saved {totalCO2Saved} CO2 over the last 4 weeks!
+                    I've saved {totalCO2Saved.toFixed(1)} kg CO2 over the last 4 weeks!
                 </CardDescription>
             </CardHeader>
             <CardContent>
@@ -126,9 +126,7 @@ export function WasteSavingChart({ setGif }: { setGif: (src: string) => void }) 
                             tickMargin={8}
                             interval={0}
                         />
-                        <YAxis type="number" 
-                            tickFormatter={(val) => val.toExponential()}
-                        />
+                        <YAxis />
                         <ChartTooltip
                             cursor={false}
                             content={<ChartTooltipContent indicator="dot" />}

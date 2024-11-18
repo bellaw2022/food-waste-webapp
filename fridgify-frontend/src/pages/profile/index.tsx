@@ -1,4 +1,4 @@
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Card, CardHeader } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectItem, SelectContent, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
@@ -19,19 +19,17 @@ export const ProfilePage = () => {
                         Profile Photo
                     </div>
                 </CardHeader>
-                <CardContent>
-                    <div className="border-2 border-black/10 rounded-md">
-                        <Table>
-                            <TableBody className="bg-[gray]/10">
-                               <NotificationSection />
-                               <PrivacySection />
-                               <FoodSection />
-                               <ProgressSection />
-                            </TableBody>
-                        </Table>
-                    </div>
-                </CardContent>
             </Card>
+            <div className="border-2 border-black/10 rounded-md">
+                <Table>
+                    <TableBody className="bg-[gray]/10">
+                        <NotificationSection />
+                        <PrivacySection />
+                        <FoodSection />
+                        <ProgressSection />
+                    </TableBody>
+                </Table>
+            </div>
         </div>
     );
 }
