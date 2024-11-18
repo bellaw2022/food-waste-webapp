@@ -120,11 +120,12 @@ export function WasteSavingChart({ setGif }: { setGif: (src: string) => void }) 
                     >
                         <CartesianGrid vertical={false} />
                         <XAxis
-                            dataKey="week"
+                            dataKey="weekNumber"
                             tickLine={false}
                             axisLine={false}
                             tickMargin={8}
                             interval={0}
+                            tickFormatter={(val) => `Week ${val}`}
                         />
                         <YAxis />
                         <ChartTooltip

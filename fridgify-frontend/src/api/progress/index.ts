@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { API_URL } from "@/api/constants";
 
 interface WasteSavingWeeklyProgress {
-    week: string;
+    weekNumber: number;
     amount: number;
 }
 
@@ -29,10 +29,11 @@ export const useWasteSavingProgress = () => {
             const result: WasteSavingWeeklyProgress[] = [];
             Object.keys(wasteSavingProgress).forEach((key, idx) => {
                 result.push({
-                    week: `Week ${idx+1}`,
+                    weekNumber: 5 - parseInt(key),
                     amount: Math.max(0, wasteSavingProgress[key]) / 1000, // ensure each week is at least 0
                 });
             });
+            result.sort((a, b) => a.weekNumber - b.weekNumber);
 
             return result;
         }
