@@ -30,7 +30,7 @@ export const useWasteSavingProgress = () => {
             Object.keys(wasteSavingProgress).forEach((key, idx) => {
                 result.push({
                     week: `Week ${idx+1}`,
-                    amount: Math.max(0, wasteSavingProgress[key]), // ensure each week is at least 0
+                    amount: Math.max(0, wasteSavingProgress[key]) / 1000, // ensure each week is at least 0
                 });
             });
 

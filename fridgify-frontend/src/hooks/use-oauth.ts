@@ -2,17 +2,22 @@ import { googleLogout, useGoogleLogin } from "@react-oauth/google";
 import axios from "axios";
 import { useEffect, useState, useContext, createContext } from "react";
 import { useAppContext } from "../AppContext";
+import { useQueryClient } from "@tanstack/react-query";
 
 export const useOAuth = () => {
     const [user, setUser] = useState(null);
     const [profile, setProfile] = useState(null);
     const [userId, setUserId] = useState(null);
     const { globalUserId, setGlobalUserId } = useAppContext();
+    const queryClient = useQueryClient();
 
     const login = useGoogleLogin({
         onSuccess: (codeResponse) => {
             console.log('Login Success:', codeResponse);
             setUser(codeResponse);
+            queryClient.invalidateQueries({
+                queryKey: ['inventory', 'waste-saving-progress'],
+            });
         },
         onError: (error) => {
             console.log('Login Failed:', error);

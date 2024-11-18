@@ -13,6 +13,12 @@ const buttonRoutes = [
 export const Navbar = () => {
     const location = useLocation();
 
+    if (location.pathname !== "/") {
+        const userIdString = localStorage.getItem('user_id');
+        if (!userIdString) {
+            window.location.href = "/"; // Prompt user to login
+        }
+    }
     if (location.pathname.startsWith("/scan")) return null;
 
     return (
