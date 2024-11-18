@@ -4,12 +4,9 @@ import "./index.css";
 import NoRecipesModal from "@/components/ui/noRecipesModal";
 import RecipeList from "../../components/ui/recipeList";
 import Recipe from "../../components/ui/recipe";
-import { Route, Routes, useNavigate } from "react-router-dom";
-import { SERVFAIL } from "dns";
 import axios from "axios";
-import { useAppContext } from "../../AppContext";
 
-let baseURL = import.meta.env.VITE_API_URL;
+const baseURL = import.meta.env.VITE_API_URL;
 
 interface BackendIngredient {
   userproduce_id: number;
