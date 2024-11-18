@@ -84,7 +84,7 @@ export const useEditInventory = () => {
             });
 
             if (Object.keys(trashedItems).length > 0) {
-                const res1 = await fetch(`${API_URL}/user/${userId}/produce`, {
+                const res1 = await fetch(`${API_URL}/user/${userId}/produce/trash`, {
                     method: "PUT",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify(trashedItems),
