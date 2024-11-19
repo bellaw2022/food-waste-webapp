@@ -153,27 +153,27 @@ export const useInventory = () => {
             console.log(API_URL);
             const res = await fetch(`${API_URL}/user/${userId}/produce`, {
                 method: "GET",
-                headers: {
-                    'Accept': 'application/json'
-                }
+                headers: new Headers({
+                    "ngrok-skip-browser-warning": "69420",
+                })
             }).then(
-                res => res.text()
+                res => res.json()
             ).catch((error) => { console.error(error) });
             if (res) console.log("Retrieved response from backend: ", res);
 
-            // const todayDate = new Date((new Date()).toISOString().split("T")[0]);
+            const todayDate = new Date((new Date()).toISOString().split("T")[0]);
 
             const inventory: Record<string, EditingCartItem> = {};
-            // res.data?.forEach((item: InventoryResponse) => {
-            //     inventory[item.userproduce_id] = {
-            //         cartItemId: item.userproduce_id,
-            //         name: item.produce_name,
-            //         quantity: item.quantity,
-            //         unit: item.unit,
-            //         expirationDays: Math.floor((Date.parse(item.expiration_date) - todayDate.getTime()) / MILLISECONDS_IN_DAY),
-            //         isTrash: false,
-            //     }
-            // });
+            res.data?.forEach((item: InventoryResponse) => {
+                inventory[item.userproduce_id] = {
+                    cartItemId: item.userproduce_id,
+                    name: item.produce_name,
+                    quantity: item.quantity,
+                    unit: item.unit,
+                    expirationDays: Math.floor((Date.parse(item.expiration_date) - todayDate.getTime()) / MILLISECONDS_IN_DAY),
+                    isTrash: false,
+                }
+            });
 
             return inventory as Record<string, EditingCartItem>;
         }
