@@ -159,7 +159,7 @@ export const useInventory = () => {
             }).then(
                 res => res.text()
             ).catch((error) => { console.error(error) });
-            console.log("Retrieved response from backend: ", res);
+            if (res) console.log("Retrieved response from backend: ", res);
 
             const todayDate = new Date((new Date()).toISOString().split("T")[0]);
 
