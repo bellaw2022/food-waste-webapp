@@ -104,6 +104,7 @@ export const RecipePage: React.FC = () => {
   const [searchOption, setSearchOption] = useState<number>(1);
 
   const [isAI, setIsAI] = useState<boolean>(false);
+  const [recalculate, setRecalculate] = useState<boolean>(false);
 
   const handleNoRecipe = () => {
     setShowNoRecipesModal(false);
@@ -120,6 +121,33 @@ export const RecipePage: React.FC = () => {
   const handleSelectionChange = (selectedIngredients: string[]) => {
     console.log("Selected ingredients:", selectedIngredients);
     setSelectedIngredients(selectedIngredients);
+  };
+
+  const recalculateStat = async () => {
+    try {
+      const response = await axios.post(baseURL + "/api/recipe/recalculate", {
+        recipes: recipes,
+        user_id: globalUserId,
+      });
+
+      const data = await response.data;
+
+      const fetchedRecipes: Recipe[] = data.recipes.map((recipe: any) => ({
+        id: recipe.id,
+        title: recipe.title,
+        missedIngredientCount: recipe.missedIngredientCount,
+        usedIngredientCount: recipe.usedIngredientCount,
+        image: recipe.image,
+        missedIngredients: recipe.missedIngredients, // If missedIngredients is a string array
+        usedIngredients: recipe.usedIngredients, // If usedIngredients is a string array
+      }));
+
+      console.log("recalculated stat: ", fetchedRecipes);
+      setRecipes(fetchedRecipes);
+      setRecalculate(false);
+    } catch (error) {
+      console.error("Error: ", error);
+    }
   };
 
   const handleRecipeSelection = async (selectedRecipe: Recipe) => {
@@ -178,7 +206,8 @@ export const RecipePage: React.FC = () => {
       setIsAI(false);
       console.log("zero everything");
     }
-  }, [basePage]);
+    if (listPage) recalculateStat();
+  }, [basePage, recalculate]);
 
   const retrieveIngredients = async () => {
     try {
@@ -336,6 +365,7 @@ export const RecipePage: React.FC = () => {
             setBasePage={setBasePage}
             setListPage={setListPage}
             setRecipePage={setRecipePage}
+            setRecalculate={setRecalculate}
           ></RecipeList>
         ) : (
           showNoRecipesModal && (
