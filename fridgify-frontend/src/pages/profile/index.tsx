@@ -22,7 +22,12 @@ export const ProfilePage = () => {
     useEffect(() => {
         const userId = localStorage.getItem("user_id");
         if (userId) {
-            fetch(`http://127.0.0.1:10000/api/users/${userId}`)
+            fetch(`http://127.0.0.1:10000/api/users/${userId}`, {
+                method: "GET",
+                headers: new Headers({
+                    "ngrok-skip-browser-warning": "69420",
+                }),
+            })
                 .then((response) => {
                     console.log("Response status:", response.status);
                     console.log("Response headers:", response.headers);
