@@ -157,9 +157,9 @@ export const useInventory = () => {
                     'Accept': 'application/json'
                 }
             }).then(
-                res => res.json()
+                res => res.text()
             ).catch((error) => { console.error(error) });
-            console.log("Retrieved response from backend")
+            console.log("Retrieved response from backend: ", res);
 
             const todayDate = new Date((new Date()).toISOString().split("T")[0]);
 
