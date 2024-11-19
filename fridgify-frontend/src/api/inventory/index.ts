@@ -30,7 +30,10 @@ export const useAddInventory = () => {
 
             const res = await fetch(`${API_URL}/user/${userId}/produce`, {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
+                headers: new Headers({
+                    "Content-Type": "application/json",
+                    "ngrok-skip-browser-warning": "69420",
+                }),
                 body: JSON.stringify(formattedInputs),
             });
 
@@ -86,7 +89,10 @@ export const useEditInventory = () => {
             if (Object.keys(trashedItems).length > 0) {
                 const res1 = await fetch(`${API_URL}/user/${userId}/produce/trash`, {
                     method: "PUT",
-                    headers: { "Content-Type": "application/json" },
+                    headers: new Headers({
+                        "Content-Type": "application/json",
+                        "ngrok-skip-browser-warning": "69420",
+                    }),
                     body: JSON.stringify(trashedItems),
                 });
 
@@ -98,7 +104,10 @@ export const useEditInventory = () => {
             if (Object.keys(consumedItems).length > 0) {
                 const res2 = await fetch(`${API_URL}/user/${userId}/produce`, {
                     method: "PUT",
-                    headers: { "Content-Type": "application/json" },
+                    headers: new Headers({
+                        "Content-Type": "application/json",
+                        "ngrok-skip-browser-warning": "69420",
+                    }),
                     body: JSON.stringify(consumedItems),
                 });
 

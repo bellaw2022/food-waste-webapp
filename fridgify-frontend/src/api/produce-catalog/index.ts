@@ -9,7 +9,12 @@ export const useProduceCatalog = () => {
         refetchOnWindowFocus: false,
         queryKey: ["produce-catalog"],
         queryFn: async () => {
-            const response1 = await fetch(`${API_URL}/all_produces`);
+            const response1 = await fetch(`${API_URL}/all_produces`, {
+                method: "GET",
+                headers: new Headers({
+                    "ngrok-skip-browser-warning": "69420",
+                }),
+            });
             if (response1.status !== 200) {
               throw new Error('Could not fetch names of produce catalog items!');
             }
@@ -29,9 +34,10 @@ export const useProduceCatalog = () => {
             
             const response2 = await fetch(`${API_URL}/produce`, {
                 method: "POST",
-                headers: {
+                headers: new Headers({
                     "Content-Type": "application/json",
-                },
+                    "ngrok-skip-browser-warning": "69420",
+                }),
                 body: JSON.stringify({
                     produces: Object.keys(result),
                 }),

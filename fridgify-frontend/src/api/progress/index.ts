@@ -15,7 +15,11 @@ export const useWasteSavingProgress = () => {
             if (!userIdString) throw new Error("Could not fetch user_id from local_storage");
             const userId = parseInt(userIdString);
 
-            const response = await fetch(`${API_URL}/user/${userId}/wastesaving`);
+            const response = await fetch(`${API_URL}/user/${userId}/wastesaving`, {
+                headers: new Headers({
+                    "ngrok-skip-browser-warning": "69420",
+                }),
+            });
             if (response.status !== 200) {
               throw new Error('Could not fetch user waste-saving data!');
             }
