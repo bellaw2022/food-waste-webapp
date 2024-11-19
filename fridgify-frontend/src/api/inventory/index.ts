@@ -151,10 +151,15 @@ export const useInventory = () => {
             const userId = parseInt(userIdString);
             
             console.log(API_URL);
-            const res = await fetch(`${API_URL}/user/${userId}/produce`, { method: "GET" }).then(
-                res => { console.log(res); return res.json(); }
+            const res = await fetch(`${API_URL}/user/${userId}/produce`, {
+                method: "GET",
+                headers: {
+                    accept: 'application/json'
+                }
+            }).then(
+                res => res.json()
             ).catch((error) => { console.error(error) });
-            console.log("Retrieved response from backend");
+            console.log("Retrieved response from backend")
 
             const todayDate = new Date((new Date()).toISOString().split("T")[0]);
 
