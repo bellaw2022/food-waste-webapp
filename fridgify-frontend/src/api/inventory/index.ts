@@ -152,7 +152,7 @@ export const useInventory = () => {
             
             console.log(API_URL);
             const res = await fetch(`${API_URL}/user/${userId}/produce`, { method: "GET" }).then(
-                res => { console.log(res); res.json(); }
+                res => { console.log(res); return res.json(); }
             ).catch((error) => { console.error(error) });
             console.log("Retrieved response from backend");
 
