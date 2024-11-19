@@ -6,10 +6,11 @@ interface User {
     access_token: string;
 }
 
-interface Profile {
+export interface Profile {
     user_id: number;
     email?: string;
     name?: string;
+    picture: string;
 }
 
 export const useOAuth = () => {
@@ -32,7 +33,8 @@ export const useOAuth = () => {
             const mockProfile = {
                 user_id: 38,
                 email: 'mock@example.com',
-                name: 'Mock User'
+                name: 'Mock User',
+                picture: "",
             };
 
             setProfile(mockProfile);

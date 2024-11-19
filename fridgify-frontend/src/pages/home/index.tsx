@@ -1,8 +1,4 @@
-interface Profile {
-    picture: string;
-    name: string;
-    email: string
-}
+import { Profile } from "@/hooks";
 
 export const HomePage = ({ profile, login, logOut }: 
     {profile: Profile | null, login: () => void, logOut: () => void }
