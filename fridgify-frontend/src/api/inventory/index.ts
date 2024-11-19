@@ -154,7 +154,7 @@ export const useInventory = () => {
             const res = await fetch(`${API_URL}/user/${userId}/produce`, {
                 method: "GET",
                 headers: {
-                    accept: 'application/json'
+                    'Accept': 'application/json'
                 }
             }).then(
                 res => res.json()
