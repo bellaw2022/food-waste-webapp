@@ -149,10 +149,12 @@ export const useInventory = () => {
             const userIdString = localStorage.getItem('user_id');
             if (!userIdString) throw new Error("Could not fetch user_id from local_storage");
             const userId = parseInt(userIdString);
-
+            
+            console.log(API_URL);
             const res = await fetch(`${API_URL}/user/${userId}/produce`, { method: "GET" }).then(
                 res => res.json()
-            ).catch((error) => { throw new Error(error) });
+            ).catch((error) => { console.error(error) });
+            console.log("Retrieved response from backend");
 
             const todayDate = new Date((new Date()).toISOString().split("T")[0]);
 
