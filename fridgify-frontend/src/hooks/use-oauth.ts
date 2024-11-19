@@ -1,5 +1,3 @@
-import { googleLogout, useGoogleLogin } from "@react-oauth/google";
-import axios from "axios";
 import { useEffect, useState } from "react";
 import { useAppContext } from "../AppContext";
 import { useQueryClient } from "@tanstack/react-query";
@@ -8,93 +6,61 @@ interface User {
     access_token: string;
 }
 
+export interface Profile {
+    user_id: number;
+    email?: string;
+    name?: string;
+    picture: string;
+}
+
 export const useOAuth = () => {
     const [user, setUser] = useState<User | null>(null);
-    const [profile, setProfile] = useState(null);
-    const [userId, setUserId] = useState(null);
+    const [profile, setProfile] = useState<Profile | null>(null);
+    const [userId, setUserId] = useState<number | null>(null);
     const { setGlobalUserId } = useAppContext();
     const queryClient = useQueryClient();
 
-    const login = useGoogleLogin({
-        onSuccess: (codeResponse: User) => {
-            console.log('Login Success:', codeResponse);
-            setUser(codeResponse);
-            queryClient.invalidateQueries({
-                queryKey: ['inventory', 'waste-saving-progress'],
-            });
-        },
-        onError: (error) => {
-            console.log('Login Failed:', error);
-        },
-    });
+    const login = () => {
+        console.log('Mock Login Success');
+        setUser({ access_token: 'mock_token' });
+        queryClient.invalidateQueries({
+            queryKey: ['inventory', 'waste-saving-progress'],
+        });
+    };
 
     useEffect(() => {
-        const fetchUserData = async () => {
-            if (!user) return;
+        const mockLogin = async () => {
+            const mockProfile = {
+                user_id: 38,
+                email: 'bellatesing@gmail.com',
+                name: 'Bella Wu',
+                picture: "",
+            };
 
-            try {
-                const googleProfileRes = await axios.get(
-                    `https://www.googleapis.com/oauth2/v1/userinfo?access_token=${user.access_token}`,
-                    {
-                        headers: {
-                            Authorization: `Bearer ${user.access_token}`,
-                            Accept: 'application/json',
-                        },
-                    }
-                );
+            setProfile(mockProfile);
+            setUserId(mockProfile.user_id);
+            setGlobalUserId(mockProfile.user_id);
 
-                const backendLoginRes = await axios.post(
-                    'http://localhost:10000/api/auth/login',
-                    {
-                        access_token: user.access_token
-                    }
-                );
-
-                if (backendLoginRes.data.success) {
-                    const combinedProfile = {
-                        ...googleProfileRes.data,
-                        user_id: backendLoginRes.data.user_id
-                    };
-
-                    
-
-                    console.log('Combined Profile Data:', combinedProfile);
-                    setProfile(combinedProfile);
-                    setUserId(backendLoginRes.data.user_id);
-                    setGlobalUserId(backendLoginRes.data.user_id);
-
-                    localStorage.setItem('user_id', backendLoginRes.data.user_id);
-                    window.location.href = "/inventory";
-                } else {
-                    console.error('Backend login failed:', backendLoginRes.data.error);
-                }
-            } catch (err) {
-                console.error('Error during login process:', err);
-            }
+            localStorage.setItem('user_id', String(mockProfile.user_id));
+            window.location.href = "/inventory";
         };
 
-        fetchUserData();
+        if (user) {
+            mockLogin();
+        }
     }, [user]);
 
-    const logOut = async () => {
-        try {
-            localStorage.removeItem('user_id');
-
-            googleLogout();
-
-            setProfile(null);
-            setUser(null);
-            setUserId(null);
-        } catch (err) {
-            console.error('Error during logout:', err);
-        }
+    const logOut = () => {
+        localStorage.removeItem('user_id');
+        setProfile(null);
+        setUser(null);
+        setUserId(null);
     };
 
     return {
         user,
         profile,
         userId,
-        useGoogleLogin,
         login,
         logOut,
         isLoggedIn: !!userId
