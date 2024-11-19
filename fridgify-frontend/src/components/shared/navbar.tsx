@@ -3,6 +3,7 @@ import { Button } from "../ui/button";
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import logo from "@/logo.png";
+import { useEffect } from "react";
 
 const buttonRoutes = [
     { name: "Inventory", path: "/inventory" },
@@ -13,12 +14,15 @@ const buttonRoutes = [
 export const Navbar = () => {
     const location = useLocation();
 
-    if (location.pathname !== "/") {
-        const userIdString = localStorage.getItem('user_id');
-        if (!userIdString) {
-            window.location.href = "/"; // Prompt user to login
+    useEffect(() => {
+        if (location.pathname !== "/") {
+            const userIdString = localStorage.getItem('user_id');
+            if (!userIdString) {
+                window.location.href = "/"; // Prompt user to login
+            }
         }
-    }
+    }, [location.pathname]);
+
     if (location.pathname.startsWith("/scan")) return null;
 
     return (
