@@ -1,3 +1,4 @@
+import { API_URL } from "@/api/constants";
 import { Button } from "@/components/ui/button";
 import { BookOpenIcon, CameraIcon, CheckIcon, EllipsisIcon, RecycleIcon, RefreshCwIcon, XIcon } from "lucide-react";
 import { useCallback, useMemo, useRef, useState } from "react";
@@ -99,7 +100,7 @@ export const BeginScanningPage = () => {
                         const blob = await (await fetch(croppedData)).blob();
                         formData.append('image', blob, 'scan.jpg');
 
-                        const res = await fetch("http://localhost:10000/api/scan", {
+                        const res = await fetch(`${API_URL}/scan`, {
                             method: "POST",
                             body: formData
                         });

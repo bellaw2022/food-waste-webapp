@@ -6,8 +6,9 @@ import { FaCircleMinus } from "react-icons/fa6";
 import defaultImage from "../../Food.png";
 import RemoveInventory from "./removeInventory";
 import axios from "axios";
+import { API_URL } from "@/api/constants";
 
-let baseURL = import.meta.env.VITE_API_URL;
+const baseURL = API_URL;
 
 interface CompleteRecipe {
   id: number;
@@ -66,7 +67,7 @@ const Recipe: React.FC<CombinedProps> = ({
   const fetchInitialIngredients = async () => {
     console.log("fetching ingredient units ", recipe.usedIngredients);
     try {
-      const response = await axios.post(baseURL + "/api/recipe/ingredients", {
+      const response = await axios.post(baseURL + "/recipe/ingredients", {
         ingredients: recipe.usedIngredients,
       });
 

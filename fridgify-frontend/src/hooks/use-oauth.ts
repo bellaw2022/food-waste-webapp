@@ -3,6 +3,7 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { useAppContext } from "../AppContext";
 import { useQueryClient } from "@tanstack/react-query";
+import { API_URL } from "@/api/constants";
 
 interface User {
     access_token: string;
@@ -44,7 +45,7 @@ export const useOAuth = () => {
                 );
 
                 const backendLoginRes = await axios.post(
-                    'http://localhost:10000/api/auth/login',
+                    `${API_URL}/auth/login`,
                     {
                         access_token: user.access_token
                     }

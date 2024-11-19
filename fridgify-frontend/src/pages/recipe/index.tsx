@@ -5,8 +5,9 @@ import NoRecipesModal from "@/components/ui/noRecipesModal";
 import RecipeList from "../../components/ui/recipeList";
 import Recipe from "../../components/ui/recipe";
 import axios from "axios";
+import { API_URL } from "@/api/constants";
 
-const baseURL = import.meta.env.VITE_API_URL;
+const baseURL = API_URL;
 
 interface BackendIngredient {
   userproduce_id: number;
@@ -126,7 +127,7 @@ export const RecipePage: React.FC = () => {
       /*
         title, image, servings, cookingMinutes, prepMinutes, ingredients, sourceURL
         */
-      const response = await axios.get(baseURL + "/api/recipe/recipe_by_id", {
+      const response = await axios.get(baseURL + "/recipe/recipe_by_id", {
         params: { id: selectedRecipe.id.toString() },
       });
 
@@ -179,7 +180,7 @@ export const RecipePage: React.FC = () => {
   const retrieveIngredients = async () => {
     try {
       const response = await axios.get<BackendData>(
-        baseURL + "/api/user/" + globalUserId + "/produce"
+        baseURL + "/user/" + globalUserId + "/produce"
       );
       const responseData = await response.data;
       console.log(responseData);
@@ -204,7 +205,7 @@ export const RecipePage: React.FC = () => {
     setLoading(true);
     try {
       const response = await axios.post(
-        baseURL + "/api/recipe/recipes_by_ingredients",
+        baseURL + "/recipe/recipes_by_ingredients",
         {
           ingredients: selectedIngredients,
           userId: globalUserId,
@@ -242,7 +243,7 @@ export const RecipePage: React.FC = () => {
 
   const searchAIRecipe = async () => {
     try {
-      const response = await axios.get(baseURL + "/api/recipe/ai", {
+      const response = await axios.get(baseURL + "/recipe/ai", {
         params: { ingredients: selectedIngredients, id: 38 },
       });
 
