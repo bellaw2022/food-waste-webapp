@@ -1,1 +1,3 @@
-export const API_URL = "http://104.197.190.166:10000/api";
+const BACKEND_URL = process.env.BACKEND_URL ?? "http://localhost:10000";
+
+export const API_URL = `${BACKEND_URL}/api`;
