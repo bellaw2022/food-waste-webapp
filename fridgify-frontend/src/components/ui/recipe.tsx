@@ -41,19 +41,21 @@ const Recipe: React.FC<CombinedProps> = ({
   isAI,
 }) => {
   console.log("recipe: ", recipe);
-  //const { globalUserId, setGlobalUserId } = useAppContext();
-  const globalUserId = 38;
+  const { globalUserId, setGlobalUserId } = useAppContext();
+  //const globalUserId = 38;
   const [servings, setServings] = useState<number>(recipe.servings);
   const [scaledIngredients, setScaledIngredients] = useState(
     recipe.ingredients
   );
   const [showPopup, setShowPopup] = useState<boolean>(false);
+  const [inventoryUpdated, setInventoryUpdated] = useState<boolean>(false);
   const [removeableIngredients, setRemoveableIngredients] = useState<
     {
       name: string;
       amount: string;
       unit: string;
       maxAmount: number;
+      userproduce_id: number;
     }[]
   >([]);
   function parseAmount(amount: string): number | string {
@@ -112,7 +114,8 @@ const Recipe: React.FC<CombinedProps> = ({
     fetchInitialIngredients();
     setServings(recipe.servings);
     setScaledIngredients(getScaledIngredients(recipe.servings));
-  }, [recipe]);
+    setShowPopup(false);
+  }, [recipe, inventoryUpdated]);
 
   const handleServingIncrease = () => {
     setServings((prevServings) => {
@@ -159,7 +162,10 @@ const Recipe: React.FC<CombinedProps> = ({
         </button>
       </div>
       {showPopup && (
-        <RemoveInventory ingredients={removeableIngredients}></RemoveInventory>
+        <RemoveInventory
+          ingredients={removeableIngredients}
+          setInventoryUpdated={setInventoryUpdated}
+        ></RemoveInventory>
       )}
       <div className="recipe">
         <div className="recipe-text">

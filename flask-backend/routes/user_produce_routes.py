@@ -93,6 +93,8 @@ def update_user_produce(user_id):
 
         # Process each produce update
         for userproduce_id, new_quantity in data.items():
+
+            print("id: ", userproduce_id, " quantity: ", new_quantity)
             # Convert userproduce_id to integer
             userproduce_id = int(userproduce_id)
 

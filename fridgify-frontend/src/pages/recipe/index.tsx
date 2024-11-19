@@ -53,8 +53,8 @@ interface CompleteRecipe {
 }
 
 export const RecipePage: React.FC = () => {
-  //const { globalUserId, setGlobalUserId } = useAppContext();
-  const globalUserId = 38;
+  const { globalUserId, setGlobalUserId } = useAppContext();
+  //const globalUserId = 38;
   console.log("userid: ", globalUserId);
   /*
   const ingredients = [
@@ -253,7 +253,14 @@ export const RecipePage: React.FC = () => {
   const searchAIRecipe = async () => {
     try {
       const response = await axios.get(baseURL + "/api/recipe/ai", {
-        params: { ingredients: selectedIngredients, id: 38 },
+        params: {
+          ingredients: selectedIngredients,
+          user_id: 38,
+          preferences:
+            searchOption == 1
+              ? "Maximize used ingredients"
+              : "Minimize ingredients user don't have",
+        },
       });
 
       const data = await response.data;
@@ -275,29 +282,31 @@ export const RecipePage: React.FC = () => {
       <h1 className="text-3xl font-bold">Recipe Rec</h1>
       {basePage && (
         <>
-          <Ingredients
-            ingredients={ingredients}
-            onSelectionChange={handleSelectionChange}
-          ></Ingredients>
-          <div className="option">
-            <h2 className="option-text">Option</h2>
-            <div className="option-buttons">
-              <button
-                className={`option-button ${
-                  searchOption === 1 ? "selected" : ""
-                }`}
-                onClick={() => handleSearchOptionChange(1)}
-              >
-                Maximize existing ingredients usage
-              </button>
-              <button
-                className={`option-button ${
-                  searchOption !== 1 ? "selected" : ""
-                }`}
-                onClick={() => handleSearchOptionChange(2)}
-              >
-                Minimize missing ingredients usage
-              </button>
+          <div className="recipe-page-body">
+            <Ingredients
+              ingredients={ingredients}
+              onSelectionChange={handleSelectionChange}
+            ></Ingredients>
+            <div className="option">
+              <h2 className="option-text">Option</h2>
+              <div className="option-buttons">
+                <button
+                  className={`option-button ${
+                    searchOption === 1 ? "selected" : ""
+                  }`}
+                  onClick={() => handleSearchOptionChange(1)}
+                >
+                  Maximize existing ingredients usage
+                </button>
+                <button
+                  className={`option-button ${
+                    searchOption !== 1 ? "selected" : ""
+                  }`}
+                  onClick={() => handleSearchOptionChange(2)}
+                >
+                  Minimize missing ingredients usage
+                </button>
+              </div>
             </div>
           </div>
           <div className="recipe-buttons">
