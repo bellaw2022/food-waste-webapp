@@ -5,7 +5,7 @@ import NoRecipesModal from "@/components/ui/noRecipesModal";
 import RecipeList from "../../components/ui/recipeList";
 import Recipe from "../../components/ui/recipe";
 import axios from "axios";
-import { useOAuth } from "@/hooks";
+import { useAppContext } from "@/AppContext";
 
 
 const baseURL = import.meta.env.VITE_API_URL;
@@ -51,8 +51,7 @@ interface CompleteRecipe {
 }
 
 export const RecipePage: React.FC = () => {
-  const { userId } = useOAuth();
-  const globalUserId = userId;
+  const { globalUserId } = useAppContext();
   console.log("userid: ", userId);
 
   const [ingredients, setIngredients] = useState<Ingredient[]>([]);
