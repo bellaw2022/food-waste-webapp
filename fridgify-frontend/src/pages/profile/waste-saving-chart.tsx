@@ -1,7 +1,6 @@
 "use client"
 
-import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts"
-import { createGIF } from "gifshot";
+import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts";
 
 import {
   Card,
@@ -9,43 +8,20 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
+} from "@/components/ui/card";
 import {
   ChartConfig,
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-import { useWasteSavingProgress } from "@/api";
+import { API_URL, useWasteSavingProgress } from "@/api";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useScreenshot } from "use-react-screenshot";
 
 const chartConfig = {} satisfies ChartConfig;
 
-const getImgURL = (base64ImageData: string) => {
-    const contentType = 'image/png';
-    const byteCharacters = atob(base64ImageData.substr(`data:${contentType};base64,`.length));
-    const byteArrays = [];
-
-    for (let offset = 0; offset < byteCharacters.length; offset += 1024) {
-      const slice = byteCharacters.slice(offset, offset + 1024);
-
-      const byteNumbers = new Array(slice.length);
-      for (let i = 0; i < slice.length; i++) {
-        byteNumbers[i] = slice.charCodeAt(i);
-      }
-
-      const byteArray = new Uint8Array(byteNumbers);
-
-      byteArrays.push(byteArray);
-    }
-    const blob = new Blob(byteArrays, { type: contentType });
-    const blobUrl = URL.createObjectURL(blob);
-
-    return blobUrl;
-}
-
-export function WasteSavingChart({ setGif }: { setGif: (src: string) => void }) {
+export function WasteSavingChart({ setVideo }: { setVideo: (src: string) => void }) {
     const { progress } = useWasteSavingProgress();
 
     const chartRef = useRef<HTMLDivElement>(null);
@@ -69,29 +45,29 @@ export function WasteSavingChart({ setGif }: { setGif: (src: string) => void }) 
 
     useEffect(() => {
         if (prevScreenshot) {
-            const url = getImgURL(prevScreenshot);
-            setImages((oldImages) => [...oldImages, url]);
+            setImages((oldImages) => [...oldImages, prevScreenshot]);
         }
     }, [prevScreenshot]);
 
-    useEffect(() => {
-        if (imagesDone) {
-            const options = {
-                images: images,
-                gifWidth: 320,
-                gifHeight: 300,
-                numWorkers: 5,
-                frameDuration: 0.05,
-                sampleInterval: 10,
-              };
-          
-              createGIF(options, (obj) => {
-                if (!obj.error) {
-                  setGif(obj.image);
-                }
-              });
+    useEffect( () => {
+        const getVideo = async () => {
+            const userId = localStorage.getItem("user_id")!;
+            const res = await fetch(`${API_URL}/user/${userId}/video`, {
+                method: "POST",
+                headers: new Headers({
+                    "Content-Type": "application/json",
+                    "ngrok-skip-browser-warning": "69420",
+                }),
+                body: JSON.stringify(images)
+            })
+            .then(res => res.blob())
+            .then(blob => window.URL.createObjectURL(blob));
+            setVideo(res);
         }
-    }, [imagesDone, images, setGif]);
+        if (imagesDone) {
+            getVideo();
+        }
+    }, [imagesDone, images]);
 
     const totalCO2Saved = useMemo(() => {
         if (!progress) return 0;

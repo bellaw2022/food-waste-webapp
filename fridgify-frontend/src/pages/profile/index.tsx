@@ -138,9 +138,9 @@ const FoodSection = () => {
 }
 
 const ProgressSection = () => {
-    const [gif, setGif] = useState("");
+    const [video, setVideo] = useState("");
 
-    const shareGif = useCallback(async () => {
+    const shareVideo = useCallback(async () => {
         try {
             console.log("Share button clicked");
 
@@ -149,16 +149,16 @@ const ProgressSection = () => {
                 return;
             }
 
-            const response = await fetch(gif);
-            console.log("Image fetch response:", response);
+            const response = await fetch(video);
+            console.log("Video fetch response:", response);
 
-            const blobImageAsset = await response.blob();
-            console.log("Image fetched and converted to blob");
+            const blobVideoAsset = await response.blob();
+            console.log("Video fetched and converted to blob");
 
             //create a file from the blob
             const filesArray = [
-                new File([blobImageAsset], "shared-image.gif", {
-                    type: "image/gif",
+                new File([blobVideoAsset], "shared-video.mp4", {
+                    type: "video/mp4",
                     lastModified: new Date().getTime(),
                 }),
             ];
@@ -180,14 +180,14 @@ const ProgressSection = () => {
         } catch (error) {
             console.error("Error sharing image:", error);
         }
-    }, [gif]);
+    }, [video]);
 
     return (
         <>
             <TableRow className="h-10 bg-white">
                 <TableCell className="text-large font-bold">Progress Tracking</TableCell>
                 <TableCell className="text-large font-bold">
-                    <Button disabled={gif === ""} onClick={shareGif}
+                    <Button disabled={video === ""} onClick={shareVideo}
                         className="w-full gap-2"
                     >
                         Share! <InstagramLogoIcon />
@@ -196,7 +196,7 @@ const ProgressSection = () => {
             </TableRow>
             <TableRow>
                 <TableCell className="w-full" colSpan={2}>
-                    <WasteSavingChart setGif={(src: string) => setGif(src)} />
+                    <WasteSavingChart setVideo={(src: string) => setVideo(src)} />
                 </TableCell>
             </TableRow>
         </>
