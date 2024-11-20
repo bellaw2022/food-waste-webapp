@@ -164,7 +164,7 @@ const ProgressSection = () => {
             ];
 
             const shareData = {
-                title: "Waste Saving Progress",
+                title: "",
                 text: "Check out my waste saving progress!",
                 files: filesArray,
             };
