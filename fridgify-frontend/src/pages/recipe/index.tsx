@@ -5,6 +5,8 @@ import NoRecipesModal from "@/components/ui/noRecipesModal";
 import RecipeList from "../../components/ui/recipeList";
 import Recipe from "../../components/ui/recipe";
 import axios from "axios";
+import { useOAuth } from "@/hooks";
+
 
 const baseURL = import.meta.env.VITE_API_URL;
 
@@ -49,27 +51,9 @@ interface CompleteRecipe {
 }
 
 export const RecipePage: React.FC = () => {
-  //const { globalUserId, setGlobalUserId } = useAppContext();
-  const globalUserId = 38;
-  console.log("userid: ", globalUserId);
-  /*
-  const ingredients = [
-    { name: "Tomato", days: 2 },
-    { name: "Lettuce", days: 5 },
-    { name: "Cheese", days: 3 },
-    { name: "Bacon", days: 1 },
-    { name: "Onion", days: 1 },
-    { name: "Pickle", days: 13 },
-    { name: "Ketchup", days: 13 },
-    { name: "Mayo", days: 13 },
-    { name: "Mustard", days: 3 },
-    { name: "Relish", days: 4 },
-    { name: "Cucumber", days: 3 },
-    { name: "Carrot", days: 1 },
-    { name: "Radish", days: 2 },
-    { name: "Olive", days: 10 },
-    { name: "Garlic", days: 6 },
-  ];*/
+  const { userId } = useOAuth();
+  const globalUserId = userId;
+  console.log("userid: ", userId);
 
   const [ingredients, setIngredients] = useState<Ingredient[]>([]);
 
@@ -242,8 +226,9 @@ export const RecipePage: React.FC = () => {
 
   const searchAIRecipe = async () => {
     try {
-      const response = await axios.get(baseURL + "/api/recipe/ai", {
-        params: { ingredients: selectedIngredients, id: 38 },
+      const response = await axios.post(`${baseURL}/api/recipe/ai/${globalUserId}`, {
+        ingredients: selectedIngredients,
+        preferences: {},
       });
 
       const data = await response.data;

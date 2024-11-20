@@ -6,13 +6,37 @@ import {
   ReactNode,
 } from "react";
 
-const AppContext = createContext<{
+interface User {
+  access_token: string;
+}
+
+interface Profile {
+  picture: string;
+  name: string;
+  email: string;
+}
+
+interface AppContextType {
   globalUserId: number;
   setGlobalUserId: React.Dispatch<React.SetStateAction<number>>;
-}>({
-  globalUserId: 0, // Set a default value that matches your data type
-  setGlobalUserId: () => {}, // Placeholder function, updated by the provider
-});
+  user: User | null;
+  setUser: React.Dispatch<React.SetStateAction<User | null>>;
+  profile: Profile | null;
+  setProfile: React.Dispatch<React.SetStateAction<Profile | null>>;
+  userId: string | null;
+  setUserId: React.Dispatch<React.SetStateAction<string | null>>;
+}
+
+const AppContext = createContext<AppContextType>({
+  globalUserId: 0,
+  setGlobalUserId: () => {},
+  user: null,
+  setUser: () => {},
+  profile: null,
+  setProfile: () => {},
+  userId: null,
+  setUserId: () => {},
+})
 
 interface WrapperProps {
   children: ReactNode;
@@ -20,11 +44,59 @@ interface WrapperProps {
 
 export const AppProvider: React.FC<WrapperProps> = ({ children }) => {
   const [globalUserId, setGlobalUserId] = useState<number>(0);
+  const [user, setUser] = useState<User | null>(() => {
+    const storedUser = localStorage.getItem("user");
+    return storedUser ? JSON.parse(storedUser) : null;
+  });
+  const [profile, setProfile] = useState<Profile | null>(() => {
+    const storedProfile = localStorage.getItem("profile");
+    return storedProfile ? JSON.parse(storedProfile) : null;
+  });
+  const [userId, setUserId] = useState<string | null>(() => {
+    return localStorage.getItem("user_id");
+  });
+
+  // Persist user state to local storage
+  useEffect(() => {
+    if (user) {
+      localStorage.setItem("user", JSON.stringify(user));
+    } else {
+      localStorage.removeItem("user");
+    }
+  }, [user]);
+
+  useEffect(() => {
+    if (profile) {
+      localStorage.setItem("profile", JSON.stringify(profile));
+    } else {
+      localStorage.removeItem("profile");
+    }
+  }, [profile]);
+
+  useEffect(() => {
+    if (userId) {
+      localStorage.setItem("user_id", userId);
+    } else {
+      localStorage.removeItem("user_id");
+    }
+  }, [userId]);
+
   return (
-    <AppContext.Provider value={{ globalUserId, setGlobalUserId }}>
+    <AppContext.Provider
+      value={{
+        globalUserId,
+        setGlobalUserId,
+        user,
+        setUser,
+        profile,
+        setProfile,
+        userId,
+        setUserId,
+      }}
+    >
       {children}
     </AppContext.Provider>
-  );
+  )
 };
 
 export const useAppContext = () => useContext(AppContext);

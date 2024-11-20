@@ -9,12 +9,21 @@ interface User {
 }
 
 export const useOAuth = () => {
-    const [user, setUser] = useState<User | null>(null);
-    const [profile, setProfile] = useState(null);
-    const [userId, setUserId] = useState(null);
-    const { setGlobalUserId } = useAppContext();
+    const {
+        user,
+        setUser,
+        profile,
+        setProfile,
+        userId,
+        setUserId,
+        setGlobalUserId,
+    } = useAppContext();
+
     const queryClient = useQueryClient();
 
+    //====================================================//
+    // Login function that triggers the Google OAuth flow //
+    //====================================================//
     const login = useGoogleLogin({
         onSuccess: (codeResponse: User) => {
             console.log('Login Success:', codeResponse);
@@ -28,6 +37,28 @@ export const useOAuth = () => {
         },
     });
 
+    //==============================================================//
+    // Logout function that clears the user state and local storage //
+    //==============================================================//
+    const logOut = async () => {
+        try {
+            localStorage.removeItem('user');
+            localStorage.removeItem('profile');
+            localStorage.removeItem('user_id');
+
+            googleLogout();
+
+            setProfile(null);
+            setUser(null);
+            setUserId(null);
+        } catch (err) {
+            console.error('Error during logout:', err);
+        }
+    };
+
+    //========================================//
+    // Fetch user data after successful login //
+    //========================================//
     useEffect(() => {
         const fetchUserData = async () => {
             if (!user) return;
@@ -56,15 +87,10 @@ export const useOAuth = () => {
                         user_id: backendLoginRes.data.user_id
                     };
 
-                    
-
-                    console.log('Combined Profile Data:', combinedProfile);
+                    // console.log('Combined Profile Data:', combinedProfile);
                     setProfile(combinedProfile);
                     setUserId(backendLoginRes.data.user_id);
                     setGlobalUserId(backendLoginRes.data.user_id);
-
-                    localStorage.setItem('user_id', backendLoginRes.data.user_id);
-                    window.location.href = "/inventory";
                 } else {
                     console.error('Backend login failed:', backendLoginRes.data.error);
                 }
@@ -76,25 +102,10 @@ export const useOAuth = () => {
         fetchUserData();
     }, [user]);
 
-    const logOut = async () => {
-        try {
-            localStorage.removeItem('user_id');
-
-            googleLogout();
-
-            setProfile(null);
-            setUser(null);
-            setUserId(null);
-        } catch (err) {
-            console.error('Error during logout:', err);
-        }
-    };
-
     return {
         user,
         profile,
         userId,
-        useGoogleLogin,
         login,
         logOut,
         isLoggedIn: !!userId
