@@ -146,7 +146,6 @@ def generate_email_content(items, user):
 
     return body, html
 
-
 def send_expiry_notifications():
     # Database session
     db = SessionLocal()
