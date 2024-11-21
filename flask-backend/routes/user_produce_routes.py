@@ -2,7 +2,7 @@ from flask import Blueprint, jsonify, request
 from datetime import datetime, timedelta
 from sqlalchemy import text
 from models import db, User, UserAndProduce, Produce, UserWasteSaving
-from send_email import send_badge_email  # Import the email function
+from badge_email import send_badge_email
 import logging
 
 logging.basicConfig(level=logging.DEBUG, format="%(asctime)s [%(levelname)s] %(message)s")
@@ -153,7 +153,6 @@ def update_user_produce(user_id):
         ).scalar() or 0
 
         # Award a badge if weekly savings exceed 200
-        logger.debug(f"User ID: {user_id}, Weekly CO₂ Savings: {weekly_savings}")
         if weekly_savings >= 200:
             last_award_date = badge_award_tracker.get(user_id)
             if not last_award_date or last_award_date < week_start:
@@ -162,12 +161,9 @@ def update_user_produce(user_id):
                 user.badge += 1
                 badge_award_tracker[user_id] = today  # Update the last badge award date
 
-                # Send email notification for the badge
-                try:
-                    send_badge_email(user)
-                    logger.info(f"Badge email sent to user {user_id} ({user.email})")
-                except Exception as e:
-                    logger.error(f"Error sending badge email to user {user_id}: {e}")
+                # Send badge email notification
+                send_badge_email(user)
+
 
         db.session.commit()
         return jsonify({
