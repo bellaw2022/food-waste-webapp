@@ -17,7 +17,7 @@ export const useOAuth = () => {
     const [user, setUser] = useState<User | null>(null);
     const [profile, setProfile] = useState<Profile | null>(null);
     const [userId, setUserId] = useState<number | null>(null);
-    const { setGlobalUserId } = useAppContext();
+    const { globalUserId,setGlobalUserId } = useAppContext();
     const queryClient = useQueryClient();
 
     const login = () => {
@@ -40,6 +40,7 @@ export const useOAuth = () => {
             setProfile(mockProfile);
             setUserId(mockProfile.user_id);
             setGlobalUserId(mockProfile.user_id);
+            console.log("user id: ",globalUserId );
 
             localStorage.setItem('user_id', String(mockProfile.user_id));
             window.location.href = "/inventory";

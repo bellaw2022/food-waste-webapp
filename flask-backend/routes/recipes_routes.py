@@ -1,61 +1,25 @@
-from flask import Blueprint, jsonify, request, Flask
+from flask import Blueprint, jsonify, request, Flask, Response
 import requests  
 import os, json
 from routes.user_produce_routes import get_user_inventory
 from routes.produce_routes import fetch_produce_info
 from difflib import get_close_matches
+from models import db, UserAndProduce, Produce
+from dotenv import load_dotenv
+
+from openai import AsyncOpenAI
+import asyncio
+import json
+import os
+load_dotenv()
+
+
+client = AsyncOpenAI(api_key=os.getenv('OPENAI_API_KEY'))
+
+if not client.api_key:
+    raise ValueError("API key is required to run this script, create one at https://platform.openai.com/api-keys")
 
 recipes_routes = Blueprint('recipes_routes', __name__)
-
-'''
-@recipes_routes.route('/api/recipes', methods=['POST'])
-def generate_recipes():
-    ingredients = request.json 
-    result = [{
-        "title": "example recipe",
-        "number": 0,
-        "pictureUrl": "https://github.com/yuqian-cao-19/Cloud_Project3/raw/main/pexels-ella-olsson-572949-1640777.jpg",
-        "ingredients": ["carrots", "onions", "beef", "bread", "lettuce", "pickles"],
-        "instructions": ["Cook beef patty", "sautee onion and carrots", "assemble burger with bread, carrots, onions, beef, lettuce, and pickles"]
-    },
-    {
-        "title": "example recipe 2",
-        "number": 1,
-        "pictureUrl": "https://github.com/yuqian-cao-19/Cloud_Project3/raw/main/pexels-ella-olsson-572949-1640777.jpg",
-        "ingredients": ["carrots", "onions", "beef", "bread", "lettuce", "pickles"],
-        "instructions": ["Cook beef patty", "sautee onion and carrots", "assemble burger with bread, carrots, onions, beef, lettuce, and pickles"]
-    },
-    {
-        "title": "example recipe 3",
-        "number": 2,
-        "pictureUrl": "https://github.com/yuqian-cao-19/Cloud_Project3/raw/main/pexels-ella-olsson-572949-1640777.jpg",
-        "ingredients": ["carrots", "onions", "beef", "bread", "lettuce", "pickles"],
-        "instructions": ["Cook beef patty", "sautee onion and carrots", "assemble burger with bread, carrots, onions, beef, lettuce, and pickles"]
-    },
-    {
-        "title": "example recipe 4",
-        "number": 3,
-        "pictureUrl": "https://github.com/yuqian-cao-19/Cloud_Project3/raw/main/pexels-ella-olsson-572949-1640777.jpg",
-        "ingredients": ["carrots", "onions", "beef", "bread", "lettuce", "pickles"],
-        "instructions": ["Cook beef patty", "sautee onion and carrots", "assemble burger with bread, carrots, onions, beef, lettuce, and pickles"]
-    },
-    {
-        "title": "example recipe 5",
-        "number": 4,
-        "pictureUrl": "https://github.com/yuqian-cao-19/Cloud_Project3/raw/main/pexels-ella-olsson-572949-1640777.jpg",
-        "ingredients": ["carrots", "onions", "beef", "bread", "lettuce", "pickles"],
-        "instructions": ["Cook beef patty", "sautee onion and carrots", "assemble burger with bread, carrots, onions, beef, lettuce, and pickles"]
-    },
-    {
-        "title": "example recipe 6",
-        "number": 4,
-        "pictureUrl": "https://github.com/yuqian-cao-19/Cloud_Project3/raw/main/pexels-ella-olsson-572949-1640777.jpg",
-        "ingredients": ["carrots", "onions", "beef", "bread", "lettuce", "pickles"],
-        "instructions": ["Cook beef patty", "sautee onion and carrots", "assemble burger with bread, carrots, onions, beef, lettuce, and pickles"]
-    }]
-    '''
-    
-    
 
 # minimize ingredients we don't have - no selection just generate recipe
 # maximize ingredients we chose - typical
@@ -1746,20 +1710,68 @@ def update_ingredients_with_inventory(user_id, response_data):
             
             if matched_item:
                 # If a close match is found, move it to usedIngredients
-                matched_ingredients.add(ingredient)
-                recipe["usedIngredients"].append(ingredient)
+                #matched_ingredients.add(ingredient)
+                #recipe["usedIngredients"].append(ingredient)
+                recipe["usedIngredients"].append(matched_item[0])
+                recipe["missedIngredients"].remove(ingredient)
         
         # Filter out matched ingredients from missedIngredients
-        recipe["missedIngredients"] = [
-            ingredient for ingredient in recipe["missedIngredients"]
-            if ingredient not in matched_ingredients
-        ]
+        #recipe["missedIngredients"] = [
+         #   ingredient for ingredient in recipe["missedIngredients"]
+          #  if ingredient not in matched_ingredients
+        #]
+
         
+
+        for ingredient in recipe["usedIngredients"]:
+            matched_item = get_close_matches(ingredient, [item["produce_name"] for item in inventory], n=1, cutoff=0.6)
+
+            if not matched_item:
+               recipe["missedIngredients"].append(ingredient)
+               #recipe["missedIngredientCount"] += 1
+               recipe["usedIngredients"].remove(ingredient)
+               #recipe["usedIngredientCount"] -= 1
+
         recipe["missedIngredientCount"] = len(recipe["missedIngredients"])
         recipe["usedIngredientCount"] = len(recipe["usedIngredients"])
 
     return response_data
     
+@recipes_routes.route('/api/recipe/recalculate', methods=['POST'])
+def recalculate_stat():
+    recipes = request.get_json().get("recipes") 
+    response_data = {
+        "recipes": [
+            {
+                "id": recipe["id"],
+                "title": recipe["title"],
+                "missedIngredientCount": 0,
+                "usedIngredientCount": 0,
+                "image": recipe["image"],
+                "missedIngredients": [
+                    recipe["missedIngredients"][i]
+                    #{"name": ingredient["name"]
+                     #, "unit": ingredient["unit"], "amount": ingredient["amount"]
+                     #}
+                    for i in range(len(recipe["missedIngredients"]))
+                ],
+                "usedIngredients": [
+                    recipe["usedIngredients"][i]
+                    #{"name": ingredient["name"]
+                     #, "unit": ingredient["unit"], "amount": ingredient["amount"]
+                    # }
+                    for i in range(len(recipe["usedIngredients"]))
+                ]
+            }
+            for recipe in recipes
+        ]
+        }
+    user_id = request.get_json().get("user_id")
+    response_data = update_ingredients_with_inventory(user_id, response_data)
+    print("recalculated with inventory: ", response_data)
+    return jsonify(response_data)
+
+
 @recipes_routes.route('/api/recipe/recipe_by_id', methods=['GET'])
 def get_recipe_info():
     #id = request.get_json().get("id") 
@@ -2179,9 +2191,17 @@ def get_recipe_info():
     
 
 # NEED TO IMPLEMENT CONNECTION WITH AI ENDPOINT
-@recipes_routes.route('/api/recipe/ai', methods = ['GET'])
-def get_ai_recipe_info():
-    user_id = request.args.get("id")
+@recipes_routes.route('/api/recipe/ai', methods = ['POST'])
+async def get_ai_recipe_info():
+    
+    data = request.get_json()
+    user_id = data.get('user_id')
+    user_ingredients = data.get('ingredients', [])
+    user_preferences = data.get('preferences', {})
+
+    data = await generate_ai_recipe(user_id, user_ingredients, user_preferences)
+
+    '''
     data = {
     "recipe": "Spicy Tomato and Potato Stir-Fry",
     "ingredients": [
@@ -2236,7 +2256,7 @@ def get_ai_recipe_info():
     ]
 
     }
-
+    '''
     response_data = {
         "recipes": [
             {
@@ -2271,8 +2291,6 @@ def get_ai_recipe_info():
     }
     '''
     print("response data")
-    print(response_data)
-    print("\n\n")
 
     fetched_data = update_ingredients_with_inventory(user_id, response_data)["recipes"][0]
 
@@ -2291,18 +2309,31 @@ def get_ingredient_units():
     
     # Extract 'ingredients' array from the JSON payload
     ingredients = data.get("ingredients", [])
+    user_id = data.get("user_id")
     
     try:
         produce_data = fetch_produce_info(ingredients)
+        inventory_data = json.loads(get_user_inventory(user_id).data.decode("utf-8"))
+        user_inventory = inventory_data.get("data", [])
 
         result = []
         for key, values in produce_data.items():
             item = {
                 "name" : key,
                 "amount" : 1,
-                "unit": values.get("unit", "")
+                "unit": values.get("unit", ""),
+                "maxAmount" : 0,
+                "userproduce_id" : 0
             }
+            for inventory_item in user_inventory:
+                if inventory_item.get("produce_name", "").lower() == key.lower():
+                    item["maxAmount"] = inventory_item.get("quantity", 0)
+                    item["userproduce_id"] = inventory_item.get("userproduce_id", 0)
+
             result.append(item)
+        
+        print("ingredient amount and unit: ")
+        print(result)
        
         return jsonify(result)
 
@@ -2311,3 +2342,138 @@ def get_ingredient_units():
         return None
 
     
+
+def response_to_json(data):
+    try:
+        data = data.split('```json')[-1].split('```')[0]
+        data = json.loads(data)
+        return data
+    except Exception:
+        return None
+
+
+async def query(prompt, max_retries=3):
+    """summary_
+    Query the OpenAI API to generate a recipe based on the user's preferences
+    and ingredients.
+    Args:
+        prompt (str): The prompt to send to the OpenAI API
+        max_retries (int): The maximum number of retries to attempt
+    Returns:
+        str: The generated recipe
+    Raises:
+        Exception: If the API request fails
+    """
+    for i in range(max_retries):
+        try:
+            response = await client.chat.completions.create(
+                model='gpt-4o',
+                messages=[
+                    {
+                        "role": "user",
+                        "content": prompt
+                    }
+                ],
+                timeout=60
+            )
+            content = response.choices[0].message.content
+            content = response_to_json(content)
+            if content:
+                return content
+            await asyncio.sleep(2**i * 0.1)
+        except Exception as e:
+            print(e)
+            await asyncio.sleep(2**i * 0.1)
+    return {"error": "Failed to generate recipe"}
+
+
+#@recipe_routes.route('/api/generate-recipe/<int:user_id>', methods=['POST'])
+async def generate_ai_recipe(user_id, user_ingredients, user_preferences):
+    """summary_
+    Generate a recipe based on user selected ingredients.
+    If no ingredients are selected, generate recipe based on user preferences
+    and user inventory.
+    Args:
+        user_id (int): The id of the user
+        ingredients (list): A list of ingredients selected by the user
+        preferences (dict): A dictionary of user preferences
+    Returns:
+        Response: A response object with the generated recipe
+    """
+
+    if request.content_type != 'application/json':
+        return jsonify({"error": "Unsupported Media Type"}), 415
+
+    #data = request.get_json()
+    #user_id = data.get('user_id')
+    #user_ingredients = data.get('ingredients', [])
+    #user_preferences = data.get('preferences', {})
+
+    inventory_data = json.loads(get_user_inventory(user_id).data.decode("utf-8"))
+    user_inventory = inventory_data.get("data", [])
+
+    # Gather data
+    inventory = UserAndProduce.query.filter_by(user_id=user_id).all()
+    if not inventory:
+        return jsonify({"error": "User has no ingredients"}), 404
+    '''
+    if len(user_ingredients) == 0:
+        # Get list of all Produce from user inventory
+        produce = [Produce.query.get(produce.produce_id) for produce in inventory]
+        counts = [produce.quantity for produce in inventory]
+    else:
+        # Get list of Produce based on ingredient_ids
+        produce = [Produce.query.get(produce_id) for produce_id in ingredient_ids]
+        counts = [inventory.quantity for inventory in inventory if inventory.produce_id in ingredient_ids]
+    produce_name = [produce.produce_name for produce in produce]
+    units = [produce.unit for produce in produce]
+    '''
+    # ingredients = list(zip(produce_name, counts, units))
+    ingredients = ""
+
+    if(len(user_ingredients) == 0):
+        for item in user_inventory:
+            ingredients += f'{item.get("produce_name", "")}: {item.get("quantity", 0)} {item.get("unit", "")}\n'
+    else:
+        for ingredient in user_ingredients:
+            for item in user_inventory:
+                if item.get("produce_name", "").lower() == ingredient.lower():
+                    ingredients += f'{item.get("produce_name", "")}: {item.get("quantity", 0)} {item.get("unit", "")}\n'
+        
+
+    #for i in range(len(produce)):
+        #ingredients += f'{produce_name[i]}: {counts[i]} {units[i]}\n'
+
+    # Generate recipe based on user preferences and ingredients
+    recipe_prompt = """
+        User preferences: {user_preferences}
+        User ingredients: {ingredients}
+        Please create a recipe based on the user preferences and ingredients.
+        Please ensure that the recipe is safe for the user to consume.
+        Format your response as a json object as such:
+        {{
+            "recipe": "<Recipe name>",
+            "ingredients": [
+                ["Ingredient 1", "<quantity>", "<unit>"],
+                ["Ingredient 2", "<quantity>", "<unit>"]
+            ],
+            "instructions": ["Step 1", "Step 2", ...],
+        }}
+        IF the recipe is unsafe for the user to consume format your response as such:
+        {{
+            "error": "Recipe is unsafe for user because ..."
+        }}
+        If you are unable to generate a recipe, please provide a reason, otherwise don't add the reason key.
+        Ensure that the recipe is safe for the user to consume.
+        Unless the ingredient unit is specified above, use traditional units of measurement.
+        Uumber the steps in order such as Step 1. Chop vegetables.
+        Don't use more of an ingredient than the user has in their inventory.
+    """.format(user_preferences=user_preferences, ingredients=ingredients)
+
+    
+
+    data = await query(recipe_prompt)
+    print("response from gpt: ")
+    print(data)
+    return data
+    #return Response(json.dumps(data), mimetype='application/json')

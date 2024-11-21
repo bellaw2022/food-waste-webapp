@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import BackButton from "../shared/back-button";
-
+import { IoIosRefresh } from "react-icons/io";
 import "./recipe.css";
 
 interface Recipe {
@@ -17,6 +17,7 @@ interface Props {
   setBasePage: React.Dispatch<React.SetStateAction<boolean>>;
   setListPage: React.Dispatch<React.SetStateAction<boolean>>;
   setRecipePage: React.Dispatch<React.SetStateAction<boolean>>;
+  setRecalculate: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 interface RecipeList {
@@ -32,17 +33,31 @@ const RecipeList: React.FC<CombinedProps> = ({
   setBasePage,
   setListPage,
   setRecipePage,
+  setRecalculate,
 }) => {
+  const sortedRecipes = recipes.sort(
+    (a, b) => a.missedIngredientCount - b.missedIngredientCount
+  );
   return (
     <>
-      <BackButton
-        setToFalsePage={[setListPage, setRecipePage]}
-        setToTruePage={[setBasePage]}
-        setToBasePage={setBasePage}
-        backToBase={false}
-      ></BackButton>
+      <div className="recipe-list-up">
+        <BackButton
+          setToFalsePage={[setListPage, setRecipePage]}
+          setToTruePage={[setBasePage]}
+          setToBasePage={setBasePage}
+          backToBase={false}
+        ></BackButton>
+        <button
+          className="refresh"
+          onClick={() => {
+            setRecalculate(true);
+          }}
+        >
+          <IoIosRefresh size={24} />
+        </button>
+      </div>
       <div className="recipes-list">
-        {recipes.map((recipe, index) => (
+        {sortedRecipes.map((recipe, index) => (
           <div
             key={index}
             className="recipes-card"

@@ -6,9 +6,9 @@ import { FaCircleMinus } from "react-icons/fa6";
 import defaultImage from "../../Food.png";
 import RemoveInventory from "./removeInventory";
 import axios from "axios";
-import { API_URL } from "@/api/constants";
+import { useAppContext } from "../../AppContext";
 
-const baseURL = API_URL;
+let baseURL = import.meta.env.VITE_API_URL;
 
 interface CompleteRecipe {
   id: number;
@@ -41,16 +41,25 @@ const Recipe: React.FC<CombinedProps> = ({
   isAI,
 }) => {
   console.log("recipe: ", recipe);
+  //const { globalUserId, setGlobalUserId } = useAppContext();
+  const userIdString = localStorage.getItem("user_id");
+  if (!userIdString)
+    throw new Error("Could not fetch user_id from local_storage");
+  const globalUserId = parseInt(userIdString);
+  //const globalUserId = 38;
   const [servings, setServings] = useState<number>(recipe.servings);
   const [scaledIngredients, setScaledIngredients] = useState(
     recipe.ingredients
   );
   const [showPopup, setShowPopup] = useState<boolean>(false);
+  const [inventoryUpdated, setInventoryUpdated] = useState<boolean>(false);
   const [removeableIngredients, setRemoveableIngredients] = useState<
     {
       name: string;
-      amount: number;
+      amount: string;
       unit: string;
+      maxAmount: number;
+      userproduce_id: number;
     }[]
   >([]);
   function parseAmount(amount: string): number | string {
@@ -67,12 +76,13 @@ const Recipe: React.FC<CombinedProps> = ({
   const fetchInitialIngredients = async () => {
     console.log("fetching ingredient units ", recipe.usedIngredients);
     try {
-      const response = await axios.post(baseURL + "/recipe/ingredients", {
+      const response = await axios.post(baseURL + "/api/recipe/ingredients", {
         ingredients: recipe.usedIngredients,
+        user_id: globalUserId,
       });
 
       const data = await response.data;
-      console.log("initial ingredients: ", data);
+
       setRemoveableIngredients(data);
     } catch (error) {
       console.error("Error fetching ingredients:", error);
@@ -97,7 +107,7 @@ const Recipe: React.FC<CombinedProps> = ({
         ...ingredient,
         amount:
           typeof parsedAmount === "number"
-            ? (parsedAmount * multiplier).toString()
+            ? (parsedAmount * multiplier).toFixed(2).toString()
             : parsedAmount.toString(),
       };
     });
@@ -108,7 +118,8 @@ const Recipe: React.FC<CombinedProps> = ({
     fetchInitialIngredients();
     setServings(recipe.servings);
     setScaledIngredients(getScaledIngredients(recipe.servings));
-  }, [recipe]);
+    setShowPopup(false);
+  }, [recipe, inventoryUpdated]);
 
   const handleServingIncrease = () => {
     setServings((prevServings) => {
@@ -155,7 +166,10 @@ const Recipe: React.FC<CombinedProps> = ({
         </button>
       </div>
       {showPopup && (
-        <RemoveInventory ingredients={removeableIngredients}></RemoveInventory>
+        <RemoveInventory
+          ingredients={removeableIngredients}
+          setInventoryUpdated={setInventoryUpdated}
+        ></RemoveInventory>
       )}
       <div className="recipe">
         <div className="recipe-text">

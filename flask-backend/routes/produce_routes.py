@@ -30,7 +30,7 @@ def fetch_produce_info(produces):
             continue
         produce = Produce.query.filter(func.lower(Produce.produce_name)==produce_name.lower()).first()
         if produce:
-            result[produce_name] = {
+            result[produce.produce_name] = {
                 "product_id": produce.produce_id,
                 "common_expdate": produce.common_expdate,
                 "unit": produce.unit
@@ -39,7 +39,7 @@ def fetch_produce_info(produces):
         else: 
             produce = Produce.query.filter_by(produce_name=produce_name[0:-1]).first()
             if produce:
-                result[produce_name] = {
+                result[produce.produce_name] = {
                     "product_id": produce.produce_id,
                     "common_expdate": produce.common_expdate,
                     "unit": produce.unit
@@ -47,7 +47,7 @@ def fetch_produce_info(produces):
             else:
                 produce = Produce.query.filter_by(produce_name=produce_name[0:-2]).first()
                 if produce:
-                    result[produce_name] = {
+                    result[produce.produce_name] = {
                         "product_id": produce.produce_id,
                         "common_expdate": produce.common_expdate,
                         "unit": produce.unit

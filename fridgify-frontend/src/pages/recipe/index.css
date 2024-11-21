@@ -13,8 +13,13 @@
 }
 .recipe-buttons {
   position: absolute;
-  right: 30px;
-  bottom: 50px;
+  right: 5vw;
+  bottom: 5vh;
+}
+
+.recipe-page-body {
+  height: 70vh;
+  overflow-y: scroll;
 }
 
 .option-buttons {

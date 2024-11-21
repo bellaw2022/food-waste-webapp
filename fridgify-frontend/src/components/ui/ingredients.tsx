@@ -4,6 +4,7 @@ import "./ingredients.css";
 interface Pairs {
   name: string;
   days: number;
+  shelfPercentage: number;
 }
 
 interface IngredientsProps {
@@ -37,11 +38,13 @@ const Ingredients: React.FC<IngredientsProps> = ({
     ingredient.name.toLowerCase().startsWith(searchQuery.toLowerCase())
   );
 
-  const sortedIngredients = filteredIngredients.sort((a, b) => a.days - b.days);
+  const sortedIngredients = filteredIngredients.sort(
+    (a, b) => a.shelfPercentage - b.shelfPercentage
+  );
 
-  const getDotColor = (days: number): string => {
-    if (days <= 2) return "red";
-    if (days >= 3 && days <= 5) return "yellow";
+  const getDotColor = (shelfPercentage: number): string => {
+    if (shelfPercentage <= 0.25) return "red";
+    if (shelfPercentage <= 0.5) return "yellow";
     return "green";
   };
 
@@ -70,7 +73,7 @@ const Ingredients: React.FC<IngredientsProps> = ({
               <span
                 className="dot"
                 style={{
-                  backgroundColor: getDotColor(ingredient.days),
+                  backgroundColor: getDotColor(ingredient.shelfPercentage),
                   borderRadius: "50%",
                   width: "8px",
                   height: "8px",
