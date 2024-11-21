@@ -7,6 +7,17 @@
   padding-top: 0px;
 }
 
+.recipe-list-up {
+  display: flex;
+  justify-content: space-between; /* Push items to opposite ends */
+  align-items: center; /* Align items vertically */
+  padding: 0 16px; /* Optional: Add padding for spacing */
+}
+
+.refresh {
+  cursor: pointer;
+}
+
 .recipes-card {
   background-color: #ededed;
   border: 1px solid #adadad;

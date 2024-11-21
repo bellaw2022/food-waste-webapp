@@ -4,10 +4,12 @@ import "./index.css";
 import NoRecipesModal from "@/components/ui/noRecipesModal";
 import RecipeList from "../../components/ui/recipeList";
 import Recipe from "../../components/ui/recipe";
+import { Route, Routes, useNavigate } from "react-router-dom";
+import { SERVFAIL } from "dns";
 import axios from "axios";
-import { API_URL } from "@/api/constants";
+import { useAppContext } from "../../AppContext";
 
-const baseURL = API_URL;
+let baseURL = import.meta.env.VITE_API_URL;
 
 interface BackendIngredient {
   userproduce_id: number;
@@ -23,6 +25,7 @@ interface BackendData {
 interface Ingredient {
   name: string;
   days: number;
+  shelfPercentage: number;
 }
 
 interface Recipe {
@@ -51,8 +54,12 @@ interface CompleteRecipe {
 
 export const RecipePage: React.FC = () => {
   //const { globalUserId, setGlobalUserId } = useAppContext();
-  const globalUserId = 38;
-  console.log("userid: ", globalUserId);
+  //const globalUserId = 38;
+  //console.log("userid: ", globalUserId);
+  const userIdString = localStorage.getItem("user_id");
+  if (!userIdString)
+    throw new Error("Could not fetch user_id from local_storage");
+  const globalUserId = parseInt(userIdString);
   /*
   const ingredients = [
     { name: "Tomato", days: 2 },
@@ -101,6 +108,7 @@ export const RecipePage: React.FC = () => {
   const [searchOption, setSearchOption] = useState<number>(1);
 
   const [isAI, setIsAI] = useState<boolean>(false);
+  const [recalculate, setRecalculate] = useState<boolean>(false);
 
   const handleNoRecipe = () => {
     setShowNoRecipesModal(false);
@@ -119,6 +127,33 @@ export const RecipePage: React.FC = () => {
     setSelectedIngredients(selectedIngredients);
   };
 
+  const recalculateStat = async () => {
+    try {
+      const response = await axios.post(baseURL + "/api/recipe/recalculate", {
+        recipes: recipes,
+        user_id: globalUserId,
+      });
+
+      const data = await response.data;
+
+      const fetchedRecipes: Recipe[] = data.recipes.map((recipe: any) => ({
+        id: recipe.id,
+        title: recipe.title,
+        missedIngredientCount: recipe.missedIngredientCount,
+        usedIngredientCount: recipe.usedIngredientCount,
+        image: recipe.image,
+        missedIngredients: recipe.missedIngredients, // If missedIngredients is a string array
+        usedIngredients: recipe.usedIngredients, // If usedIngredients is a string array
+      }));
+
+      console.log("recalculated stat: ", fetchedRecipes);
+      setRecipes(fetchedRecipes);
+      setRecalculate(false);
+    } catch (error) {
+      console.error("Error: ", error);
+    }
+  };
+
   const handleRecipeSelection = async (selectedRecipe: Recipe) => {
     console.log("Selected recipe: " + selectedRecipe.title);
     setSelectedRecipe(selectedRecipe);
@@ -127,7 +162,7 @@ export const RecipePage: React.FC = () => {
       /*
         title, image, servings, cookingMinutes, prepMinutes, ingredients, sourceURL
         */
-      const response = await axios.get(baseURL + "/recipe/recipe_by_id", {
+      const response = await axios.get(baseURL + "/api/recipe/recipe_by_id", {
         params: { id: selectedRecipe.id.toString() },
       });
 
@@ -175,24 +210,31 @@ export const RecipePage: React.FC = () => {
       setIsAI(false);
       console.log("zero everything");
     }
-  }, [basePage]);
+    if (listPage) recalculateStat();
+  }, [basePage, recalculate]);
 
   const retrieveIngredients = async () => {
     try {
       const response = await axios.get<BackendData>(
-        baseURL + "/user/" + globalUserId + "/produce"
+        baseURL + "/api/user/" + globalUserId + "/produce"
       );
       const responseData = await response.data;
       console.log(responseData);
       const fetchedIngredients: Ingredient[] = responseData.data.map((item) => {
         const expirationDate = new Date(item.expiration_date);
+        const purchaseDate = new Date(item.purchase_date);
         const today = new Date();
         const daysUntilExpiration = Math.ceil(
           (expirationDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)
         );
+        const expirationRatio =
+          (today.getTime() - purchaseDate.getTime()) /
+          (expirationDate.getTime() - purchaseDate.getTime());
+
         return {
           name: item.produce_name,
           days: daysUntilExpiration,
+          shelfPercentage: expirationRatio,
         };
       });
       setIngredients(fetchedIngredients);
@@ -205,7 +247,7 @@ export const RecipePage: React.FC = () => {
     setLoading(true);
     try {
       const response = await axios.post(
-        baseURL + "/recipe/recipes_by_ingredients",
+        baseURL + "/api/recipe/recipes_by_ingredients",
         {
           ingredients: selectedIngredients,
           userId: globalUserId,
@@ -242,9 +284,16 @@ export const RecipePage: React.FC = () => {
   };
 
   const searchAIRecipe = async () => {
+    setLoading(true);
     try {
-      const response = await axios.get(baseURL + "/recipe/ai", {
-        params: { ingredients: selectedIngredients, id: 38 },
+      let preference =
+        searchOption == 1
+          ? "Maximize used ingredients"
+          : "Minimize ingredients user don't have";
+      const response = await axios.post(baseURL + "/api/recipe/ai", {
+        ingredients: selectedIngredients,
+        user_id: globalUserId,
+        preferences: preference,
       });
 
       const data = await response.data;
@@ -254,6 +303,7 @@ export const RecipePage: React.FC = () => {
     } catch (error) {
       console.error("Error: ", error);
     } finally {
+      setLoading(false);
       setRecipePage(true);
       setBasePage(false);
       setListPage(false);
@@ -266,29 +316,31 @@ export const RecipePage: React.FC = () => {
       <h1 className="text-3xl font-bold">Recipe Rec</h1>
       {basePage && (
         <>
-          <Ingredients
-            ingredients={ingredients}
-            onSelectionChange={handleSelectionChange}
-          ></Ingredients>
-          <div className="option">
-            <h2 className="option-text">Option</h2>
-            <div className="option-buttons">
-              <button
-                className={`option-button ${
-                  searchOption === 1 ? "selected" : ""
-                }`}
-                onClick={() => handleSearchOptionChange(1)}
-              >
-                Maximize existing ingredients usage
-              </button>
-              <button
-                className={`option-button ${
-                  searchOption !== 1 ? "selected" : ""
-                }`}
-                onClick={() => handleSearchOptionChange(2)}
-              >
-                Minimize missing ingredients usage
-              </button>
+          <div className="recipe-page-body">
+            <Ingredients
+              ingredients={ingredients}
+              onSelectionChange={handleSelectionChange}
+            ></Ingredients>
+            <div className="option">
+              <h2 className="option-text">Option</h2>
+              <div className="option-buttons">
+                <button
+                  className={`option-button ${
+                    searchOption === 1 ? "selected" : ""
+                  }`}
+                  onClick={() => handleSearchOptionChange(1)}
+                >
+                  Maximize existing ingredients usage
+                </button>
+                <button
+                  className={`option-button ${
+                    searchOption !== 1 ? "selected" : ""
+                  }`}
+                  onClick={() => handleSearchOptionChange(2)}
+                >
+                  Minimize missing ingredients usage
+                </button>
+              </div>
             </div>
           </div>
           <div className="recipe-buttons">
@@ -318,6 +370,7 @@ export const RecipePage: React.FC = () => {
             setBasePage={setBasePage}
             setListPage={setListPage}
             setRecipePage={setRecipePage}
+            setRecalculate={setRecalculate}
           ></RecipeList>
         ) : (
           showNoRecipesModal && (
