@@ -280,16 +280,16 @@ export const RecipePage: React.FC = () => {
   };
 
   const searchAIRecipe = async () => {
+    setLoading(true);
     try {
-      const response = await axios.get(baseURL + "/api/recipe/ai", {
-        params: {
-          ingredients: selectedIngredients,
-          user_id: 38,
-          preferences:
-            searchOption == 1
-              ? "Maximize used ingredients"
-              : "Minimize ingredients user don't have",
-        },
+      let preference =
+        searchOption == 1
+          ? "Maximize used ingredients"
+          : "Minimize ingredients user don't have";
+      const response = await axios.post(baseURL + "/api/recipe/ai", {
+        ingredients: selectedIngredients,
+        user_id: globalUserId,
+        preferences: preference,
       });
 
       const data = await response.data;
@@ -299,6 +299,7 @@ export const RecipePage: React.FC = () => {
     } catch (error) {
       console.error("Error: ", error);
     } finally {
+      setLoading(false);
       setRecipePage(true);
       setBasePage(false);
       setListPage(false);
