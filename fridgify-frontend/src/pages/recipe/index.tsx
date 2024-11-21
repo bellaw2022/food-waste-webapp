@@ -52,7 +52,6 @@ interface CompleteRecipe {
 
 export const RecipePage: React.FC = () => {
   const { globalUserId } = useAppContext();
-  console.log("userid: ", userId);
 
   const [ingredients, setIngredients] = useState<Ingredient[]>([]);
 
