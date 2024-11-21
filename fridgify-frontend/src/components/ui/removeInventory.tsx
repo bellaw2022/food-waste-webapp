@@ -3,7 +3,17 @@ import "./removeInventory.css";
 import { SlClose } from "react-icons/sl";
 import axios from "axios";
 import { useAppContext } from "../../AppContext";
+
+import { API_URL } from "@/api/constants";
+
 let baseURL = import.meta.env.VITE_API_URL;
+const axiosClient = axios.create({
+  baseURL: API_URL,
+  headers: {
+    "ngrok-skip-browser-warning": "69420",
+    "Content-Type": "application/json",
+  },
+});
 
 interface Ingredient {
   name: string;
@@ -122,8 +132,8 @@ const IngredientList: React.FC<Ingredients> = ({
     }, {} as Record<number, number>); // Backend expects a { userproduce_id: amount } object
 
     try {
-      const response = await axios.put(
-        baseURL + "/api/user/" + globalUserId + "/produce",
+      const response = await axiosClient.put(
+        "/user/" + globalUserId + "/produce",
         data
       );
 
