@@ -1,10 +1,17 @@
 from flask import Blueprint, jsonify, request
 from datetime import datetime, timedelta
 from sqlalchemy import text
-from models import db, UserAndProduce, Produce, UserWasteSaving
+from models import db, User, UserAndProduce, Produce, UserWasteSaving
+from send_email import send_badge_email  # Import the email function
+import logging
+
+logging.basicConfig(level=logging.DEBUG, format="%(asctime)s [%(levelname)s] %(message)s")
+logger = logging.getLogger(__name__)
 
 user_produce_routes = Blueprint('user_produce_routes', __name__)
 
+# Global dictionary to track last badge award date for each user
+badge_award_tracker = {}
 
 @user_produce_routes.route('/api/user/<int:user_id>/produce', methods=['GET'])
 def get_user_inventory(user_id):
@@ -90,6 +97,7 @@ def update_user_produce(user_id):
 
         data = request.get_json()
         today = datetime.now().date()
+        week_start = today - timedelta(days=today.weekday()) # Get the start of the week (Monday)
         total_co2_saved = 0
 
         # Process each produce update
@@ -137,6 +145,29 @@ def update_user_produce(user_id):
                 co2_saved=total_co2_saved
             )
             db.session.add(new_waste_saving)
+
+        # Calculate the weekly CO2 savings
+        weekly_savings = db.session.query(db.func.sum(UserWasteSaving.co2_saved)).filter(
+            UserWasteSaving.user_id == user_id,
+            UserWasteSaving.date >= week_start
+        ).scalar() or 0
+
+        # Award a badge if weekly savings exceed 200
+        logger.debug(f"User ID: {user_id}, Weekly CO₂ Savings: {weekly_savings}")
+        if weekly_savings >= 200:
+            last_award_date = badge_award_tracker.get(user_id)
+            if not last_award_date or last_award_date < week_start:
+                logger.debug(f"Incrementing badge for user {user_id}")
+                user = User.query.get(user_id)
+                user.badge += 1
+                badge_award_tracker[user_id] = today  # Update the last badge award date
+
+                # Send email notification for the badge
+                try:
+                    send_badge_email(user)
+                    logger.info(f"Badge email sent to user {user_id} ({user.email})")
+                except Exception as e:
+                    logger.error(f"Error sending badge email to user {user_id}: {e}")
 
         db.session.commit()
         return jsonify({

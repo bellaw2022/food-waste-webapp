@@ -147,6 +147,95 @@ def generate_email_content(items, user):
     return body, html
 
 
+def generate_badge_email_content(user):
+    """Generate email content for badge achievement."""
+    user_name = user.username.split()[0] if user.username else "there"
+
+    body = f"""
+    Congratulations, {user_name}!
+    You’ve earned a new badge for your environmental achievements. Keep up the amazing work!
+    """
+
+    html = f"""
+    <html>
+    <head>
+        <style>
+        table {{
+            border-collapse: collapse;
+            width: 100%;
+        }}
+        th, td {{
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }}
+        th {{
+            background-color: #f2f2f2;
+        }}
+        tr:hover {{
+            background-color: #f9f9f9;
+        }}
+        h2 {{
+            color: #333;
+        }}
+        p {{
+            font-size: 14px;
+            color: #555;
+        }}
+        .badge {{
+            text-align: left;
+            margin: 20px 0;
+        }}
+        </style>
+    </head>
+    <body>
+        <div class="badge">
+            <img src="cid:badge" alt="Environmental Badge" width="200" height="200" />
+        </div>
+        <h2>Congratulations, {user_name}!</h2>
+        <p>You’ve earned a new badge for your environmental achievements!</p>
+        <p>Keep up the amazing work and continue making a difference for our planet!</p>
+    </body>
+    </html>
+    """
+    return body, html
+
+
+def send_badge_email(user):
+    """Send email for badge achievement."""
+    smtp_server = "smtp.gmail.com"
+    smtp_port = 587
+    username = "bellawutamu@gmail.com"
+    password = "cpvk xxrg bert iwjq"
+
+    sender = EmailSender(smtp_server, smtp_port, username, password)
+
+    # Generate badge email content
+    body, html = generate_badge_email_content(user)
+
+    # Create message with inline image for the badge
+    msg = sender.create_message(
+        subject="Congratulations on Your New Environmental Badge!",
+        from_addr=username,
+        to_addr=user.email,
+        body=body,
+        html=html,
+    )
+
+    # Add badge image inline
+    with open("badge.png", "rb") as badge_file:
+        msg_image = MIMEText(badge_file.read(), "base64", "utf-8")
+        msg_image.add_header("Content-ID", "<badge>")
+        msg_image.add_header("Content-Disposition", "inline", filename="badge.png")
+        msg.attach(msg_image)
+
+    # Send the email
+    try:
+        sender.send(msg)
+        print(f"Badge email sent successfully to {user.email}")
+    except Exception as e:
+        print(f"Error sending badge email to {user.email}: {e}")
+
 def send_expiry_notifications():
     # Database session
     db = SessionLocal()

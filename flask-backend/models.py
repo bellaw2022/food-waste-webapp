@@ -8,6 +8,7 @@ class User(db.Model):
     user_id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(50), unique=True, nullable=False)
     email = db.Column(db.String(100), unique=True, nullable=False)
+    badge = db.Column(db.Integer, nullable=False, default=0)
     
     produce = db.relationship('UserAndProduce', backref='user', lazy=True)
     waste_savings = db.relationship('UserWasteSaving', backref='user', lazy=True)
