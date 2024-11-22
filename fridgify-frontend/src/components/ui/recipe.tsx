@@ -7,8 +7,16 @@ import defaultImage from "../../Food.png";
 import RemoveInventory from "./removeInventory";
 import axios from "axios";
 import { useAppContext } from "../../AppContext";
+import { API_URL } from "@/api/constants";
 
 let baseURL = import.meta.env.VITE_API_URL;
+const axiosClient = axios.create({
+  baseURL: API_URL,
+  headers: {
+    "ngrok-skip-browser-warning": "69420",
+    "Content-Type": "application/json",
+  },
+});
 
 interface CompleteRecipe {
   id: number;
@@ -76,7 +84,7 @@ const Recipe: React.FC<CombinedProps> = ({
   const fetchInitialIngredients = async () => {
     console.log("fetching ingredient units ", recipe.usedIngredients);
     try {
-      const response = await axios.post(baseURL + "/api/recipe/ingredients", {
+      const response = await axiosClient.post("/recipe/ingredients", {
         ingredients: recipe.usedIngredients,
         user_id: globalUserId,
       });
