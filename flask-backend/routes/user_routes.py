@@ -17,24 +17,12 @@ def get_all_users():
     ]
     return jsonify(result)
 
-@user_routes.route('/api/users/<int:user_id>', methods=['GET'])
-def get_user_by_id(user_id):
-    user = User.query.get(user_id)
-    if not user:
-        return jsonify({"status": 404, "error": "User not found"}), 404
-
-    result = {
-        "user_id": user.user_id,
-        "username": user.username,
-        "email": user.email,
-        "badge": user.badge  # Include badge count
-    }
-    return jsonify(result)
-
 @user_routes.route('/api/auth/login', methods=['POST'])
 def user_login():
     try:
+        print("Received request for /api/auth/login") 
         data = request.json
+        print(f"Request JSON data: {data}")
         access_token = data.get('access_token')
 
         if not access_token:
@@ -57,13 +45,14 @@ def user_login():
             }), 401
 
         user_info = response.json()
-        print(user_info)
+        print(user_info)   
         email = user_info.get('email')
         name = user_info.get('name')
-
+        profile_pic_url = user_info.get('picture')  
+        
         user = User.query.filter_by(email=email).first()
         if not user:
-            user = User(email=email, username=name)
+            user = User(email=email, username=name)  
             db.session.add(user)
             db.session.commit()
 
@@ -71,7 +60,11 @@ def user_login():
             'success': True,
             'user_id': user.user_id,
             'email': user.email,
-            'profile': user_info
+            'profile': {
+                'name': user.username,
+                'email': user.email,
+                'profile_pic_url': profile_pic_url 
+            }
         }), 200
 
     except Exception as e:
@@ -80,3 +73,4 @@ def user_login():
             'success': False,
             'error': 'Internal server error'
         }), 500
+

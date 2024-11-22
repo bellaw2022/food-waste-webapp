@@ -38,6 +38,7 @@ export const useOAuth = () => {
                         },
                     }
                 );
+                console.log('Google Profile Data:', googleProfileRes.data);
 
                 const backendLoginRes = await axios.post(
                     'http://localhost:10000/api/auth/login',
@@ -45,6 +46,7 @@ export const useOAuth = () => {
                         access_token: user.access_token
                     }
                 );
+                console.log('Backend Login Response:', backendLoginRes.data);
 
                 if (backendLoginRes.data.success) {
                     const combinedProfile = {
@@ -58,7 +60,10 @@ export const useOAuth = () => {
                     setGlobalUserId(backendLoginRes.data.user_id);
 
                     localStorage.setItem('user_id', String(backendLoginRes.data.user_id));
-                    window.location.href = "/inventory";  
+                    console.log("User ID saved to localStorage:", backendLoginRes.data.user_id);
+
+                    console.log('Global User ID:', backendLoginRes.data.user_id);
+                    console.log('Is Logged In:', !!backendLoginRes.data.user_id); 
                 } else {
                     console.error('Backend login failed:', backendLoginRes.data.error);
                 }

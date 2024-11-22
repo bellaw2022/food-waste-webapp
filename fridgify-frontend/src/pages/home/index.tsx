@@ -1,8 +1,15 @@
-import { Profile } from "@/hooks";
+import { useProfile } from "@/context/ProfileContext";
 
 export const HomePage = ({ profile, login, logOut }: 
     {profile: Profile | null, login: () => void, logOut: () => void }
 ) => {
+    const { setProfile } = useProfile(); 
+
+    
+    if (profile) {
+        setProfile(profile);
+    }
+
     return (
         <div className="mx-4">
             <h1 className="text-3xl font-bold">Home</h1>
