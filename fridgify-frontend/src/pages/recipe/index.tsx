@@ -8,8 +8,16 @@ import { Route, Routes, useNavigate } from "react-router-dom";
 import { SERVFAIL } from "dns";
 import axios from "axios";
 import { useAppContext } from "../../AppContext";
+import { API_URL } from "@/api/constants";
 
 let baseURL = import.meta.env.VITE_API_URL;
+const axiosClient = axios.create({
+  baseURL: API_URL,
+  headers: {
+    "ngrok-skip-browser-warning": "69420",
+    "Content-Type": "application/json",
+  },
+});
 
 interface BackendIngredient {
   userproduce_id: number;
@@ -129,7 +137,7 @@ export const RecipePage: React.FC = () => {
 
   const recalculateStat = async () => {
     try {
-      const response = await axios.post(baseURL + "/api/recipe/recalculate", {
+      const response = await axiosClient.post("/recipe/recalculate", {
         recipes: recipes,
         user_id: globalUserId,
       });
@@ -162,7 +170,7 @@ export const RecipePage: React.FC = () => {
       /*
         title, image, servings, cookingMinutes, prepMinutes, ingredients, sourceURL
         */
-      const response = await axios.get(baseURL + "/api/recipe/recipe_by_id", {
+      const response = await axiosClient.get("/recipe/recipe_by_id", {
         params: { id: selectedRecipe.id.toString() },
       });
 
@@ -215,8 +223,8 @@ export const RecipePage: React.FC = () => {
 
   const retrieveIngredients = async () => {
     try {
-      const response = await axios.get<BackendData>(
-        baseURL + "/api/user/" + globalUserId + "/produce"
+      const response = await axiosClient.get<BackendData>(
+        "/user/" + globalUserId + "/produce"
       );
       const responseData = await response.data;
       console.log(responseData);
@@ -246,8 +254,8 @@ export const RecipePage: React.FC = () => {
   const searchRecipes = async () => {
     setLoading(true);
     try {
-      const response = await axios.post(
-        baseURL + "/api/recipe/recipes_by_ingredients",
+      const response = await axiosClient.post(
+        "/recipe/recipes_by_ingredients",
         {
           ingredients: selectedIngredients,
           userId: globalUserId,
@@ -290,7 +298,7 @@ export const RecipePage: React.FC = () => {
         searchOption == 1
           ? "Maximize used ingredients"
           : "Minimize ingredients user don't have";
-      const response = await axios.post(baseURL + "/api/recipe/ai", {
+      const response = await axiosClient.post("/recipe/ai", {
         ingredients: selectedIngredients,
         user_id: globalUserId,
         preferences: preference,
