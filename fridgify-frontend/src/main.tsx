@@ -10,7 +10,7 @@ import APIClient from "@/api";
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <QueryClientProvider client={APIClient}>
-      <GoogleOAuthProvider clientId="802780030815-677uu3ip7m02mbgvvuu2d25t61nsun8r.apps.googleusercontent.com">
+      <GoogleOAuthProvider clientId="647856339439-ch1qle9m7uqdu41f5fsen6soqd019cua.apps.googleusercontent.com">
         <AppProvider>
           <App />
         </AppProvider>

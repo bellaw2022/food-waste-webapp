@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, ReactNode, useEffect } from "react";
 
 // Profile type
-type Profile = {
+export type Profile = {
   name: string;
   email: string;
   picture: string;

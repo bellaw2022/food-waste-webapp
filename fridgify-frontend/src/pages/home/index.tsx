@@ -1,4 +1,4 @@
-import { useProfile } from "@/context/ProfileContext";
+import { useProfile, Profile } from "@/context/ProfileContext";
 
 export const HomePage = ({ profile, login, logOut }: 
     {profile: Profile | null, login: () => void, logOut: () => void }
