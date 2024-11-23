@@ -12,13 +12,14 @@
   font-weight: bold;
 }
 .recipe-buttons {
-  position: absolute;
-  right: 5vw;
-  bottom: 5vh;
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 40px;
+  margin-bottom: 40px;
 }
 
 .recipe-page-body {
-  height: 70vh;
+  /*height: 70vh;*/
   overflow-y: scroll;
 }
 
