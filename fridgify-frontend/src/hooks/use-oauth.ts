@@ -44,6 +44,11 @@ export const useOAuth = () => {
                     'http://localhost:10000/api/auth/login',
                     {
                         access_token: user.access_token
+                    },
+                    {
+                        headers: {
+                            "ngrok-skip-browser-warning": "69420",  
+                        }
                     }
                 );
                 console.log('Backend Login Response:', backendLoginRes.data);
