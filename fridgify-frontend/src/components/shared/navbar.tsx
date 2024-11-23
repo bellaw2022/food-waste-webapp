@@ -1,4 +1,3 @@
-import { Share2Icon } from "lucide-react";
 import { Button } from "../ui/button";
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -32,7 +31,7 @@ export const Navbar = () => {
                     <img src={logo} width={50} />
                 </Button>
             </Link>
-            <div className="flex flex-row items-center justify-center gap-1">
+            <div className="flex flex-row items-center justify-center gap-1 w-full">
                 {buttonRoutes.map((route) => (
                     <Link key={route.path} to={route.path}>
                         <Button variant="outline"
@@ -43,11 +42,6 @@ export const Navbar = () => {
                     </Link>
                 ))}
             </div>
-            <Link to="/profile/#share">
-                <Button className="px-2 w-fit h-fit rounded-sm bg-[green]/50" variant="outline">
-                    <Share2Icon size={18} />
-                </Button>
-            </Link>
         </div>
     );
 }
