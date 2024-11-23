@@ -33,6 +33,7 @@ export const useAddInventory = () => {
                 headers: new Headers({
                     "Content-Type": "application/json",
                     "ngrok-skip-browser-warning": "69420",
+                    'Accept': 'application/json'
                 }),
                 body: JSON.stringify(formattedInputs),
             });
@@ -92,6 +93,7 @@ export const useEditInventory = () => {
                     headers: new Headers({
                         "Content-Type": "application/json",
                         "ngrok-skip-browser-warning": "69420",
+                        'Accept': 'application/json'
                     }),
                     body: JSON.stringify(trashedItems),
                 });
@@ -107,6 +109,7 @@ export const useEditInventory = () => {
                     headers: new Headers({
                         "Content-Type": "application/json",
                         "ngrok-skip-browser-warning": "69420",
+                        'Accept': 'application/json'
                     }),
                     body: JSON.stringify(consumedItems),
                 });
@@ -164,6 +167,7 @@ export const useInventory = () => {
                 method: "GET",
                 headers: new Headers({
                     "ngrok-skip-browser-warning": "69420",
+                    'Accept': 'application/json'
                 })
             }).then(
                 res => res.json()
