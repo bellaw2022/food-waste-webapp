@@ -7,18 +7,21 @@ import { Button } from "@/components/ui/button";
 import { useCallback, useEffect, useState } from "react";
 import { InstagramLogoIcon } from "@radix-ui/react-icons";
 import { googleLogout } from "@react-oauth/google";
+import { useProfile } from "@/context/ProfileContext"; 
 
 export const ProfilePage = () => {
-    const [badgeCount, setBadgeCount] = useState(0); // New state for badge count
+    const { profile, setProfile } = useProfile(); 
+    const [badgeCount, setBadgeCount] = useState(0); 
 
-    // Function to log out
     const logout = () => {
         localStorage.removeItem("user_id");
+        localStorage.removeItem("profile"); 
         googleLogout();
         window.location.href = "/";
+        setProfile(null); 
     };
+  
 
-    // Fetch user badge count when the component loads
     useEffect(() => {
         const userId = localStorage.getItem("user_id");
         if (userId) {
@@ -58,22 +61,25 @@ export const ProfilePage = () => {
             <h1 className="text-3xl font-bold mb-3">Profile</h1>
             <Card className="pb-2 flex flex-col items-center gap-2">
                 <CardHeader className="flex flex-row items-center justify-center pb-0">
-                    <div className="w-[120px] h-[120px] rounded-full bg-[gray]/50 text-center
+                    <div className="w-[120px] h-[120px] rounded-full text-center
                         flex flex-row items-center justify-center"
                     >
-                        Profile Photo
+                        <img src={profile?.picture} alt="User" className="rounded-full" />
                     </div>
                 </CardHeader>
+                {/* Name and email display */}
+                <div className="text-center">
+                    <h2 className="font-semibold text-lg">{profile?.name}</h2>
+                    <p className="text-sm text-gray-600">{profile?.email}</p>
+                </div>
                 <Button onClick={logout}>Log out</Button>
             </Card>
             <div className="border-2 border-black/10 rounded-md">
                 <Table>
                     <TableBody className="bg-[gray]/10">
+                        <ProgressSection />
                         <NotificationSection />
                         <AchievementsSection badgeCount={badgeCount} /> {/* New Achievements section */}
-                        <PrivacySection />
-                        <FoodSection />
-                        <ProgressSection />
                     </TableBody>
                 </Table>
             </div>
@@ -83,7 +89,7 @@ export const ProfilePage = () => {
 
 // New AchievementsSection component
 const AchievementsSection = ({ badgeCount }: { badgeCount: number }) => {
-    console.log("AchievementsSection badgeCount:", badgeCount); // Add this
+    console.log("AchievementsSection badgeCount:", badgeCount); 
     return (
         <>
             <TableRow className="h-10 bg-white">
@@ -110,89 +116,20 @@ const NotificationSection = () => {
                     <div className="ml-2">Expiration Alerts</div>
                 </TableCell>
                 <TableCell className="text-right">
-                    <Checkbox
-                        className="mr-5" 
-                        defaultChecked={false}
-                        onCheckedChange={(e) => {}} 
-                    />
-                </TableCell>
-            </TableRow>
-            <TableRow className="h-10">
-                <TableCell className="font-medium">
-                    <div className="ml-2">Recipe Suggestions</div>
-                </TableCell>
-                <TableCell className="text-right">
-                    <Checkbox
-                        className="mr-5" 
-                        defaultChecked={false}
-                        onCheckedChange={(e) => {}} 
-                    />
-                </TableCell>
-            </TableRow>
-            <TableRow className="h-10">
-                <TableCell className="font-medium">
-                    <div className="ml-2">Waste Reduction Report</div>
-                </TableCell>
-                <TableCell className="text-right">
-                    <Checkbox
-                        className="mr-5" 
-                        defaultChecked={false}
-                        onCheckedChange={(e) => {}} 
-                    />
-                </TableCell>
-            </TableRow>
-        </>
-    )
-}
-
-const PrivacySection = () => {
-    return (
-        <>
-            <TableRow className="h-10 bg-white">
-                <TableCell className="text-large font-bold">Privacy</TableCell>
-            </TableRow>
-            <TableRow className="h-10">
-                <TableCell className="font-medium">
-                    <div className="ml-2">Anonymize Data</div>
-                </TableCell>
-                <TableCell className="text-right">
-                    <Checkbox
-                        className="mr-5" 
-                        defaultChecked={false}
-                        onCheckedChange={(e) => {}} 
-                    />
-                </TableCell>
-            </TableRow>
-        </>
-    )
-}
-
-const FoodSection = () => {
-    return (
-        <>
-            <TableRow className="h-10 bg-white">
-                <TableCell className="text-large font-bold">Food Preferences</TableCell>
-            </TableRow>
-            <TableRow className="h-10">
-                <TableCell className="font-medium">
-                    <div className="ml-2">Diet Restrictions</div>
-                </TableCell>
-                <TableCell className="text-right">
-                    <Select defaultValue="none">
-                        <SelectTrigger id="diet-selection" className="bg-white">
+                    <Select defaultValue="4">
+                        <SelectTrigger id="expiration-selection" className="bg-white">
                             <SelectValue />
                         </SelectTrigger>
                         <SelectContent position="popper">
-                            <SelectItem value="none">None</SelectItem>
-                            <SelectItem value="vegetarian">Vegetarian</SelectItem>
-                            <SelectItem value="vegan">Vegan</SelectItem>
+                            <SelectItem value="4">Every 4 days</SelectItem>
+                            <SelectItem value="7">Every 7 days</SelectItem>
                         </SelectContent>
                     </Select>
                 </TableCell>
             </TableRow>
         </>
-    )
-}
+    );
+};
 
 const ProgressSection = () => {
     const [video, setVideo] = useState("");
