@@ -64,6 +64,8 @@ export const useOAuth = () => {
 
                     console.log('Global User ID:', backendLoginRes.data.user_id);
                     console.log('Is Logged In:', !!backendLoginRes.data.user_id); 
+
+                    window.location.href = "/inventory";
                 } else {
                     console.error('Backend login failed:', backendLoginRes.data.error);
                 }

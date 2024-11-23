@@ -10,8 +10,8 @@ const AppContext = createContext<{
   globalUserId: number;
   setGlobalUserId: React.Dispatch<React.SetStateAction<number>>;
 }>({
-  globalUserId: 0, // Set a default value that matches your data type
-  setGlobalUserId: () => {}, // Placeholder function, updated by the provider
+  globalUserId: 0, 
+  setGlobalUserId: () => {}, 
 });
 
 interface WrapperProps {

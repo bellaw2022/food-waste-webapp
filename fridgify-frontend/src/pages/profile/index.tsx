@@ -77,11 +77,9 @@ export const ProfilePage = () => {
             <div className="border-2 border-black/10 rounded-md">
                 <Table>
                     <TableBody className="bg-[gray]/10">
+                        <ProgressSection />
                         <NotificationSection />
                         <AchievementsSection badgeCount={badgeCount} /> {/* New Achievements section */}
-                        <PrivacySection />
-                        <FoodSection />
-                        <ProgressSection />
                     </TableBody>
                 </Table>
             </div>
@@ -118,89 +116,20 @@ const NotificationSection = () => {
                     <div className="ml-2">Expiration Alerts</div>
                 </TableCell>
                 <TableCell className="text-right">
-                    <Checkbox
-                        className="mr-5" 
-                        defaultChecked={false}
-                        onCheckedChange={(e) => {}} 
-                    />
-                </TableCell>
-            </TableRow>
-            <TableRow className="h-10">
-                <TableCell className="font-medium">
-                    <div className="ml-2">Recipe Suggestions</div>
-                </TableCell>
-                <TableCell className="text-right">
-                    <Checkbox
-                        className="mr-5" 
-                        defaultChecked={false}
-                        onCheckedChange={(e) => {}} 
-                    />
-                </TableCell>
-            </TableRow>
-            <TableRow className="h-10">
-                <TableCell className="font-medium">
-                    <div className="ml-2">Waste Reduction Report</div>
-                </TableCell>
-                <TableCell className="text-right">
-                    <Checkbox
-                        className="mr-5" 
-                        defaultChecked={false}
-                        onCheckedChange={(e) => {}} 
-                    />
-                </TableCell>
-            </TableRow>
-        </>
-    )
-}
-
-const PrivacySection = () => {
-    return (
-        <>
-            <TableRow className="h-10 bg-white">
-                <TableCell className="text-large font-bold">Privacy</TableCell>
-            </TableRow>
-            <TableRow className="h-10">
-                <TableCell className="font-medium">
-                    <div className="ml-2">Anonymize Data</div>
-                </TableCell>
-                <TableCell className="text-right">
-                    <Checkbox
-                        className="mr-5" 
-                        defaultChecked={false}
-                        onCheckedChange={(e) => {}} 
-                    />
-                </TableCell>
-            </TableRow>
-        </>
-    )
-}
-
-const FoodSection = () => {
-    return (
-        <>
-            <TableRow className="h-10 bg-white">
-                <TableCell className="text-large font-bold">Food Preferences</TableCell>
-            </TableRow>
-            <TableRow className="h-10">
-                <TableCell className="font-medium">
-                    <div className="ml-2">Diet Restrictions</div>
-                </TableCell>
-                <TableCell className="text-right">
-                    <Select defaultValue="none">
-                        <SelectTrigger id="diet-selection" className="bg-white">
+                    <Select defaultValue="4">
+                        <SelectTrigger id="expiration-selection" className="bg-white">
                             <SelectValue />
                         </SelectTrigger>
                         <SelectContent position="popper">
-                            <SelectItem value="none">None</SelectItem>
-                            <SelectItem value="vegetarian">Vegetarian</SelectItem>
-                            <SelectItem value="vegan">Vegan</SelectItem>
+                            <SelectItem value="4">Every 4 days</SelectItem>
+                            <SelectItem value="7">Every 7 days</SelectItem>
                         </SelectContent>
                     </Select>
                 </TableCell>
             </TableRow>
         </>
-    )
-}
+    );
+};
 
 const ProgressSection = () => {
     const [video, setVideo] = useState("");
@@ -251,16 +180,17 @@ const ProgressSection = () => {
         <>
             <TableRow className="h-10 bg-white">
                 <TableCell className="text-large font-bold">Progress Tracking</TableCell>
-                <TableCell className="text-right font-bold mr-5">
-                    <Button onClick={shareVideo}>Share</Button>
+                <TableCell className="text-large font-bold">
+                    <Button disabled={video === ""} onClick={shareVideo}
+                        className="w-full gap-2"
+                    >
+                        Share! <InstagramLogoIcon />
+                    </Button>
                 </TableCell>
             </TableRow>
-            <TableRow className="h-10">
-                <TableCell className="font-medium">
-                    <div className="ml-2">Waste Saving Chart</div>
-                </TableCell>
-                <TableCell className="text-right font-medium mr-5">
-                    <WasteSavingChart />
+            <TableRow>
+                <TableCell className="w-full" colSpan={2}>
+                    <WasteSavingChart setVideo={(src: string) => setVideo(src)} />
                 </TableCell>
             </TableRow>
         </>
