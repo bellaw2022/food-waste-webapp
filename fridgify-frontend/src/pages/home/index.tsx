@@ -1,13 +1,7 @@
-import { useProfile, Profile } from "@/context/ProfileContext";
+import { useOAuth } from "@/hooks";
 
-export const HomePage = ({ profile, login, logOut }: 
-    {profile: Profile | null, login: () => void, logOut: () => void }
-) => {
-    const { setProfile } = useProfile(); 
-
-    if (profile) {
-        setProfile(profile);
-    }
+export const HomePage = () => {
+    const { profile, login, logOut } = useOAuth();
 
     return (
         <div className="relative min-h-screen flex flex-col items-center justify-start py-12" style={{ backgroundColor: "#c1e1c1" }}>
@@ -50,7 +44,7 @@ export const HomePage = ({ profile, login, logOut }:
                             Sign in to access your profile
                         </p>
                         <button 
-                            onClick={() => login()} 
+                            onClick={() => login("/inventory")} 
                             className="px-8 py-3 bg-white text-green-600 font-semibold rounded-lg shadow-md hover:bg-green-50 transition duration-200 ease-in-out"
                         >
                             Sign in with Google

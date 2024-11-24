@@ -6,24 +6,14 @@ import { WasteSavingChart } from "./waste-saving-chart";
 import { Button } from "@/components/ui/button";
 import { useCallback, useEffect, useState } from "react";
 import { InstagramLogoIcon } from "@radix-ui/react-icons";
-import { googleLogout } from "@react-oauth/google";
-import { useProfile } from "@/context/ProfileContext"; 
+import { googleLogout } from "@react-oauth/google"; 
+import { useOAuth } from "@/hooks";
 
 export const ProfilePage = () => {
-    const { profile, setProfile } = useProfile(); 
-    const [badgeCount, setBadgeCount] = useState(0); 
-
-    const logout = () => {
-        localStorage.removeItem("user_id");
-        localStorage.removeItem("profile"); 
-        googleLogout();
-        window.location.href = "/";
-        setProfile(null); 
-    };
-  
+    const { profile, login, logOut, userId } = useOAuth();
+    const [badgeCount, setBadgeCount] = useState(0);   
 
     useEffect(() => {
-        const userId = localStorage.getItem("user_id");
         if (userId) {
             fetch(`http://127.0.0.1:10000/api/users/${userId}`, {
                 method: "GET",
@@ -72,7 +62,7 @@ export const ProfilePage = () => {
                     <h2 className="font-semibold text-lg">{profile?.name}</h2>
                     <p className="text-sm text-gray-600">{profile?.email}</p>
                 </div>
-                <Button onClick={logout}>Log out</Button>
+                <Button onClick={logOut}>Log out</Button>
             </Card>
             <div className="border-2 border-black/10 rounded-md">
                 <Table>
