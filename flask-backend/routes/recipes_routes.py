@@ -2480,10 +2480,10 @@ async def generate_ai_recipe(user_id, user_ingredients, user_preferences):
 
     data = await query(recipe_prompt)
 
-    print("\n\n\n\n\n")
-    print("response from gpt: ")
-    print(data)
-    print("\n\n\n\n\n")
+    # print("\n\n\n\n\n")
+    # print("response from gpt: ")
+    # print(data)
+    # print("\n\n\n\n\n")
     if "ingredients" in data:
         corrected_ingredients = []
         for ingredient in data["ingredients"]:
@@ -2496,8 +2496,8 @@ async def generate_ai_recipe(user_id, user_ingredients, user_preferences):
             corrected_ingredients.append(ingredient)
         data["ingredients"] = corrected_ingredients
 
-    print("response from gpt AFTER: ")
-    print(data)
-    print("\n\n\n\n\n")
+    # print("response from gpt AFTER: ")
+    # print(data)
+    # print("\n\n\n\n\n")
     return data
     #return Response(json.dumps(data), mimetype='application/json')
