@@ -3,7 +3,6 @@ import requests
 import os, json
 from routes.user_produce_routes import get_user_inventory
 from routes.produce_routes import fetch_produce_info
-from difflib import get_close_matches
 from models import db, UserAndProduce, Produce
 from dotenv import load_dotenv
 
@@ -11,6 +10,8 @@ from openai import AsyncOpenAI
 import asyncio
 import json
 import os
+from rapidfuzz import process, fuzz
+import re
 load_dotenv()
 
 
@@ -1695,42 +1696,45 @@ def search_recipes_by_ingredients():
         return jsonify({"error": "Failed to query external API"}), 500
     
 
+def normalize_ingredient(name):
+    # Remove punctuation and convert to lowercase
+    name = re.sub(r'[^\w\s]', '', name).lower()
+    tokens = [word for word in name.split()]
+    return ' '.join(tokens)
+
 def update_ingredients_with_inventory(user_id, response_data):
     inventory_data = json.loads(get_user_inventory(user_id).data.decode("utf-8"))
     
     inventory = inventory_data.get("data", [])
+    inventory_names = [normalize_ingredient(item["produce_name"]) for item in inventory]
     
     for recipe in response_data["recipes"]:
-        # Set to store matched ingredients from missedIngredients
-        matched_ingredients = set()
-        
-        for ingredient in recipe["missedIngredients"]:
-            # Try to match ingredient with inventory items by produce_name
-            matched_item = get_close_matches(ingredient, [item["produce_name"] for item in inventory], n=1, cutoff=0.6)
-            
-            if matched_item:
-                # If a close match is found, move it to usedIngredients
-                #matched_ingredients.add(ingredient)
-                #recipe["usedIngredients"].append(ingredient)
-                recipe["usedIngredients"].append(matched_item[0])
+        missed_ingredients = recipe["missedIngredients"][:]
+        used_ingredients = recipe["usedIngredients"][:]
+
+        # Match missed ingredients to inventory
+        for ingredient in missed_ingredients:
+            match = process.extractOne(
+                ingredient.lower(),
+                inventory_names,
+                scorer=fuzz.token_sort_ratio,
+                score_cutoff=90,
+            )
+            if match:
+                recipe["usedIngredients"].append(ingredient)
                 recipe["missedIngredients"].remove(ingredient)
-        
-        # Filter out matched ingredients from missedIngredients
-        #recipe["missedIngredients"] = [
-         #   ingredient for ingredient in recipe["missedIngredients"]
-          #  if ingredient not in matched_ingredients
-        #]
 
-        
-
-        for ingredient in recipe["usedIngredients"]:
-            matched_item = get_close_matches(ingredient, [item["produce_name"] for item in inventory], n=1, cutoff=0.6)
-
-            if not matched_item:
-               recipe["missedIngredients"].append(ingredient)
-               #recipe["missedIngredientCount"] += 1
-               recipe["usedIngredients"].remove(ingredient)
-               #recipe["usedIngredientCount"] -= 1
+        # Verify used ingredients are in inventory
+        for ingredient in used_ingredients:
+            match = process.extractOne(
+                ingredient.lower(),
+                inventory_names,
+                scorer=fuzz.token_sort_ratio,
+                score_cutoff=90,
+            )
+            if not match:
+                recipe["missedIngredients"].append(ingredient)
+                recipe["usedIngredients"].remove(ingredient)
 
         recipe["missedIngredientCount"] = len(recipe["missedIngredients"])
         recipe["usedIngredientCount"] = len(recipe["usedIngredients"])
@@ -2466,14 +2470,34 @@ async def generate_ai_recipe(user_id, user_ingredients, user_preferences):
         If you are unable to generate a recipe, please provide a reason, otherwise don't add the reason key.
         Ensure that the recipe is safe for the user to consume.
         Unless the ingredient unit is specified above, use traditional units of measurement.
-        Uumber the steps in order such as Step 1. Chop vegetables.
+        **Number the steps in order, such as "Step 1. Chop vegetables."**
         Don't use more of an ingredient than the user has in their inventory.
+        Each ingredient must be an array of exactly three elements: ["name", "quantity", "unit"].
+        If quantity or unit is missing for an ingredient, use an empty string "" for that field.
+        If an ingredient doesn't need a quantity or unit, use "" and "" respectively.
+        **For seasonings, provide the full name of the seasoning and include a quantity and unit if appropriate. You may use descriptive quantities like "to taste" or "a pinch".**
     """.format(user_preferences=user_preferences, ingredients=ingredients)
 
-    
-
     data = await query(recipe_prompt)
-    print("response from gpt: ")
-    print(data)
+
+    # print("\n\n\n\n\n")
+    # print("response from gpt: ")
+    # print(data)
+    # print("\n\n\n\n\n")
+    if "ingredients" in data:
+        corrected_ingredients = []
+        for ingredient in data["ingredients"]:
+            if isinstance(ingredient, list):
+                while len(ingredient) < 3:
+                    ingredient.append("")
+                ingredient = ingredient[:3]
+            else:
+                ingredient = [str(ingredient), "", ""]
+            corrected_ingredients.append(ingredient)
+        data["ingredients"] = corrected_ingredients
+
+    # print("response from gpt AFTER: ")
+    # print(data)
+    # print("\n\n\n\n\n")
     return data
     #return Response(json.dumps(data), mimetype='application/json')
