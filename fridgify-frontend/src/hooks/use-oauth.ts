@@ -34,7 +34,8 @@ export const useOAuth = () => {
                     {
                         headers: {
                             Authorization: `Bearer ${user.access_token}`,
-                            Accept: 'application/json',
+                            "ngrok-skip-browser-warning": "69420", 
+                            "Content-Type": "application/json",    
                         },
                     }
                 );
@@ -48,8 +49,7 @@ export const useOAuth = () => {
                     {
                         headers: {
                             "ngrok-skip-browser-warning": "69420", 
-                            "Content-Type": "application/json",     
-                            "Accept": "application/json"            
+                            "Content-Type": "application/json",             
                         }
                     }
                 );
