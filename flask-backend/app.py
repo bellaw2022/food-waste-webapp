@@ -39,7 +39,7 @@ app.register_blueprint(scan_routes)
 
 @app.route('/')
 def index():
-    return "Hello, Fridgify is running!"
+    return "Hello, Fridgify is running! lucky"
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=10000, debug=True)
