@@ -53,6 +53,7 @@ const Recipe: React.FC<CombinedProps> = ({
   const userIdString = localStorage.getItem("user_id");
   if (!userIdString) {
     window.location.href = "/";
+    return;
   }
   const globalUserId = parseInt(userIdString);
   //const globalUserId = 38;

@@ -12,7 +12,10 @@ export const useAddInventory = () => {
     const mutation = useMutation({
         mutationFn: async (cart: Record<string, CartItem>) => {
             const userIdString = localStorage.getItem('user_id');
-            if (!userIdString) window.location.href = "/";
+            if (!userIdString) {
+                window.location.href = "/";
+                return;
+            }
             const userId = parseInt(userIdString);
 
             const formattedInputs = Object.keys(cart).map((itemName) => ({
@@ -73,7 +76,10 @@ export const useEditInventory = () => {
     const mutation = useMutation({
         mutationFn: async (cart: Record<string, EditingCartItem>) => {
             const userIdString = localStorage.getItem('user_id');
-            if (!userIdString) window.location.href = "/";
+            if (!userIdString) {
+                window.location.href = "/";
+                return;
+            }
             const userId = parseInt(userIdString);
 
             const trashedItems: Record<string, number> = {};
@@ -156,7 +162,10 @@ export const useInventory = () => {
         queryKey: ["inventory"],
         queryFn: async () => {
             const userIdString = localStorage.getItem('user_id');
-            if (!userIdString) window.location.href = "/";
+            if (!userIdString) {
+                window.location.href = "/";
+                return;
+            }
             const userId = parseInt(userIdString);
             
             console.log(API_URL);

@@ -96,8 +96,10 @@ const IngredientList: React.FC<Ingredients> = ({
   //console.log("initial ingredients: ", initialIngredients);
   //const { globalUserId, setGlobalUserId } = useAppContext();
   const userIdString = localStorage.getItem("user_id");
-  if (!userIdString)
+  if (!userIdString) {
     window.location.href = "/";
+    return;
+  }
   const globalUserId = parseInt(userIdString);
   const [ingredients, setIngredients] =
     useState<Ingredient[]>(initialIngredients);

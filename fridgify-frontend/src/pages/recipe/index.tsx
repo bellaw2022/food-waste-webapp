@@ -65,8 +65,10 @@ export const RecipePage: React.FC = () => {
   //const globalUserId = 38;
   //console.log("userid: ", globalUserId);
   const userIdString = localStorage.getItem("user_id");
-  if (!userIdString)
+  if (!userIdString) {
     window.location.href = "/";
+    return;
+  }
   const globalUserId = parseInt(userIdString);
   /*
   const ingredients = [
