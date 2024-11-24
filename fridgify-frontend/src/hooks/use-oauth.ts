@@ -3,6 +3,7 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { useAppContext } from "../AppContext";
 import { useQueryClient } from "@tanstack/react-query";
+import { API_URL } from "@/api/constants";
 
 export const useOAuth = () => {
     const [user, setUser] = useState<any>(null);
@@ -41,7 +42,7 @@ export const useOAuth = () => {
                 console.log('Google Profile Data:', googleProfileRes.data);
 
                 const backendLoginRes = await axios.post(
-                    'http://localhost:10000/api/auth/login',
+                    `${API_URL}/auth/login`,
                     {
                         access_token: user.access_token
                     }
