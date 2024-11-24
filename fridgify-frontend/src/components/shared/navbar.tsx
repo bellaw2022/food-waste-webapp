@@ -26,7 +26,7 @@ export const Navbar = () => {
 
     return (
         <div className="m-3 flex flex-row items-center justify-between">
-            <Link to="/">
+            <Link to="/inventory">
                 <Button className="p-0 h-fit w-fit" variant="ghost">
                     <img src={logo} width={50} />
                 </Button>
