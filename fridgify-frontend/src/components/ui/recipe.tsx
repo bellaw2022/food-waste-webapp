@@ -51,8 +51,9 @@ const Recipe: React.FC<CombinedProps> = ({
   console.log("recipe: ", recipe);
   //const { globalUserId, setGlobalUserId } = useAppContext();
   const userIdString = localStorage.getItem("user_id");
-  if (!userIdString)
-    throw new Error("Could not fetch user_id from local_storage");
+  if (!userIdString) {
+    window.location.href = "/";
+  }
   const globalUserId = parseInt(userIdString);
   //const globalUserId = 38;
   const [servings, setServings] = useState<number>(recipe.servings);

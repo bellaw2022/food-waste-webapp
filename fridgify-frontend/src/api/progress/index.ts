@@ -12,7 +12,7 @@ export const useWasteSavingProgress = () => {
         queryKey: ["waste-saving-progress"],
         queryFn: async () => {
             const userIdString = localStorage.getItem('user_id');
-            if (!userIdString) throw new Error("Could not fetch user_id from local_storage");
+            if (!userIdString) window.location.href = "/";
             const userId = parseInt(userIdString);
 
             const response = await fetch(`${API_URL}/user/${userId}/wastesaving`, {

@@ -66,7 +66,7 @@ export const RecipePage: React.FC = () => {
   //console.log("userid: ", globalUserId);
   const userIdString = localStorage.getItem("user_id");
   if (!userIdString)
-    throw new Error("Could not fetch user_id from local_storage");
+    window.location.href = "/";
   const globalUserId = parseInt(userIdString);
   /*
   const ingredients = [
