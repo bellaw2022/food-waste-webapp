@@ -108,6 +108,7 @@ export const RecipePage: React.FC = () => {
   });
   // whether or not the button is clicked - true if loading or already loaded
   const [loading, setLoading] = useState(false);
+  const [AILoading, setAILoading] = useState(false);
   const [showNoRecipesModal, setShowNoRecipesModal] = useState(true);
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe>();
 
@@ -238,8 +239,9 @@ export const RecipePage: React.FC = () => {
           (expirationDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)
         );
         const expirationRatio =
+          1 -
           (today.getTime() - purchaseDate.getTime()) /
-          (expirationDate.getTime() - purchaseDate.getTime());
+            (expirationDate.getTime() - purchaseDate.getTime());
 
         return {
           name: item.produce_name,
@@ -294,7 +296,7 @@ export const RecipePage: React.FC = () => {
   };
 
   const searchAIRecipe = async () => {
-    setLoading(true);
+    setAILoading(true);
     try {
       let preference =
         searchOption == 1
@@ -313,7 +315,7 @@ export const RecipePage: React.FC = () => {
     } catch (error) {
       console.error("Error: ", error);
     } finally {
-      setLoading(false);
+      setAILoading(false);
       setRecipePage(true);
       setBasePage(false);
       setListPage(false);
@@ -357,9 +359,9 @@ export const RecipePage: React.FC = () => {
             <button
               className="recipe-button"
               onClick={searchAIRecipe}
-              disabled={loading}
+              disabled={AILoading}
             >
-              {loading ? "Searching..." : "Generate AI Recipes"}
+              {AILoading ? "Searching..." : "Generate AI Recipes"}
             </button>
             <button
               className="recipe-button"
