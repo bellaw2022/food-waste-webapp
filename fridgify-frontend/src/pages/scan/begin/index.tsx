@@ -138,6 +138,7 @@ export const BeginScanningPage = () => {
                     ref={webcamRef}
                     errorMessages={{}}
                     aspectRatio="cover"
+                    facingMode="environment"
                 />
             </div>
             <div className="absolute top-[calc(36vh-170px)] left-[calc(50vw-170px)] border-black border-2 w-[340px] h-[340px] z-99
