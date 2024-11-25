@@ -51,7 +51,6 @@ export const useEditingCart = create<EditingCartState>()(
                 updates: {
                     quantity?: number,
                     unit?: UnitTypes,
-                    expirationDays?: number,
                     isTrash?: boolean,
                 }
             ) => set((state) => {
@@ -64,7 +63,6 @@ export const useEditingCart = create<EditingCartState>()(
                                 ...item,
                                 quantity: updates.quantity ?? item.quantity,
                                 unit: updates.unit ?? item.unit,
-                                expirationDays: updates.expirationDays ?? item.expirationDays,
                                 isTrash: updates.isTrash ?? item.isTrash,
                             }
                         }
