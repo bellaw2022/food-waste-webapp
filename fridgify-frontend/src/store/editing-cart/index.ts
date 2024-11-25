@@ -6,6 +6,7 @@ export interface EditingCartItem {
     name: string;
     cartItemId: string; // from userproduce_id
     quantity: number;
+    quantityRemoved: number;
     unit: UnitTypes;
     expirationDays: number;
     isTrash: boolean;
@@ -20,7 +21,7 @@ interface EditingCartState {
     setItems: (items: { [cartItemId: string]: EditingCartItem }) => void;
     addItem: (cartItemId: string, item: EditingCartItem) => void;
     removeItem: (cartItemId: string) => void;
-    updateItem: (cartItemId: string, updates: { quantity?: number, unit?: UnitTypes, expirationDays?: number, isTrash?: boolean }) => void;
+    updateItem: (cartItemId: string, updates: { quantityRemoved?: number, unit?: UnitTypes, expirationDays?: number, isTrash?: boolean }) => void;
 }
 
 export const useEditingCart = create<EditingCartState>()(
@@ -49,7 +50,7 @@ export const useEditingCart = create<EditingCartState>()(
             updateItem: (
                 cartItemId: string,
                 updates: {
-                    quantity?: number,
+                    quantityRemoved?: number,
                     unit?: UnitTypes,
                     isTrash?: boolean,
                 }
@@ -61,7 +62,7 @@ export const useEditingCart = create<EditingCartState>()(
                             ...state.cartItems, 
                             [cartItemId]: {
                                 ...item,
-                                quantity: updates.quantity ?? item.quantity,
+                                quantityRemoved: updates.quantityRemoved ?? item.quantityRemoved,
                                 unit: updates.unit ?? item.unit,
                                 isTrash: updates.isTrash ?? item.isTrash,
                             }

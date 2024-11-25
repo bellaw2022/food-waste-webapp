@@ -92,9 +92,9 @@ export const useEditInventory = () => {
             const consumedItems: Record<string, number> = {};
             Object.values(cart).forEach((item) => {
                 if (item.isTrash) {
-                    trashedItems[item.cartItemId] = item.quantity;
+                    trashedItems[item.cartItemId] = item.quantity - item.quantityRemoved;
                 } else {
-                    consumedItems[item.cartItemId] = item.quantity;
+                    consumedItems[item.cartItemId] = item.quantity - item.quantityRemoved;
                 }
             });
 
@@ -197,6 +197,7 @@ export const useInventory = () => {
                     cartItemId: item.userproduce_id,
                     name: item.produce_name,
                     quantity: item.quantity,
+                    quantityRemoved: 0,
                     unit: item.unit,
                     expirationDays: expirationDays,
                     isTrash: false,
