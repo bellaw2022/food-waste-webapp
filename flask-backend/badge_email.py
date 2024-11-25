@@ -65,7 +65,7 @@ def send_badge_email(user):
     smtp_server = "smtp.gmail.com"
     smtp_port = 587
     username = "bellawutamu@gmail.com"
-    password = "cpvk xxrg bert iwjq"
+    password = "fsot mbzu viir jgrh"
 
     sender = EmailSender(smtp_server, smtp_port, username, password)
 
