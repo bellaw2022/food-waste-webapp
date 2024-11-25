@@ -38,13 +38,11 @@ const Ingredients: React.FC<IngredientsProps> = ({
     ingredient.name.toLowerCase().startsWith(searchQuery.toLowerCase())
   );
 
-  const sortedIngredients = filteredIngredients.sort(
-    (a, b) => a.shelfPercentage - b.shelfPercentage
-  );
+  const sortedIngredients = filteredIngredients.sort((a, b) => a.days - b.days);
 
-  const getDotColor = (shelfPercentage: number): string => {
-    if (shelfPercentage <= 0.25) return "red";
-    if (shelfPercentage <= 0.5) return "yellow";
+  const getDotColor = (days: number): string => {
+    if (days < 4) return "red";
+    if (days < 7) return "yellow";
     return "green";
   };
 
@@ -73,7 +71,7 @@ const Ingredients: React.FC<IngredientsProps> = ({
               <span
                 className="dot"
                 style={{
-                  backgroundColor: getDotColor(ingredient.shelfPercentage),
+                  backgroundColor: getDotColor(ingredient.days),
                   borderRadius: "50%",
                   width: "8px",
                   height: "8px",
