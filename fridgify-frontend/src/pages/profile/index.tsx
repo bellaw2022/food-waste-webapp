@@ -7,7 +7,8 @@ import { Button } from "@/components/ui/button";
 import { useCallback, useEffect, useState } from "react";
 import { InstagramLogoIcon } from "@radix-ui/react-icons";
 import { googleLogout } from "@react-oauth/google";
-import { useProfile } from "@/context/ProfileContext"; 
+import { useProfile } from "@/context/ProfileContext";
+import { API_URL } from "@/api/constants"; 
 
 export const ProfilePage = () => {
     const { profile, setProfile } = useProfile(); 
@@ -25,7 +26,7 @@ export const ProfilePage = () => {
     useEffect(() => {
         const userId = localStorage.getItem("user_id");
         if (userId) {
-            fetch(`http://127.0.0.1:10000/api/users/${userId}`, {
+            fetch(`${API_URL}/users/${userId}`, {
                 method: "GET",
                 headers: new Headers({
                     "ngrok-skip-browser-warning": "69420",
