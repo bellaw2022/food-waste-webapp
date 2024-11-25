@@ -139,7 +139,7 @@ export const BeginScanningPage = () => {
     }, [addItem, guessIndex, allGuesses, clearPicture, produceCatalog]);
 
     return (
-        <div className="relative w-full h-[100vh] overflow-hidden">
+        <div className="relative w-full h-full overflow-hidden">
             <div className="absolute top-0 left-0">
                 <Webcam
                     ref={webcamRef}
