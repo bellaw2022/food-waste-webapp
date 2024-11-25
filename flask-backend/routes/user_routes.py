@@ -17,6 +17,20 @@ def get_all_users():
     ]
     return jsonify(result)
 
+@user_routes.route('/api/users/<int:user_id>', methods=['GET'])
+def get_user_by_id(user_id):
+    user = User.query.get(user_id)
+    if not user:
+        return jsonify({"status": 404, "error": "User not found"}), 404
+
+    result = {
+        "user_id": user.user_id,
+        "username": user.username,
+        "email": user.email,
+        "badge": user.badge  # Include badge count
+    }
+    return jsonify(result)
+
 @user_routes.route('/api/auth/login', methods=['POST'])
 def user_login():
     try:
