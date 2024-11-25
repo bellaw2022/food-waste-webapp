@@ -155,7 +155,7 @@ def send_expiry_notifications():
         smtp_server = "smtp.gmail.com"
         smtp_port = 587
         username = "bellawutamu@gmail.com"
-        password = "cpvk xxrg bert iwjq"
+        password = "fsot mbzu viir jgrh"
 
         # Create email sender
         sender = EmailSender(smtp_server, smtp_port, username, password)
