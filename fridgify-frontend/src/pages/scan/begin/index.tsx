@@ -1,9 +1,8 @@
 import { API_URL } from "@/api/constants";
 import { Button } from "@/components/ui/button";
-import { BookOpenIcon, CameraIcon, CheckIcon, EllipsisIcon, RecycleIcon, RefreshCwIcon, XIcon } from "lucide-react";
-import { useCallback, useMemo, useRef, useState } from "react";
-import { useWindowDimensions } from "@/hooks";
-import Webcam from "react-webcam";
+import { BookOpenIcon, CameraIcon, CheckIcon, EllipsisIcon, RefreshCwIcon } from "lucide-react";
+import { useCallback, useRef, useState } from "react";
+import { Camera, CameraType } from "react-camera-pro";
 import { Link } from "react-router-dom";
 import { useScanningCart } from "@/store/scanning-cart";
 import { ManualInputModal } from "./modal";
@@ -16,16 +15,10 @@ import { useToast } from "@/hooks/use-toast";
 export const BeginScanningPage = () => {
     const { isCatalogLoading, isCatalogError, produceCatalog } = useProduceCatalog();
 
-    const webcamRef = useRef<Webcam>(null);
+    const webcamRef = useRef<CameraType>(null);
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const fullImageRef = useRef<HTMLImageElement>(null);
     const croppedImageRef = useRef<HTMLImageElement>(null);
-
-    const { width, height } = useWindowDimensions();
-    const videoConstraints = useMemo(() => ({
-        width, height,
-        facingMode: "environment",
-    }), [width, height]);
 
     const [isLoadingGuess, setLoadingGuess] = useState(false);
     const [pictureTaken, setPictureTaken] = useState(false);
@@ -54,8 +47,8 @@ export const BeginScanningPage = () => {
             croppedImageRef.current && 
             webcamRef.current
         ) {
-            const video = webcamRef.current.video;
-            if (!video) {
+            const photo = webcamRef.current.takePhoto('imgData') as ImageData;
+            if (!photo) {
                 setPictureTaken(false); setLoadingGuess(false);
                 return;
             };
@@ -64,10 +57,10 @@ export const BeginScanningPage = () => {
 
             // Capture full image first
             ctx?.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
-            canvasRef.current.width = video.videoWidth;
-            canvasRef.current.height = video.videoHeight;
+            canvasRef.current.width = photo.width;
+            canvasRef.current.height = photo.height;
 
-            ctx?.drawImage(video, 0, 0, canvasRef.current.width, canvasRef.current.height);
+            ctx?.putImageData(photo, 0, 0);
             const fullData = canvasRef.current.toDataURL("image/png");
             fullImageRef.current.setAttribute("src", fullData);
 
@@ -85,7 +78,7 @@ export const BeginScanningPage = () => {
 
                     ctx?.drawImage(
                         fullImageRef.current,
-                        video.videoWidth/2-170, video.videoHeight*0.36-170, 340, 340, // region in the full image
+                        photo.width/2-170, photo.height*0.36-170, 340, 340, // region in the full image
                         0, 0, 340, 340 // destination in the canvas
                     );
                     const croppedData = canvasRef.current.toDataURL("image/png");
@@ -140,12 +133,11 @@ export const BeginScanningPage = () => {
 
     return (
         <div className="relative w-full h-full overflow-hidden">
-            <div className="absolute top-0 left-0">
-                <Webcam
+            <div className="absolute top-0 left-0 w-full h-full">
+                <Camera
                     ref={webcamRef}
-                    audio={false}
-                    screenshotFormat="image/jpeg"
-                    videoConstraints={videoConstraints}
+                    errorMessages={{}}
+                    aspectRatio="cover"
                 />
             </div>
             <div className="absolute top-[calc(36vh-170px)] left-[calc(50vw-170px)] border-black border-2 w-[340px] h-[340px] z-99
