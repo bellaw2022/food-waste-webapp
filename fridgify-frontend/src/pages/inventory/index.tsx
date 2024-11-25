@@ -22,8 +22,11 @@ export const InventoryPage = () => {
             searchQuery === "" || item.name.toLowerCase().startsWith(searchQuery.toLowerCase())),
     [searchQuery, inventory]);
 
-    const expiringItems = useMemo(() => 
-        filteredItems.filter((item) => item.expirationDays < 7)
+    const expiringVerySoonItems = useMemo(() => 
+        filteredItems.filter((item) => item.expirationDays < 4)
+    , [filteredItems]);
+    const expiringSoonItems = useMemo(() => 
+        filteredItems.filter((item) => item.expirationDays >= 4 && item.expirationDays < 7)
     , [filteredItems]);
     const freshItems = useMemo(() => 
         filteredItems.filter((item) => item.expirationDays >= 7)
@@ -139,13 +142,22 @@ export const InventoryPage = () => {
             </div>
             {inventory ?
                 <div className="mt-8 flex flex-col items-start gap-4">
-                    <h2 className="text-2xl font-bold">Expiring Soon:</h2>
-                    {expiringItems.map((item) => 
+                    <h2 className="text-2xl font-bold">Expiring Very Soon:</h2>
+                    {expiringVerySoonItems.map((item) => 
                         <InventoryCard key={item.cartItemId}
                             isEditing={isEditing}
                             onToggle={() => onToggleSelect(item.cartItemId)}
                             isSelected={item.cartItemId in cartItems} 
-                            item={item} expiringSoon={true} 
+                            item={item} color="red" 
+                        />
+                    )}
+                    <h2 className="text-2xl font-bold">Expiring Soon:</h2>
+                    {expiringSoonItems.map((item) => 
+                        <InventoryCard key={item.cartItemId}
+                            isEditing={isEditing}
+                            onToggle={() => onToggleSelect(item.cartItemId)}
+                            isSelected={item.cartItemId in cartItems} 
+                            item={item} color="orange"
                         />
                     )}
                     <h2 className="text-2xl font-bold">Still Fresh:</h2>
@@ -154,7 +166,7 @@ export const InventoryPage = () => {
                             isEditing={isEditing}
                             onToggle={() => onToggleSelect(item.cartItemId)}
                             isSelected={item.cartItemId in cartItems} 
-                            item={item} expiringSoon={false} 
+                            item={item} color="green"
                         />
                     )}
                 </div>
@@ -167,14 +179,13 @@ export const InventoryPage = () => {
     );
 }
 
-const InventoryCard = ({ item, onToggle, isEditing, isSelected, expiringSoon }: 
-    { item: EditingCartItem, onToggle: () => void, isEditing: boolean, isSelected: boolean, expiringSoon: boolean }) => {
+const InventoryCard = ({ item, onToggle, isEditing, isSelected, color }: 
+    { item: EditingCartItem, onToggle: () => void, isEditing: boolean, isSelected: boolean, color: string }) => {
     return (
         <Card className={
             cn(
             isEditing && isSelected ? "border-4" : "border",
-            "w-[320px] bg-[lightgray] px-4 py-2 flex flex-row items-center justify-between", 
-            expiringSoon ? "border-[orange]" : "border-[green]")}
+            `w-[320px] bg-[lightgray] px-4 py-2 flex flex-row items-center justify-between border-[${color}]`)}
             onClick={isEditing ? onToggle : () => {}}
         >
             <div className="text-md">

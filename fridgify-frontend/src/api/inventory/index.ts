@@ -6,6 +6,12 @@ import { useToast } from "@/hooks/use-toast";
 
 const MILLISECONDS_IN_DAY = 24 * 60 * 60 * 1000;
 
+export const getExpirationDays = (today: Date, expirationDate: Date) => {
+    return Math.ceil(
+        (expirationDate.getTime() - today.getTime()) / (MILLISECONDS_IN_DAY)
+    );
+}
+
 export const useAddInventory = () => {
     const { toast } = useToast();
 
@@ -155,6 +161,7 @@ interface InventoryResponse {
     quantity: number,
     unit: UnitTypes,
     expiration_date: string,
+    purchase_date: string;
 }
 
 export const useInventory = () => {
@@ -179,16 +186,19 @@ export const useInventory = () => {
             ).catch((error) => { console.error(error) });
             if (res) console.log("Retrieved response from backend: ", res);
 
-            const todayDate = new Date((new Date()).toISOString().split("T")[0]);
+            const todayDate = new Date();
 
             const inventory: Record<string, EditingCartItem> = {};
             res.data?.forEach((item: InventoryResponse) => {
+                const expirationDays = getExpirationDays(
+                    todayDate, new Date(item.expiration_date),
+                )
                 inventory[item.userproduce_id] = {
                     cartItemId: item.userproduce_id,
                     name: item.produce_name,
                     quantity: item.quantity,
                     unit: item.unit,
-                    expirationDays: Math.floor((Date.parse(item.expiration_date) - todayDate.getTime()) / MILLISECONDS_IN_DAY),
+                    expirationDays: expirationDays,
                     isTrash: false,
                 }
             });
