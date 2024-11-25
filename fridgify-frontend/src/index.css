@@ -80,6 +80,10 @@
   }
 }
 
+html, body, #root, #root>div {
+  height: 100%
+}
+
 /* Hide arrows on number input UI component */
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
