@@ -78,11 +78,11 @@ export const InventoryPage = () => {
                                     <div className="text-md">{item.name.charAt(0).toUpperCase() + item.name.slice(1)}</div>
                                     <div className="flex flex-row items-center justify-between gap-2">
                                         <NumberInput
-                                            value={item.quantity}
+                                            value={item.quantityRemoved}
                                             minVal={0} maxVal={inventory?.[itemId].quantity}
-                                            onIncrement={() => updateItem(itemId, { quantity: item.quantity+1 })}
-                                            onDecrement={() => updateItem(itemId, { quantity: Math.max(0, item.quantity-1) })}
-                                            onSetValue={(newQuantity: number) => updateItem(itemId, { quantity: newQuantity })}
+                                            onIncrement={() => updateItem(itemId, { quantityRemoved: item.quantityRemoved+1 })}
+                                            onDecrement={() => updateItem(itemId, { quantityRemoved: Math.max(0, item.quantityRemoved-1) })}
+                                            onSetValue={(newQuantityRemoved: number) => updateItem(itemId, { quantityRemoved: newQuantityRemoved })}
                                         />
                                         <div className="w-[1em]">{UnitAbbreviations?.[item.unit]}</div>
                                     </div>
