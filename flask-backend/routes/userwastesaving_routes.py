@@ -52,7 +52,7 @@ def get_video(user_id):
     except Exception as e:
         return jsonify({"status": 202, "data": str(e)})
 
-def blobs_to_video(image_blobs, fps=24, codec='mp4v'):
+def blobs_to_video(image_blobs, fps=12, codec='mp4v'):
     """Converts a list of image blobs to a video file."""
     
     # Strip the "data:image/jpeg;base64," prefix before passing to the function:
