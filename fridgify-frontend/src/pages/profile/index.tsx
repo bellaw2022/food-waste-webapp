@@ -26,7 +26,7 @@ export const ProfilePage = () => {
     useEffect(() => {
         const userId = localStorage.getItem("user_id");
         if (userId) {
-            fetch(`${API_URL}/users/${userId}`, {
+            fetch(`http://127.0.0.1:10000/api/users/${userId}`, {
                 method: "GET",
                 headers: new Headers({
                     "ngrok-skip-browser-warning": "69420",
