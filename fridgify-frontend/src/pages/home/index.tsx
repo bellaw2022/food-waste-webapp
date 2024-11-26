@@ -13,14 +13,21 @@ export const HomePage = ({ profile, login, logOut }:
         <div className="relative min-h-screen flex flex-col items-center justify-start py-12" style={{ backgroundColor: "#c1e1c1" }}>
             {/* Hero Section */}
             <div className="relative z-10 text-center space-y-6 mb-12">
-                <h1 className="text-5xl font-extrabold tracking-tight text-green-800 drop-shadow-lg">
+                {/* <h1 className="text-5xl font-extrabold tracking-tight text-green-800 drop-shadow-lg">
+                    Welcome to Fridgify
+                </h1> */}
+                <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-green-800 drop-shadow-lg font-fun">
                     Welcome to Fridgify
                 </h1>
-                <p className="text-xl font-medium text-gray-700 opacity-80">
-                    A better way to manage your groceries. Let’s get started!
+
+                <p className="text-sm sm:text-lg md:text-xl text-gray-800 font-medium opacity-80 max-w-xl mx-auto">
+                    A better way to manage your groceries
+                </p>
+
+                <p className="text-sm sm:text-lg md:text-xl text-gray-800 font-medium opacity-80 max-w-xl mx-auto">
+                    With Fridgify, managing your kitchen and making sustainable choices has never been easier
                 </p>
             </div>
-
             {/* Profile Section */}
             <div className="mx-6 max-w-md lg:max-w-lg mx-auto z-10 relative bg-black bg-opacity-50 p-6 rounded-lg shadow-lg">
                 {profile ? (

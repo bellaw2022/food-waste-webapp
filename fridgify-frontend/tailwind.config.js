@@ -7,6 +7,9 @@ export default {
   ],
   theme: {
   	extend: {
+		fontFamily: {
+			fun: ['Dancing Script', 'cursive']
+		  },
   		borderRadius: {
   			lg: 'var(--radius)',
   			md: 'calc(var(--radius) - 2px)',
@@ -52,7 +55,12 @@ export default {
   				'3': 'hsl(var(--chart-3))',
   				'4': 'hsl(var(--chart-4))',
   				'5': 'hsl(var(--chart-5))'
-  			}
+  			},
+			lightGreen: {
+				50: '#c1e1c1', 
+				100: '#dcfce7', 
+				200: '#bbf7d0', 
+			},
   		}
   	}
   },

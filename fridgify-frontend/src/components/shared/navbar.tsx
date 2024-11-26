@@ -35,7 +35,8 @@ export const Navbar = () => {
                 {buttonRoutes.map((route) => (
                     <Link key={route.path} to={route.path}>
                         <Button variant="outline"
-                            className={cn("px-3", route.path === location.pathname ? "border-black" : "")}
+                            className={cn("px-3", route.path === location.pathname ? "border-black" : "",
+                            "bg-lightGreen-100 hover:bg-lightGreen-200 text-lightGreen-800")}
                         >
                             {route.name}
                         </Button>
