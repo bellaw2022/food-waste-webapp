@@ -7,12 +7,10 @@ import { Button } from "@/components/ui/button";
 import { useCallback, useEffect, useState } from "react";
 import { InstagramLogoIcon } from "@radix-ui/react-icons";
 import { googleLogout } from "@react-oauth/google";
-import { useProfile } from "@/context/ProfileContext";
-import { API_URL } from "@/api/constants"; 
+import { useProfile } from "@/context/ProfileContext"; 
 
 export const ProfilePage = () => {
     const { profile, setProfile } = useProfile(); 
-    const [badgeCount, setBadgeCount] = useState(0); 
 
     const logout = () => {
         localStorage.removeItem("user_id");
@@ -20,42 +18,7 @@ export const ProfilePage = () => {
         googleLogout();
         window.location.href = "/";
         setProfile(null); 
-    };
-  
-
-    useEffect(() => {
-        const userId = localStorage.getItem("user_id");
-        if (userId) {
-            fetch(`${API_URL}/users/${userId}`, {
-                method: "GET",
-                headers: new Headers({
-                    "ngrok-skip-browser-warning": "69420",
-                }),
-            })
-                .then((response) => {
-                    console.log("Response status:", response.status);
-                    console.log("Response headers:", response.headers);
-
-                    if (!response.ok) {
-                        console.error("Error response from server:", response.status, response.statusText);
-                        return Promise.reject("Failed to fetch user data");
-                    }
-
-                    return response.json();
-                })
-                .then((data) => {
-                    console.log("Fetched user data:", data);
-                    if (data && data.badge !== undefined) {
-                        setBadgeCount(data.badge);
-                    }
-                })
-                .catch((error) => {
-                    console.error("Error fetching user data:", error);
-                });
-        } else {
-            console.error("No user ID in localStorage");
-        }
-    }, []);    
+    };    
 
     return (
         <div className="mx-4 mb-10">
@@ -80,31 +43,12 @@ export const ProfilePage = () => {
                     <TableBody className="bg-[gray]/10">
                         <ProgressSection />
                         <NotificationSection />
-                        <AchievementsSection badgeCount={badgeCount} /> {/* New Achievements section */}
                     </TableBody>
                 </Table>
             </div>
         </div>
     );
 }
-
-// New AchievementsSection component
-const AchievementsSection = ({ badgeCount }: { badgeCount: number }) => {
-    console.log("AchievementsSection badgeCount:", badgeCount); 
-    return (
-        <>
-            <TableRow className="h-10 bg-white">
-                <TableCell className="text-large font-bold">Achievements</TableCell>
-            </TableRow>
-            <TableRow className="h-10">
-                <TableCell className="font-medium">
-                    <div className="ml-2">Badges Earned</div>
-                </TableCell>
-                <TableCell className="text-right font-bold mr-5">{badgeCount}</TableCell>
-            </TableRow>
-        </>
-    );
-};
 
 const NotificationSection = () => {
     return (
