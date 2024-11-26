@@ -82,7 +82,7 @@ export function WasteSavingChart({ setVideo }: { setVideo: (src: string) => void
                 <CardTitle>Waste Saved in CO₂ emissions</CardTitle>
                 <CardDescription>
                     {/* I've saved {totalCO2Saved.toFixed(1)} kg CO2 over the last 4 weeks! */}
-                    Tracking My Carbon Footprint | Over the past 4 weeks, I've saved {totalCO2Saved.toFixed(1)} kg of CO₂ emissions by consuming food before it expires using Fridgify!
+                    I've saved {totalCO2Saved.toFixed(1)} kg of CO₂ emissions by consuming food before it expires using Fridgify!
                 </CardDescription>
             </CardHeader>
             <CardContent>
